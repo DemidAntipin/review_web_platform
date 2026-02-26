@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from app.database import BaseDBModel
-from app.models.comment.comment_type import CommentType
-from app.models.comment.comment_status import CommentStatus
-from app.models.comment.comment_priority import CommentPriority
+from src.core.database import BaseDBModel
+from src.models.comment.comment_type import CommentType
+from src.models.comment.comment_status import CommentStatus
+from src.models.comment.comment_priority import CommentPriority
 from datetime import datetime
 
 class Comment(BaseDBModel):

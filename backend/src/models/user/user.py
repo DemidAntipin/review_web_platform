@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum
 from sqlalchemy.orm import relationship
-from app.database import BaseDBModel
-from app.models.user.user_role import UserRole
+from src.core.database import BaseDBModel
+from src.models.user.user_role import UserRole
 from datetime import datetime
 
 class User(BaseDBModel):

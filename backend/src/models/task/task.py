@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from app.database import BaseDBModel
-from app.models.task.task_type import TaskType
-from app.models.task.task_status import TaskStatus
+from src.core.database import BaseDBModel
+from src.models.task.task_type import TaskType
+from src.models.task.task_status import TaskStatus
 from datetime import datetime
 
 class Task(BaseDBModel):

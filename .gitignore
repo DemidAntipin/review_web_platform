@@ -44,9 +44,6 @@ dist/
 .env.production.local
 
 ### Docker ###
-.dockerignore
-Dockerfile*
-docker-compose*.yml
 .docker/
 .dockerenv
 

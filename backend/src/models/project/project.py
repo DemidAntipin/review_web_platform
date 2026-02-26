@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum
 from sqlalchemy.orm import relationship
-from app.database import BaseDBModel
-from app.models.project.project_status import ProjectStatus
+from src.core.database import BaseDBModel
+from src.models.project.project_status import ProjectStatus
 from datetime import datetime
 
 class Project(BaseDBModel):
