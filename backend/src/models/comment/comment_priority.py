@@ -1,6 +1,6 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class CommentPriority(Enum):
+class CommentPriority(IntEnum):
     low = auto()
     medium = auto()
     high = auto()

@@ -1,6 +1,6 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class TaskType(Enum):
+class TaskType(IntEnum):
     text_change = auto()
     experiment = auto()
     analysis = auto()

@@ -1,6 +1,6 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class TaskStatus(Enum):
+class TaskStatus(IntEnum):
     todo = auto()
     in_progress = auto()
     completed = auto()

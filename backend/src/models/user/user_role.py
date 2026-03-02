@@ -1,6 +1,6 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class UserRole(Enum):
+class UserRole(IntEnum):
     author = auto()
     coauthor = auto()
     editor = auto()

@@ -1,6 +1,6 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class CommentStatus(Enum):
+class CommentStatus(IntEnum):
     new = auto()
     in_progress = auto()
     completed = auto()

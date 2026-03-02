@@ -5,5 +5,7 @@ alembic
 psycopg2-binary
 python-dotenv
 python-jose[cryptography]
-passlib[bcrypt]
 websockets
+pydantic[email]
+python-multipart
+werkzeug>=2.3.0

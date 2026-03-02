@@ -1,6 +1,6 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class CommentType(Enum):
+class CommentType(IntEnum):
     text_change = auto()
     experiment = auto()
     analysis = auto()
