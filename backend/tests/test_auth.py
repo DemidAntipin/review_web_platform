@@ -61,7 +61,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         # Действия
@@ -82,7 +82,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         # Подготовка
         json_data = {
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         # Действия
@@ -98,7 +98,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         # Подготовка
         json_data = {
             "username": "test",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         # Действия
@@ -131,7 +131,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value
+            "role": UserRole.author
         }
         # Действия
         response = await self.client.post("/auth/register", json=json_data)
@@ -147,7 +147,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_data2 = {
@@ -170,7 +170,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_data2 = {
@@ -193,7 +193,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {
@@ -217,7 +217,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {
@@ -237,7 +237,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {
@@ -257,7 +257,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_update = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test",
             "new_password": "test2"
         }
@@ -273,7 +273,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {"username": "test", "password": "test"}
@@ -298,7 +298,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {"username": "test", "password": "test"}
@@ -327,13 +327,13 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_register2 = {
             "username": "test2",
             "email": "test2@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {
@@ -362,13 +362,13 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_register1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_register2 = {
             "username": "test2",
             "email": "test2@test.com",
-            "role": UserRole.author.value,
+            "role": UserRole.author,
             "password": "test"
         }
         json_login = {
