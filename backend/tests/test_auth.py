@@ -1,7 +1,7 @@
 import unittest
 import os
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from src.core.database import BaseDBModel
@@ -44,7 +44,9 @@ class test_auth(unittest.TestCase):
         self.session = self.SessionLocal()
 
     def tearDown(self):
-        self.session.query(User).delete()
+        self.session.rollback()
+        for table in BaseDBModel.metadata.sorted_tables:
+            self.session.execute(text(f'TRUNCATE TABLE "{table.name}" RESTART IDENTITY CASCADE;'))
         self.session.commit()
         self.session.close()
 
@@ -189,3 +191,198 @@ class test_auth(unittest.TestCase):
         assert response2.status_code == 400
         assert "detail" in response2.json()
         assert response2.json()["detail"] == "Email или username уже зарегистрированы"
+
+    # проверить авторизацию пользователя. Успешная авторизация.
+    def test_auth_success_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "test",
+            "password": "test"
+        }
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        # Проверки
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert isinstance(data["access_token"], str)
+        assert "token_type" in data
+        assert data["token_type"] == "bearer"
+
+    # проверить авторизацию пользователя. Ошибка авторизации, неверный логин.
+    def test_auth_invalid_username_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "not_user",
+            "password": "test"
+        }
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        # Проверки
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Неверное имя пользователя или пароль"
+
+    # проверить авторизацию пользователя. Ошибка авторизации, неверный пароль.
+    def test_auth_invalid_password_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "test",
+            "password": "invalid_password"
+        }
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        # Проверки
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Неверное имя пользователя или пароль"
+
+    # проверить обновление пользователя. Ошибка при запросе от неавторизированного пользователя.
+    def test_update_anauthorized_user(self):
+        # Подготовка
+        json_update = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test",
+            "new_password": "test2"}
+        # Действия
+        response = self.client.patch("/auth/update", json=json_update)
+        # Проверки
+        assert response.status_code == 401
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Not authenticated"
+
+    # проверить обновление пользователя. Ошибка при несовпадении пароля.
+    def test_update_invalid_password_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "test",
+            "password": "test"
+        }
+        json_update = {"password": "invalid_password"}
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        token = response.json()["access_token"]
+        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        # Проверки
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Неверный пароль"
+
+    # проверить обновление пользователя. Успешное обновление данных.
+    def test_update_success_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "test",
+            "password": "test"
+        }
+        json_update = {"password": "test", "username":"test2", "new_password": "test2"}
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        token = response.json()["access_token"]
+        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        json_login["username"]="test2"
+        json_login["password"]="test2"
+        response2 = self.client.post("/auth/login", data=json_login)
+        # Проверки
+        assert response.status_code == 200
+        data = response.json()
+        assert "username" in data
+        assert data["username"] == "test2"
+        assert response2.status_code == 200
+
+    # проверить обновление пользователя. Ошибка уникальности usernama при обновлении данных.
+    def test_update_unique_username_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "test",
+            "password": "test"
+        }
+        json_update = {"password": "test", "username":"test2"}
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        json_register["username"] = "test2"
+        json_register["email"] = "test2@test.com"
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        token = response.json()["access_token"]
+        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        # Проверки
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Имя пользователя уже занято"
+
+    # проверить обновление пользователя. Ошибка уникальности email при обновлении данных.
+    def test_update_unique_email_user(self):
+        # Подготовка
+        json_register = {
+            "username": "test",
+            "email": "test@test.com",
+            "role": UserRole.author,
+            "password": "test"
+        }
+        json_login = {
+            "username": "test",
+            "password": "test"
+        }
+        json_update = {"password": "test", "email":"test2@test.com"}
+        # Действия
+        response = self.client.post("/auth/register", json=json_register)
+        json_register["username"] = "test2"
+        json_register["email"] = "test2@test.com"
+        response = self.client.post("/auth/register", json=json_register)
+        response = self.client.post("/auth/login", data=json_login)
+        token = response.json()["access_token"]
+        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        # Проверки
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Email уже используется"
