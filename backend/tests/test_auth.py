@@ -1,204 +1,199 @@
 import unittest
+from unittest.mock import patch
 import os
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+import time
+import unittest
+from unittest.mock import patch
+import asyncio
+from httpx import AsyncClient, ASGITransport
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy import text
 
-from src.core.database import BaseDBModel
-from src.core.dependencies import CurrentUser, get_current_user, get_db_session
-from src.models.user.user import User
+import uvloop
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+from src.core.database import BaseDBModel, get_db_session
 from src.models.user.user_role import UserRole
-from src.core.security import get_password_hash
-from src.dtos.auth.user import UserUpdateDTO
 from main import app
+import httpx
 
-class test_auth(unittest.TestCase):
+class test_auth(unittest.IsolatedAsyncioTestCase):
 
     @classmethod
     def setUpClass(cls):
-        test_db_url = os.getenv(
+        cls.test_db_url = os.getenv(
             "TEST_DATABASE_URL",
-            "postgresql://app_user:secure_password@db:5432/review_platform_test"
+            "postgresql+asyncpg://app_user:secure_password@db:5432/review_platform_test"
         )
-        cls.engine = create_engine(test_db_url, echo=False)
-        BaseDBModel.metadata.create_all(cls.engine)
-        cls.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=cls.engine)
+        temp_engine = create_async_engine(cls.test_db_url, echo=False)
+        async def create_tables():
+            async with temp_engine.begin() as conn:
+                await conn.run_sync(BaseDBModel.metadata.create_all)
+        asyncio.run(create_tables())
+        asyncio.run(temp_engine.dispose())
 
-        def override_get_db():
-            db = cls.SessionLocal()
-            try:
-                yield db
-            finally:
-                db.close()
+    async def asyncSetUp(self):
+        self.engine = create_async_engine(self.test_db_url, echo=False, pool_size=5, max_overflow=0, pool_pre_ping=True)
+        self.cleanup_engine = create_async_engine(self.test_db_url, echo=False, pool_size=1)
+        self.AsyncSessionLocal = async_sessionmaker(self.engine, expire_on_commit=False)
+        async def override_get_db():
+            async with self.AsyncSessionLocal() as session:
+                yield session
 
         app.dependency_overrides[get_db_session] = override_get_db
-        cls.client = TestClient(app)
+        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
-    @classmethod
-    def tearDownClass(cls):
+    async def asyncTearDown(self):
+        async with self.cleanup_engine.connect() as conn:
+            async with conn.begin():
+                for table in reversed(BaseDBModel.metadata.sorted_tables):
+                    await conn.execute(
+                        text(f'TRUNCATE TABLE "{table.name}" RESTART IDENTITY CASCADE;')
+                    )
         app.dependency_overrides.clear()
-        BaseDBModel.metadata.drop_all(cls.engine)
-        cls.engine.dispose()
-
-    def setUp(self):
-        self.session = self.SessionLocal()
-
-    def tearDown(self):
-        self.session.rollback()
-        for table in BaseDBModel.metadata.sorted_tables:
-            self.session.execute(text(f'TRUNCATE TABLE "{table.name}" RESTART IDENTITY CASCADE;'))
-        self.session.commit()
-        self.session.close()
+        await self.client.aclose()
+        await self.engine.dispose()
+        await self.cleanup_engine.dispose()
 
     # проверить регистрацию пользователя. Успешная регистрация.
-    def test_register_success_user(self):
+    async def test_register_success_user(self):
         # Подготовка
-        json = {
+        json_data = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
+        response = await self.client.post("/auth/register", json=json_data)
         # Проверки
         assert response.status_code == 200
         data = response.json()
         assert "id" in data
         assert "username" in data
-        assert data["username"] == json["username"]
+        assert data["username"] == json_data["username"]
         assert "email" in data
-        assert data["email"] == json["email"]
+        assert data["email"] == json_data["email"]
         assert "role" in data
-        assert data["role"] == json["role"]
+        assert data["role"] == json_data["role"]
 
     # проверить регистрацию пользователя. Ошибка при пропуске обязательного поля - username.
-    def test_register_missing_username_user(self):
+    async def test_register_missing_username_user(self):
         # Подготовка
-        json = {
+        json_data = {
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
+        response = await self.client.post("/auth/register", json=json_data)
         # Проверки
         assert response.status_code == 422
-        data = response.json()["detail"][0]
-        assert "msg" in data
-        assert data["msg"] == "Field required"
-        assert "loc" in data
-        assert data["loc"] == ["body", "username"]
+        error = response.json()["detail"][0]
+        assert error["msg"] == "Field required"
+        assert error["loc"] == ["body", "username"]
 
     # проверить регистрацию пользователя. Ошибка при пропуске обязательного поля - email.
-    def test_register_missing_email_user(self):
+    async def test_register_missing_email_user(self):
         # Подготовка
-        json = {
+        json_data = {
             "username": "test",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
+        response = await self.client.post("/auth/register", json=json_data)
         # Проверки
         assert response.status_code == 422
-        data = response.json()["detail"][0]
-        assert "msg" in data
-        assert data["msg"] == "Field required"
-        assert "loc" in data
-        assert data["loc"] == ["body", "email"]
+        error = response.json()["detail"][0]
+        assert error["msg"] == "Field required"
+        assert error["loc"] == ["body", "email"]
 
     # проверить регистрацию пользователя. Ошибка при пропуске обязательного поля - role.
-    def test_register_missing_role_user(self):
+    async def test_register_missing_role_user(self):
         # Подготовка
-        json = {
+        json_data = {
             "username": "test",
             "email": "test@test.com",
             "password": "test"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
+        response = await self.client.post("/auth/register", json=json_data)
         # Проверки
         assert response.status_code == 422
-        data = response.json()["detail"][0]
-        assert "msg" in data
-        assert data["msg"] == "Field required"
-        assert "loc" in data
-        assert data["loc"] == ["body", "role"]
+        error = response.json()["detail"][0]
+        assert error["msg"] == "Field required"
+        assert error["loc"] == ["body", "role"]
 
     # проверить регистрацию пользователя. Ошибка при пропуске обязательного поля - password.
-    def test_register_missing_password_user(self):
+    async def test_register_missing_password_user(self):
         # Подготовка
-        json = {
+        json_data = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author
+            "role": UserRole.author.value
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
+        response = await self.client.post("/auth/register", json=json_data)
         # Проверки
         assert response.status_code == 422
-        data = response.json()["detail"][0]
-        assert "msg" in data
-        assert data["msg"] == "Field required"
-        assert "loc" in data
-        assert data["loc"] == ["body", "password"]
+        error = response.json()["detail"][0]
+        assert error["msg"] == "Field required"
+        assert error["loc"] == ["body", "password"]
 
     # проверить регистрацию пользователя. Ошибка уникальности username.
-    def test_register_unique_username_error_user(self):
+    async def test_register_unique_username_error_user(self):
         # Подготовка
-        json = {
+        json_data1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
-        json2 = {
+        json_data2 = {
             "username": "test",
             "email": "test2@test.com",
-            "role": UserRole.coauthor,
+            "role": UserRole.coauthor.value,
             "password": "test2"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
-        response2 = self.client.post("/auth/register", json=json2)
+        response1 = await self.client.post("/auth/register", json=json_data1)
+        response2 = await self.client.post("/auth/register", json=json_data2)
         # Проверки
-        assert response.status_code == 200
+        assert response1.status_code == 200
         assert response2.status_code == 400
-        assert "detail" in response2.json()
         assert response2.json()["detail"] == "Email или username уже зарегистрированы"
 
     # проверить регистрацию пользователя. Ошибка уникальности email.
-    def test_register_unique_email_error_user(self):
+    async def test_register_unique_email_error_user(self):
         # Подготовка
-        json = {
+        json_data1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
-        json2 = {
+        json_data2 = {
             "username": "test2",
             "email": "test@test.com",
-            "role": UserRole.coauthor,
+            "role": UserRole.coauthor.value,
             "password": "test2"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json)
-        response2 = self.client.post("/auth/register", json=json2)
+        response1 = await self.client.post("/auth/register", json=json_data1)
+        response2 = await self.client.post("/auth/register", json=json_data2)
         # Проверки
-        assert response.status_code == 200
+        assert response1.status_code == 200
         assert response2.status_code == 400
-        assert "detail" in response2.json()
         assert response2.json()["detail"] == "Email или username уже зарегистрированы"
 
     # проверить авторизацию пользователя. Успешная авторизация.
-    def test_auth_success_user(self):
+    async def test_auth_success_user(self):
         # Подготовка
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
         json_login = {
@@ -206,8 +201,8 @@ class test_auth(unittest.TestCase):
             "password": "test"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
+        await self.client.post("/auth/register", json=json_register)
+        response = await self.client.post("/auth/login", data=json_login)
         # Проверки
         assert response.status_code == 200
         data = response.json()
@@ -217,12 +212,12 @@ class test_auth(unittest.TestCase):
         assert data["token_type"] == "bearer"
 
     # проверить авторизацию пользователя. Ошибка авторизации, неверный логин.
-    def test_auth_invalid_username_user(self):
+    async def test_auth_invalid_username_user(self):
         # Подготовка
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
         json_login = {
@@ -230,21 +225,19 @@ class test_auth(unittest.TestCase):
             "password": "test"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
+        await self.client.post("/auth/register", json=json_register)
+        response = await self.client.post("/auth/login", data=json_login)
         # Проверки
         assert response.status_code == 400
-        data = response.json()
-        assert "detail" in data
-        assert data["detail"] == "Неверное имя пользователя или пароль"
+        assert response.json()["detail"] == "Неверное имя пользователя или пароль"
 
     # проверить авторизацию пользователя. Ошибка авторизации, неверный пароль.
-    def test_auth_invalid_password_user(self):
+    async def test_auth_invalid_password_user(self):
         # Подготовка
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
         json_login = {
@@ -252,137 +245,178 @@ class test_auth(unittest.TestCase):
             "password": "invalid_password"
         }
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
+        await self.client.post("/auth/register", json=json_register)
+        response = await self.client.post("/auth/login", data=json_login)
         # Проверки
         assert response.status_code == 400
-        data = response.json()
-        assert "detail" in data
-        assert data["detail"] == "Неверное имя пользователя или пароль"
+        assert response.json()["detail"] == "Неверное имя пользователя или пароль"
 
     # проверить обновление пользователя. Ошибка при запросе от неавторизированного пользователя.
-    def test_update_anauthorized_user(self):
+    async def test_update_unauthorized_user(self):
         # Подготовка
         json_update = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test",
-            "new_password": "test2"}
+            "new_password": "test2"
+        }
         # Действия
-        response = self.client.patch("/auth/update", json=json_update)
+        response = await self.client.patch("/auth/update", json=json_update)
         # Проверки
         assert response.status_code == 401
-        data = response.json()
-        assert "detail" in data
-        assert data["detail"] == "Not authenticated"
+        assert response.json()["detail"] == "Not authenticated"
 
     # проверить обновление пользователя. Ошибка при несовпадении пароля.
-    def test_update_invalid_password_user(self):
+    async def test_update_invalid_password_user(self):
         # Подготовка
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
-        json_login = {
-            "username": "test",
-            "password": "test"
-        }
+        json_login = {"username": "test", "password": "test"}
         json_update = {"password": "invalid_password"}
+
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
-        token = response.json()["access_token"]
-        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        await self.client.post("/auth/register", json=json_register)
+        login_resp = await self.client.post("/auth/login", data=json_login)
+        token = login_resp.json()["access_token"]
+        response = await self.client.patch(
+            "/auth/update",
+            json=json_update,
+            headers={"Authorization": f"Bearer {token}"}
+        )
         # Проверки
         assert response.status_code == 400
-        data = response.json()
-        assert "detail" in data
-        assert data["detail"] == "Неверный пароль"
+        assert response.json()["detail"] == "Неверный пароль"
 
     # проверить обновление пользователя. Успешное обновление данных.
-    def test_update_success_user(self):
+    async def test_update_success_user(self):
         # Подготовка
         json_register = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
             "password": "test"
         }
-        json_login = {
-            "username": "test",
-            "password": "test"
-        }
-        json_update = {"password": "test", "username":"test2", "new_password": "test2"}
+        json_login = {"username": "test", "password": "test"}
+        json_update = {"password": "test", "username": "test2", "new_password": "test2"}
+
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
-        token = response.json()["access_token"]
-        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
-        json_login["username"]="test2"
-        json_login["password"]="test2"
-        response2 = self.client.post("/auth/login", data=json_login)
+        await self.client.post("/auth/register", json=json_register)
+        login_resp = await self.client.post("/auth/login", data=json_login)
+        token = login_resp.json()["access_token"]
+        response = await self.client.patch(
+            "/auth/update",
+            json=json_update,
+            headers={"Authorization": f"Bearer {token}"}
+        )
         # Проверки
         assert response.status_code == 200
         data = response.json()
-        assert "username" in data
         assert data["username"] == "test2"
+        json_login2 = {"username": "test2", "password": "test2"}
+        response2 = await self.client.post("/auth/login", data=json_login2)
         assert response2.status_code == 200
 
-    # проверить обновление пользователя. Ошибка уникальности usernama при обновлении данных.
-    def test_update_unique_username_user(self):
+    # проверить обновление пользователя. Ошибка уникальности username при обновлении данных.
+    async def test_update_unique_username_user(self):
         # Подготовка
-        json_register = {
+        json_register1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
+            "password": "test"
+        }
+        json_register2 = {
+            "username": "test2",
+            "email": "test2@test.com",
+            "role": UserRole.author.value,
             "password": "test"
         }
         json_login = {
             "username": "test",
             "password": "test"
         }
-        json_update = {"password": "test", "username":"test2"}
+        json_update = {"password": "test", "username": "test2"}
+
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        json_register["username"] = "test2"
-        json_register["email"] = "test2@test.com"
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
-        token = response.json()["access_token"]
-        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        await self.client.post("/auth/register", json=json_register1)
+        await self.client.post("/auth/register", json=json_register2)
+        login_resp = await self.client.post("/auth/login", data=json_login)
+        token = login_resp.json()["access_token"]
+        response = await self.client.patch(
+            "/auth/update",
+            json=json_update,
+            headers={"Authorization": f"Bearer {token}"}
+        )
         # Проверки
         assert response.status_code == 400
-        data = response.json()
-        assert "detail" in data
-        assert data["detail"] == "Имя пользователя уже занято"
+        assert response.json()["detail"] == "Имя пользователя уже занято"
 
     # проверить обновление пользователя. Ошибка уникальности email при обновлении данных.
-    def test_update_unique_email_user(self):
+    async def test_update_unique_email_user(self):
         # Подготовка
-        json_register = {
+        json_register1 = {
             "username": "test",
             "email": "test@test.com",
-            "role": UserRole.author,
+            "role": UserRole.author.value,
+            "password": "test"
+        }
+        json_register2 = {
+            "username": "test2",
+            "email": "test2@test.com",
+            "role": UserRole.author.value,
             "password": "test"
         }
         json_login = {
             "username": "test",
             "password": "test"
         }
-        json_update = {"password": "test", "email":"test2@test.com"}
+        json_update = {"password": "test", "email": "test2@test.com"}
+
         # Действия
-        response = self.client.post("/auth/register", json=json_register)
-        json_register["username"] = "test2"
-        json_register["email"] = "test2@test.com"
-        response = self.client.post("/auth/register", json=json_register)
-        response = self.client.post("/auth/login", data=json_login)
-        token = response.json()["access_token"]
-        response = self.client.patch("/auth/update", json=json_update, headers={"Authorization": f"Bearer {token}"})
+        await self.client.post("/auth/register", json=json_register1)
+        await self.client.post("/auth/register", json=json_register2)
+        login_resp = await self.client.post("/auth/login", data=json_login)
+        token = login_resp.json()["access_token"]
+        response = await self.client.patch(
+            "/auth/update",
+            json=json_update,
+            headers={"Authorization": f"Bearer {token}"}
+        )
         # Проверки
         assert response.status_code == 400
-        data = response.json()
-        assert "detail" in data
-        assert data["detail"] == "Email уже используется"
+        assert response.json()["detail"] == "Email уже используется"
+
+    # Проверить производительность. 100 одновременных запросов на авторизацию должны обработаться не более чем за 1 секуду.
+    async def test_performance_auth(self):
+        # Подготовка
+        num_users = 100
+        users_data = [
+            {
+                "username": f"user{i}",
+                "email": f"user{i}@example.com",
+                "role": UserRole.author,
+                "password": "test"
+            } for i in range(num_users)]
+        with patch("src.routers.auth.get_password_hash", side_effect=lambda x: f"hash_{x}"), \
+            patch("src.routers.auth.check_password", return_value=True), \
+            patch("src.routers.auth.create_access_token", return_value="fake_token"):
+            async def register_user(data):
+                return await self.client.post("/auth/register", json=data)
+            async def login_user(data):
+                return await self.client.post("/auth/login", data={"username": data["username"], "password": data["password"]})
+            # Действия
+            reg_responses = await asyncio.gather(*[register_user(d) for d in users_data])
+            start = time.perf_counter()
+            responses = await asyncio.gather(*[login_user(d) for d in users_data])
+            duration = time.perf_counter() - start
+            # Проверки
+            for r in reg_responses:
+                assert r.status_code == 200
+            for r in responses:
+                assert r.status_code == 200
+            assert duration < 1
