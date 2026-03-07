@@ -16,7 +16,7 @@ class Task(BaseDBModel):
     type = Column(Enum(TaskType), nullable=False)
     status = Column(Enum(TaskStatus), default=TaskStatus.todo)
 
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now)
     completed_at = Column(DateTime, nullable=True)
 
     assignee = relationship("User", back_populates="tasks")

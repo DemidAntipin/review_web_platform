@@ -13,7 +13,7 @@ class User(BaseDBModel):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(Enum(UserRole), nullable=False, default=UserRole.author)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now)
 
     projects = relationship("ProjectMember", back_populates="user")
     tasks = relationship("Task", back_populates="assignee")

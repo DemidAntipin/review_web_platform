@@ -1,5 +1,3 @@
-import unittest
-from unittest.mock import patch
 import os
 import time
 import unittest
@@ -15,7 +13,6 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from src.core.database import BaseDBModel, get_db_session
 from src.models.user.user_role import UserRole
 from main import app
-import httpx
 
 class test_auth(unittest.IsolatedAsyncioTestCase):
 
@@ -420,3 +417,6 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             for r in responses:
                 assert r.status_code == 200
             assert duration < 1
+
+if __name__ == "__main__":
+    unittest.main()

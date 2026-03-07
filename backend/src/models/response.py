@@ -10,6 +10,6 @@ class Response(BaseDBModel):
     
     response_md = Column(Text, nullable=False)
     approved = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now)
 
     comment = relationship("Comment", back_populates="response")

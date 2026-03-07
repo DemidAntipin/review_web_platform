@@ -11,6 +11,6 @@ class Attachment(BaseDBModel):
     file_url = Column(String, nullable=False)
     file_type = Column(String, nullable=False)
 
-    uploaded_at = Column(DateTime, default=datetime.now())
+    uploaded_at = Column(DateTime, default=datetime.now)
 
     task = relationship("Task", back_populates="attachments")

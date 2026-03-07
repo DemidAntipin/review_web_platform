@@ -11,7 +11,7 @@ class ActivityLog(BaseDBModel):
     
     action_type = Column(String, nullable=False)
     description = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now)
 
     user = relationship("User", back_populates="logs")
     project = relationship("Project", back_populates="logs")

@@ -9,7 +9,7 @@ class Reviewer(BaseDBModel):
     project_id = Column(Integer, ForeignKey('projects.id'), nullable=False)
     name = Column(String, nullable=False)
     general_comment = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now)
 
     project = relationship("Project", back_populates="reviewers")
     comments = relationship("Comment", back_populates="reviewer")
