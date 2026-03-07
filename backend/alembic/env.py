@@ -1,4 +1,5 @@
 import os
+import re
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -6,8 +7,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.src.core.database import BaseDBModel
-from app.src.models import *
+from src.core.database import BaseDBModel
+from src.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -65,8 +66,16 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    original_url = config.get_main_option("sqlalchemy.url")
+    if not original_url:
+        raise ValueError("DATABASE_URL not set in environment")
+    
+    sync_url = re.sub(r"postgresql\+asyncpg", "postgresql+psycopg2", original_url)
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = sync_url
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
