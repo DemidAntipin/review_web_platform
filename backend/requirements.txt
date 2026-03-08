@@ -9,3 +9,5 @@ websockets
 pydantic[email]
 python-multipart
 werkzeug>=2.3.0
+asyncpg
+httpx
