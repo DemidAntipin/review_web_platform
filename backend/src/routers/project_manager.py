@@ -121,12 +121,12 @@ async def add_member_project(data: ProjectMemberDTO, db: DBSession, current_user
         member.left_at = None
         member.update(data)
     else:
-        member = ProjectMember(project_id=data.project_id, user_id=data.user_id, role=data.role)
+        member = ProjectMember(project_id=data.project_id, user_id=data.user_id, role=data.role.name)
         db.add(member)
     await db.commit()
     await db.refresh(member)
 
-    event = MemberAddedEvent(user_id=current_user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role)
+    event = MemberAddedEvent(user_id=current_user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name)
     EventDispatcher.create_event(background_tasks, event)
 
     return member
@@ -144,7 +144,7 @@ async def leave_project(project_id: int, db: DBSession, current_user: CurrentUse
     member.left_at = datetime.now()
     await db.commit()
 
-    event = MemberRemovedEvent(user_id=current_user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role)
+    event = MemberRemovedEvent(user_id=current_user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name)
     EventDispatcher.create_event(background_tasks, event)
 
     return {"message": "Вы успешно покинули проект"}
@@ -183,7 +183,7 @@ async def remove_member(project_id: int, user_id: int, db: DBSession, current_us
     member.left_at = datetime.now()
     await db.commit()
 
-    event = MemberRemovedEvent(user_id=current_user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role)
+    event = MemberRemovedEvent(user_id=current_user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name)
     EventDispatcher.create_event(background_tasks, event)
 
     return {"message": "Пользователь исключён из команды проекта"}
