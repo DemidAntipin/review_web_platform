@@ -1,22 +1,23 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional
+from src.core.types import UsernameStr, PasswordStr, ID
 
 class UserBaseDTO(BaseModel):
-	username : str
+	username : UsernameStr
 	email : EmailStr
 	role: int
 
 class UserCreateDTO(UserBaseDTO):
-	password : str
+	password : PasswordStr
 
 class UserUpdateDTO(BaseModel):
-    username: Optional[str] = None
+    username: Optional[UsernameStr] = None
     email: Optional[EmailStr] = None
     password: str
-    new_password: Optional[str] = None
+    new_password: Optional[PasswordStr] = None
     role: Optional[int] = None
 
 class UserDTO(UserBaseDTO):
-	id: int
+	id: ID
 	
 	model_config = ConfigDict(from_attributes=True)

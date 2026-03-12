@@ -60,6 +60,19 @@ if [ ! -f "docker-compose.yml" ]; then
     exit 1
 fi
 
+echo -e "Проверка SSL-сертификатов..."
+mkdir -p ./nginx/ssl
+
+if [ ! -f "./nginx/ssl/cert.pem" ]; then
+    echo -e "Генерация самоподписанного SSL-сертификата..."
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+      -keyout ./nginx/ssl/key.pem \
+      -out ./nginx/ssl/cert.pem \
+      -subj "/C=RU/ST=Irkutst/L=Irkutsk/O=Development/CN=localhost"
+    
+    chmod 644 ./nginx/ssl/cert.pem ./nginx/ssl/key.pem
+fi
+
 echo -e "Запуск контейнеров"
 docker compose up -d --build
 

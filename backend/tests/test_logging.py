@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from main import app
 from src.models.user.user_role import UserRole
 from src.models.activity_log import ActivityLog
-from src.core.security import create_access_token
+from src.core.utils.security import create_access_token
 import time
 from src.core.database import BaseDBModel, get_db_session
 from src.models.user.user_role import UserRole
@@ -50,18 +50,18 @@ class TestLogging(unittest.IsolatedAsyncioTestCase):
         self.db_patcher = patch("src.core.events.listeners.activity_log_listener.DBSession", self.AsyncSessionLocal)
         self.db_patcher.start()
         EventDispatcher.add(ActivityLogListener())
-        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test/api")
         author_data = {
             "username": "author",
             "email": "author@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         admin_data = {
             "username": "admin",
             "email": "admin@test.com",
             "role": UserRole.admin,
-            "password": "test"
+            "password": "test12345"
         }
         self.author = (await self.client.post("/auth/register", json=author_data)).json()
         self.admin = (await self.client.post("/auth/register", json=admin_data)).json()

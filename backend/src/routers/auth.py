@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from src.models.user.user import User
-from src.core.security import create_access_token, check_password, get_password_hash
+from src.core.utils.security import create_access_token, check_password, get_password_hash
 from sqlalchemy import select, exists
 from fastapi.security import OAuth2PasswordRequestForm
 from src.dtos.auth.user import UserCreateDTO, UserUpdateDTO, UserDTO

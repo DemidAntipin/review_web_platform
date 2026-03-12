@@ -4,7 +4,7 @@ from src.core.database import BaseDBModel
 from src.models.user.user_role import UserRole
 from datetime import datetime
 from src.dtos.auth.user import UserUpdateDTO
-from src.core.security import get_password_hash
+from src.core.utils.security import get_password_hash
 
 class User(BaseDBModel):
     __tablename__ = "users"

@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 import asyncio
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import text
 
 import uvloop
@@ -38,7 +38,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
                 yield session
 
         app.dependency_overrides[get_db_session] = override_get_db
-        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test/api")
 
     async def asyncTearDown(self):
         async with self.cleanup_engine.connect() as conn:
@@ -59,7 +59,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         # Действия
         response = await self.client.post("/auth/register", json=json_data)
@@ -80,7 +80,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data = {
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         # Действия
         response = await self.client.post("/auth/register", json=json_data)
@@ -96,7 +96,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data = {
             "username": "test",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         # Действия
         response = await self.client.post("/auth/register", json=json_data)
@@ -112,7 +112,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         json_data = {
             "username": "test",
             "email": "test@test.com",
-            "password": "test"
+            "password": "test12345"
         }
         # Действия
         response = await self.client.post("/auth/register", json=json_data)
@@ -145,13 +145,13 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_data2 = {
             "username": "test",
             "email": "test2@test.com",
             "role": UserRole.coauthor.value,
-            "password": "test2"
+            "password": "test54321"
         }
         # Действия
         response1 = await self.client.post("/auth/register", json=json_data1)
@@ -168,13 +168,13 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_data2 = {
             "username": "test2",
             "email": "test@test.com",
             "role": UserRole.coauthor.value,
-            "password": "test2"
+            "password": "test54321"
         }
         # Действия
         response1 = await self.client.post("/auth/register", json=json_data1)
@@ -191,11 +191,11 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_login = {
             "username": "test",
-            "password": "test"
+            "password": "test12345"
         }
         # Действия
         await self.client.post("/auth/register", json=json_register)
@@ -215,11 +215,11 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_login = {
             "username": "not_user",
-            "password": "test"
+            "password": "test12345"
         }
         # Действия
         await self.client.post("/auth/register", json=json_register)
@@ -235,11 +235,11 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_login = {
             "username": "test",
-            "password": "invalid_password"
+            "password": "invalid_password12345"
         }
         # Действия
         await self.client.post("/auth/register", json=json_register)
@@ -255,8 +255,8 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test",
-            "new_password": "test2"
+            "password": "test12345",
+            "new_password": "test54321"
         }
         # Действия
         response = await self.client.patch("/auth/update", json=json_update)
@@ -271,10 +271,10 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
-        json_login = {"username": "test", "password": "test"}
-        json_update = {"password": "invalid_password"}
+        json_login = {"username": "test", "password": "test12345"}
+        json_update = {"password": "invalid_password12345"}
 
         # Действия
         await self.client.post("/auth/register", json=json_register)
@@ -296,10 +296,10 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
-        json_login = {"username": "test", "password": "test"}
-        json_update = {"password": "test", "username": "test2", "new_password": "test2"}
+        json_login = {"username": "test", "password": "test12345"}
+        json_update = {"password": "test12345", "username": "test2", "new_password": "test54321"}
 
         # Действия
         await self.client.post("/auth/register", json=json_register)
@@ -314,7 +314,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
         assert response.status_code == 200
         data = response.json()
         assert data["username"] == "test2"
-        json_login2 = {"username": "test2", "password": "test2"}
+        json_login2 = {"username": "test2", "password": "test54321"}
         response2 = await self.client.post("/auth/login", data=json_login2)
         assert response2.status_code == 200
 
@@ -325,19 +325,19 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_register2 = {
             "username": "test2",
             "email": "test2@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_login = {
             "username": "test",
-            "password": "test"
+            "password": "test12345"
         }
-        json_update = {"password": "test", "username": "test2"}
+        json_update = {"password": "test12345", "username": "test2"}
 
         # Действия
         await self.client.post("/auth/register", json=json_register1)
@@ -360,19 +360,19 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
             "username": "test",
             "email": "test@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_register2 = {
             "username": "test2",
             "email": "test2@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         json_login = {
             "username": "test",
-            "password": "test"
+            "password": "test12345"
         }
-        json_update = {"password": "test", "email": "test2@test.com"}
+        json_update = {"password": "test12345", "email": "test2@test.com"}
 
         # Действия
         await self.client.post("/auth/register", json=json_register1)
@@ -397,7 +397,7 @@ class test_auth(unittest.IsolatedAsyncioTestCase):
                 "username": f"user{i}",
                 "email": f"user{i}@example.com",
                 "role": UserRole.author,
-                "password": "test"
+                "password": "test12345"
             } for i in range(num_users)]
         with patch("src.routers.auth.get_password_hash", side_effect=lambda x: f"hash_{x}"), \
             patch("src.routers.auth.check_password", return_value=True), \

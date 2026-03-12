@@ -42,25 +42,25 @@ class TestProjects(unittest.IsolatedAsyncioTestCase):
                 yield session
 
         app.dependency_overrides[get_db_session] = override_get_db
-        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+        self.client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test/api")
 
         author_data = {
             "username": "author",
             "email": "author@test.com",
             "role": UserRole.author,
-            "password": "test"
+            "password": "test12345"
         }
         admin_data = {
             "username": "admin",
             "email": "admin@test.com",
             "role": UserRole.admin,
-            "password": "test"
+            "password": "test12345"
         }
         coauthor_data = {
             "username": "coauthor",
             "email": "coauthor@test.com",
             "role": UserRole.coauthor,
-            "password": "test"
+            "password": "test12345"
         }
         self.author = (await self.client.post("/auth/register", json=author_data)).json()
         self.coauthor = (await self.client.post("/auth/register", json=coauthor_data)).json()

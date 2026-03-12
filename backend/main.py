@@ -10,9 +10,9 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(auth.router)
-app.include_router(project_manager.router)
-app.include_router(logger.router)
+app.include_router(auth.router, prefix="/api")
+app.include_router(project_manager.router, prefix="/api")
+app.include_router(logger.router, prefix="/api")
 
 @app.get("/")
 def foo():
