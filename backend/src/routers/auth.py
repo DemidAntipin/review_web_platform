@@ -34,6 +34,10 @@ async def login(db: DBSession, form_data: OAuth2PasswordRequestForm = Depends())
     access_token = create_access_token(data={"sub": user.username})
     return TokenDTO(access_token=access_token, token_type="bearer")
 
+@router.get("/me", response_model=UserDTO)
+async def get_current_user(current_user: CurrentUser):
+    return current_user
+
 @router.patch("/update", response_model=UserDTO)
 async def update_current_user(data: UserUpdateDTO, db: DBSession, current_user: CurrentUser):
     if not check_password(data.password, current_user.hashed_password):

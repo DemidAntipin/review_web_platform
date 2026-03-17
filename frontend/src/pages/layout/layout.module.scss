@@ -1,0 +1,22 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--main-padding);
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.body {
+  flex: 1; // Занимает всё оставшееся пространство
+  width: 100%;
+  background-color: var(--background-color);
+  overflow-y: auto; // Чтобы прокручивался только контент, а не шапка
+}

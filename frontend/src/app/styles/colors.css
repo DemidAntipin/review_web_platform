@@ -1,0 +1,20 @@
+:root {
+    --main-color: #e95420;
+    --text-primary: black;
+    --background-color: white;
+    --menu-background-color: #dadada;
+    --menu-background-color-hover: #bcbcbc;
+    --header-background-color: #e6e6e6;
+    --icon-default-color: var(--text-primary);
+    --input-background: #eaeaea;
+    --outline-color: #80808080;
+}
+
+[data-theme='dark'] {
+    --text-primary: white;
+    --background-color: #272727;
+    --menu-background-color: #1d1d1d;
+    --menu-background-color-hover: #131313;
+    --header-background-color: #121212;
+    --input-background: #2d2d2d;
+}

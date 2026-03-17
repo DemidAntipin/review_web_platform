@@ -38,14 +38,15 @@ services:
     container_name: review_frontend
     restart: unless-stopped
     expose:
-      - "3000"
+      - "5173"
     environment:
-      REACT_APP_API_URL: https://localhost/api
+      VITE_API_URL: https://localhost/api
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
       - backend
+    command: npm run dev -- --host 0.0.0.0
 
   nginx:
     image: nginx:latest
