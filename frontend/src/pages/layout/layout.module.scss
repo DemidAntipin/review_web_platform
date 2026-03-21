@@ -1,22 +1,77 @@
 .layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  display: grid;
+  height: 100vh;
+  width: 100%;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas: 
+    "sidebar header"
+    "sidebar content";
+  overflow: hidden;
+  background-color: var(--background-main);
 }
 
 .header {
-  height: 60px;
+  grid-area: header;
+  background-color: var(--bg-header);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--main-padding);
-  background-color: var(--secondary-color);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
 }
 
-.body {
-  flex: 1; // Занимает всё оставшееся пространство
+.headerContent {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   width: 100%;
-  background-color: var(--background-color);
-  overflow-y: auto; // Чтобы прокручивался только контент, а не шапка
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 var(--padding-outer); 
+  height: 100%;
+}
+
+.content {
+  grid-area: content;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--background-main);
+  color: var(--text-primary);
+}
+
+.pageTitle {
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.mobileOnly { display: none; }
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas: 
+      "header"
+      "content";
+  }
+
+  .sidebar {
+    display: none; 
+  }
+  
+  .header {
+    background-color: var(--bg-header);
+    padding: 0;
+  }
+
+  .headerContent {
+    justify-content: stretch;
+    padding: 0 10px;
+  }
+
+  .pageTitle { display: none; }
+
+  .mobileOnly { display: flex; width: 100%; }
+  .desktopOnly { display: none; }
 }

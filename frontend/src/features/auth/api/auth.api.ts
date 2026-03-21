@@ -1,5 +1,5 @@
 import { $api } from '@/shared/api/client';
-import type { TokenResponse, User } from '@/features/auth/model/auth.types';
+import type { TokenResponse, User, RegisterData } from '@/features/auth/model/auth.types';
 
 export const authService = {
   async login(username: string, password: string): Promise<TokenResponse> {
@@ -15,6 +15,11 @@ export const authService = {
 
   async getProfile(): Promise<User> {
     const response = await $api.get<User>('/auth/me');
+    return response.data;
+  },
+
+  async register(data: RegisterData): Promise<User> {
+    const response = await $api.post<User>('/auth/register', data);
     return response.data;
   }
 };

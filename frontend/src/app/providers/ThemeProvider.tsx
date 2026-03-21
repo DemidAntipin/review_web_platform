@@ -1,4 +1,4 @@
-import { storageManager } from '@/shared/lib/storage/LocalStorage';
+import { storage } from '@/shared/lib/storage/LocalStorage';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 export type Theme = 'light' | 'dark';
@@ -11,9 +11,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-    const [theme, setTheme] = useState<Theme>(
-        (storageManager.getItem('theme') as Theme) || 'light',
-    );
+    const [theme, setTheme] = useState<Theme>(storage.getItem('theme'));
 
     const toggleTheme = () => {
         setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
@@ -21,7 +19,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
-        storageManager.setItem('theme', theme);
+        storage.setItem('theme', theme);
     }, [theme]);
 
     return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;

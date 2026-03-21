@@ -1,0 +1,54 @@
+.profileWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    flex: 1;
+    
+    &:hover .name {
+        color: var(--accent-color);
+    }
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--secondary-bg);
+    color: var(--text-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+}
+
+.name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: color 0.2s;
+}
+
+.role {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.arrow {
+    color: var(--text-secondary);
+    transition: transform 0.2s ease;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+.arrowActive {
+    transform: rotate(180deg);
+}

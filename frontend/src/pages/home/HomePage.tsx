@@ -1,38 +1,115 @@
-import clsx from 'clsx';
+import { useState, useMemo, useEffect } from 'react';
+import { ProjectCard } from '@/entities/project/ui/ProjectCard';
+import { Project } from '@/entities/project/model/types';
+import { SlidersHorizontal, Plus } from 'lucide-react';
 import s from './home-page.module.scss';
-import { useAuthStore } from '@/features/auth/model/auth.store';
-import { Link } from 'react-router-dom';
+import clsx from 'clsx';
+import { Button } from '@/shared/ui/button/Button';
+import { IconButton } from '@/shared/ui/icon_button/IconButton';
+import { useOutletContext } from 'react-router-dom';
 
 export const HomePage = () => {
-    const user = useAuthStore((state) => state.user);
+    const { setPageTitle } = useOutletContext<{ setPageTitle: (t: string) => void }>();
+    useEffect(() => setPageTitle('Мои проекты'), [setPageTitle]);
+
+    const [projects] = useState<Project[]>([
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'in_progress',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        },
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'in_progress',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        },
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'completed',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        },
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'in_progress',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        },
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'accepted',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        },
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'in_progress',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        },
+        {
+            id: '1',
+            title: 'Методы автоматизации рецензирования',
+            journal: 'Вестник науки',
+            deadlineDays: 12,
+            status: 'closed',
+            tasksCount: 15,
+            completedTasks: 9,
+            authorId: 1
+        }
+    ]); 
 
     return (
-        <div className={clsx(s['main'])}>
-            <div className={clsx(s['content'])}>
-                <header className={s['welcome-section']}>
-                    <h1>Интеллектуальная платформа рецензирования</h1>
-                    <p>Добро пожаловать, {user?.username || 'Коллега'}! У вас есть активные задачи по статьям.</p>
-                </header>
+        <div className={s.container}>
+            <h1 className={clsx(s.mobileTitle, s.mobileOnly)}>Мои проекты</h1>
 
-                <div className={s['dashboard-grid']}>
-                    <Link to="/projects" className={s['card']}>
-                        <div className={s['card-icon']}>📝</div>
-                        <h3>Мои проекты</h3>
-                        <p>Управление статьями, дедлайнами и журналами</p>
-                    </Link>
-
-                    <Link to="/kanban" className={s['card']}>
-                        <div className={s['card-icon']}>📋</div>
-                        <h3>Канбан-доска</h3>
-                        <p>Отслеживание прогресса по замечаниям (75% выполнено)</p>
-                    </Link>
-
-                    <Link to="/responses" className={s['card']}>
-                        <div className={s['card-icon']}>📄</div>
-                        <h3>Ответы рецензентам</h3>
-                        <p>Экспорт в PDF, DOCX и LaTeX</p>
-                    </Link>
+            <div className={s.actionRow}>
+                <div className={s.searchWrap}>
+                    <input className={s.searchInput} placeholder="Поиск проекта..." />
+                    <IconButton size="md">
+                        <SlidersHorizontal size={20} />
+                    </IconButton>
                 </div>
+                
+                <Button variant="primary" className={s.desktopOnly}>
+                    <Plus size={20} /> Создать проект
+                </Button>
+            </div>
+
+            <div className={s.grid}>
+                {projects.map(p => <ProjectCard key={p.id} project={p} />)}
+            </div>
+
+            <div className={clsx(s.createBtnMobile, s.mobileOnly)}>
+                <Button variant="primary" fullWidth>
+                    <Plus size={20} /> Создать новый проект
+                </Button>
             </div>
         </div>
     );

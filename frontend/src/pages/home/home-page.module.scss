@@ -1,68 +1,65 @@
-.main {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--background-color);
+.container {
+  padding: var(--padding-outer);
+  max-width: 1320px;
+  margin: 0 auto;
 }
 
-.content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
+.mobileTitle {
+  font-size: 22px;
+  margin-bottom: 16px;
+  font-weight: 600;
 }
 
-.welcome-section {
-    h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        color: var(--primary-blue);
-    }
-    p {
+.actionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.searchWrap {
+  display: flex;
+  flex: 1;
+  max-width: 600px;
+  gap: 10px;
+
+  .searchInput {
+    flex: 1;
+    padding: 10px var(--padding-inner);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--background-card);
+    color: var(--text-primary);
+    &::placeholder {
         color: var(--text-secondary);
-        font-size: 1.1rem;
     }
+  }
 }
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 8px;
+  padding-bottom: 100px; 
 }
 
-.card {
-    background: var(--card-bg, #ffffff);
-    border-radius: 12px;
-    padding: 24px;
-    text-decoration: none;
-    color: var(--text-main);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-blue);
-    }
-
-    .card-icon {
-        font-size: 2rem;
-        margin-bottom: 15px;
-    }
-
-    h3 { margin: 0 0 10px 0; }
-    p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+.createBtnMobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 20px; 
+  padding-bottom: calc(env(safe-area-inset-bottom)); 
+  
+  background: var(--background-main);
+  opacity: 0.95;
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+  
+  box-sizing: border-box; 
 }
 
-.badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: var(--primary-blue);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-}
+.desktopOnly { @media (max-width: 768px) { display: none !important; } }
+.mobileOnly { @media (min-width: 769px) { display: none !important; } }

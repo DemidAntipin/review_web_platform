@@ -1,0 +1,142 @@
+.card {
+    background: var(--background-card);
+    border-radius: var(--border-radius);
+    padding: var(--padding-inner);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+    min-width: min-content; 
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+}
+
+.titleGroup {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 4px 0;
+        line-height: 1.2;
+    }
+    
+    .journal {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+    }
+}
+
+.progressSection {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    .progressInfo {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        
+        .label { color: var(--text-secondary); }
+        .taskCount { font-weight: 600; color: var(--text-primary); }
+    }
+
+    .progressLineWrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .barContainer {
+            flex: 1;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+
+            .bar {
+                height: 100%;
+                background: var(--accent-color); 
+                border-radius: 10px;
+                transition: width 0.3s ease;
+            }
+        }
+
+        .percent {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            min-width: 35px;
+            text-align: right;
+        }
+    }
+}
+
+.footer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    width: 100%;
+
+    .badge {
+        flex-shrink: 0;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .deadlineBadge {
+        background: var(--secondary-bg);
+        color: var(--status-review);
+        border: 1px solid var(--border-color);
+    }
+
+    .in_progress { color: var(--accent-color); background: color-mix(in srgb, var(--accent-color), transparent 90%) }
+    .completed { color: var(--status-review); background: color-mix(in srgb, var(--status-review), transparent 90%) }
+    .accepted {color: var(--status-success); background: color-mix(in srgb, var(--status-success), transparent 90%)}
+    .closed {color: var(--text-secondary); background: color-mix(in srgb, var(--status-neutral), transparent 90%)}
+
+    .teamBtn {
+        margin-left: auto; 
+        background: var(--secondary-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        
+        &:hover { background: var(--border-color); }
+    }
+}

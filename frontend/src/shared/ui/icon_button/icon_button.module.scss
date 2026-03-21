@@ -1,0 +1,16 @@
+.iconBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: background 0.2s;
+
+    &:hover { background: var(--border-color); }
+}
+
+.sm { width: 32px; height: 32px; }
+.md { width: 40px; height: 40px; }

@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { User } from './auth.types';
+import type { User as UserDTO, RegisterData } from './auth.types';
 import { authService } from '../api/auth.api';
+import { ROLE_MAP } from '@/shared/config/roles';
+import type { User } from '@/entities/user/model/types';
 
 interface AuthState {
   user: User | null;
@@ -9,7 +11,8 @@ interface AuthState {
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
-  setUser: (user: User | null) => void; 
+  checkAuth: () => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,14 +26,42 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const data = await authService.login(username, password);
-          
           set({ token: data.access_token });
-
-          const userProfile = await authService.getProfile();
-          set({ user: userProfile });
           
+          await get().checkAuth();
         } catch (e) {
           get().logout();
+          throw e;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      checkAuth: async () => {
+        const currentToken = get().token;
+        if (!currentToken) return;
+        
+        try {
+          const serverUser: UserDTO = await authService.getProfile();
+          const { role: serverRole, ...rest } = serverUser;
+          
+          const transformedUser: User = {
+            ...rest,
+            role: ROLE_MAP[serverRole as keyof typeof ROLE_MAP] || 'Гость'
+          };
+
+          set({ user: transformedUser });
+        } catch (e) {
+          get().logout();
+        }
+      },
+
+      register: async (data: RegisterData) => {
+        set({ isLoading: true });
+        try {
+          await authService.register(data);
+          await get().login(data.username, data.password);
+        } catch (e) {
           throw e;
         } finally {
           set({ isLoading: false });
@@ -40,12 +71,14 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         set({ user: null, token: null });
       },
-
-      setUser: (user) => set({ user }),
     }),
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ 
+        token: state.token, 
+        user: state.user 
+      }),
     }
   )
 );

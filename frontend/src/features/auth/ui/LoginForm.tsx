@@ -1,24 +1,32 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../model/auth.store';
 import s from './login-form.module.scss';
+import { Field } from '@/shared/ui/field/Field';
+import { Button } from '@/shared/ui/button/Button';
 
-export const LoginForm = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    
+interface LoginFormProps {
+    onToggle: () => void;
+}
+
+export const LoginForm = ({ onToggle }: { onToggle: () => void }) => {
     const login = useAuthStore((state) => state.login);
     const navigate = useNavigate();
+    
+    const [formData, setFormData] = useState({ username: '', password: '' });
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
-        
         try {
-            await login(username, password);
+            await login(formData.username, formData.password);
             navigate('/');
         } catch (err) {
             setError('Неверный логин или пароль');
@@ -30,44 +38,38 @@ export const LoginForm = () => {
     return (
         <form className={s.form} onSubmit={handleSubmit}>
             <div className={s.header}>
-                <h1>Вход в систему</h1>
-                <p>Платформа рецензирования статей</p>
+                <h1>Вход</h1>
+                <p>Платформа рецензирования</p>
             </div>
 
             <div className={s.inputs}>
-                <div className={s.field}>
-                    <label>Логин</label>
-                    <input 
-                        type="text" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Введите ваш username"
-                        disabled={isLoading}
-                        required 
-                    />
-                </div>
-
-                <div className={s.field}>
-                    <label>Пароль</label>
-                    <input 
-                        type="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        disabled={isLoading}
-                        required 
-                    />
-                </div>
+                <Field 
+                    label="Логин" 
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    placeholder="Введите username"
+                    disabled={isLoading}
+                    required
+                />
+                <Field 
+                    label="Пароль" 
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    disabled={isLoading}
+                    required
+                />
             </div>
 
-            {error && <span className={s.error}>{error}</span>}
+            {error && <div className={s.errorMessage}>{error}</div>}
 
-            <button type="submit" className={s.submitBtn} disabled={isLoading}>
-                {isLoading ? 'Вход...' : 'Войти'}
-            </button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Вход...' : 'Войти'}</Button>
 
             <div className={s.footer}>
-                <span>Нет аккаунта? Обратитесь к администратору</span>
+                Нет аккаунта? <span onClick={onToggle}>Зарегистрироваться</span>
             </div>
         </form>
     );

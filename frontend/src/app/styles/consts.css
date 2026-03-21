@@ -1,5 +1,9 @@
 :root {
-    --complex-page-padding: 20px;
-    --window-padding: 20px;
-    --box-padding: 12px;
+  --padding-outer: 24px;
+  --padding-inner: 16px;
+  --padding-xs: 8px;
+
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --border-radius: 8px;
 }
