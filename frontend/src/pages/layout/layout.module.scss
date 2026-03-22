@@ -3,12 +3,24 @@
   height: 100vh;
   width: 100%;
   grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: var(--header-height) 1fr;
+  grid-template-rows: var(--header-height) auto 1fr; /* Добавлена строка для экшн-бара */
   grid-template-areas: 
     "sidebar header"
+    "sidebar actions"
     "sidebar content";
   overflow: hidden;
   background-color: var(--background-main);
+}
+
+.headerContent, .gridContainer {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 var(--padding-outer);
+  box-sizing: border-box;
 }
 
 .header {
@@ -20,15 +32,57 @@
   padding: 0;
 }
 
-.headerContent {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  max-width: 1320px;
-  margin: 0 auto;
-  padding: 0 var(--padding-outer); 
+.content {
+    grid-area: content;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.content > .gridContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+  grid-column: span 9;
+  font-size: 24px;
+  font-weight: 600;
+  overflow: hidden;
   height: 100%;
+}
+
+.actionsBar {
+  grid-area: actions;
+  padding: var(--padding-outer) 0;
+  background-color: var(--background-main);
+}
+
+.searchSection {
+    grid-column: span 6;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    min-width: 0;
+
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    padding: 10px var(--padding-inner);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--background-card);
+    color: var(--text-primary);
+  }
+}
+
+.pageActionsSlot {
+  grid-column: span 6; // Занимает оставшиеся 3 колонки
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .content {
@@ -36,24 +90,45 @@
   overflow-y: auto;
   overflow-x: hidden;
   background-color: var(--background-main);
-  color: var(--text-primary);
-}
-
-.pageTitle {
-  font-size: 20px;
-  font-weight: 400;
-  margin: 0;
+  
+  .gridContainer > div {
+    grid-column: span 12; 
+  }
 }
 
 .mobileOnly { display: none; }
 
+.mobileFooterNav {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .layout {
     grid-template-columns: 1fr;
-    grid-template-rows: 60px 1fr;
+    grid-template-rows: 60px auto 1fr;
     grid-template-areas: 
       "header"
+      "actions"
       "content";
+  }
+
+  .gridContainer {
+      display: flex;
+      flex-direction: column;
+      padding: 0 16px;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: visible;
+      height: auto;
+    }
+
+    .searchSection {
+      width: 100%;
+      flex-shrink: 1;
+    }
+
+  .pageActionsSlot {
+    display: none;
   }
 
   .sidebar {
@@ -74,4 +149,46 @@
 
   .mobileOnly { display: flex; width: 100%; }
   .desktopOnly { display: none; }
+}
+
+.mobileFooter {
+    display: none;
+
+    @media (max-width: 768px) {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background: var(--background-card);
+        border-top: 1px solid var(--border-color);
+        z-index: 100;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+.navLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.2s;
+
+    svg {
+        color: var(--text-secondary);
+    }
+
+    &.active {
+        color: var(--accent-color);
+        svg {
+            color: var(--accent-color);
+        }
+    }
 }

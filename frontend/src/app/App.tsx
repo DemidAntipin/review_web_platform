@@ -5,7 +5,7 @@ import { Loader } from '@/shared/ui/loader/Loader';
 
 export const App = () => {
     return (
-        <Suspense fallback={<Loader type='circle' />}>
+        <Suspense fallback={<Loader />}>
             <RouterProvider router={AppRouter} />
         </Suspense>
     );

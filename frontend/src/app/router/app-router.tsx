@@ -4,6 +4,7 @@ import { MainLayout } from '@/pages/layout/MainLayout';
 import { HomePage } from '@/pages/home/HomePage';
 import { LoginPage } from '@/pages/login/LoginPage';
 import { useAuthStore } from '@/features/auth/model/auth.store';
+import { KanbanPage } from '@/pages/kanban/KanbanPage';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     const token = useAuthStore((state) => state.token);
@@ -35,12 +36,20 @@ export const AppRouter = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <HomePage />,
+                element: <Navigate to="/projects" replace />,
             },
             {
                 path: 'projects',
-                element: <div>Страница со списком научных работ (В разработке)</div>,
+                element: <HomePage />,
             },
+            {
+                path: 'projects/:projectId',
+                element: <Navigate to="/projects/:projectId/kanban" replace />
+            },
+            {
+                path: 'projects/:projectId/kanban',
+                element: <KanbanPage />,
+            }
         ],
     },
     {

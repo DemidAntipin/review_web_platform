@@ -5,10 +5,14 @@ import { UserInfo } from '@/entities/user/ui/UserInfo';
 import s from './layout.module.scss';
 import { useAuthStore } from '@/features/auth/model/auth.store';
 import { Loader } from '@/shared/ui/loader/Loader';
+import { SlidersHorizontal } from 'lucide-react';
+import { IconButton } from '@/shared/ui/icon_button/IconButton';
+import { MobileNav } from './MobileNav';
 import clsx from 'clsx';
 
 export const MainLayout = () => {
     const [pageTitle, setPageTitle] = useState('');
+    const [headerActions, setHeaderActions] = useState<React.ReactNode>(null);
     const { user, token, checkAuth, isLoading } = useAuthStore();
     const navigate = useNavigate();
 
@@ -23,8 +27,6 @@ export const MainLayout = () => {
 
     if (isLoading || (token && !user)) {return <Loader />;}
 
-    if (token && !user) return null;
-
     return (
         <div className={s.layout}>
             {user && <Sidebar user={user} />}
@@ -36,9 +38,26 @@ export const MainLayout = () => {
                 </div>
             </header>
 
+            <section className={s.actionsBar}>
+                <div className={s.gridContainer}>
+                    <div className={s.searchSection}>
+                        <input className={s.searchInput} placeholder="Поиск" />
+                        <IconButton size="md">
+                            <SlidersHorizontal size={20} />
+                        </IconButton>
+                    </div>
+                    <div className={s.pageActionsSlot}>
+                        {headerActions}
+                    </div>
+                </div>
+            </section>
+
             <main className={s.content}>
-                <Outlet context={{ setPageTitle }} />
+                <div className={s.gridContainer}>
+                    <Outlet context={{ setPageTitle, setHeaderActions }} />
+                </div>
             </main>
+            <MobileNav />
         </div>
     );
 };

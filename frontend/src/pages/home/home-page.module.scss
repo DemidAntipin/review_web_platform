@@ -1,7 +1,6 @@
 .container {
-  padding: var(--padding-outer);
-  max-width: 1320px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 0;
 }
 
 .mobileTitle {
@@ -21,7 +20,7 @@
 .searchWrap {
   display: flex;
   flex: 1;
-  max-width: 600px;
+  max-width: 400px;
   gap: 10px;
 
   .searchInput {

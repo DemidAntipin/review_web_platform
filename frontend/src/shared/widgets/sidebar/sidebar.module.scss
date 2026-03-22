@@ -46,6 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border-top: 1px solid var(--border-color);
 }
 
 .link {
@@ -60,7 +61,7 @@
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: var(--border-color);
     color: var(--text-primary);
   }
 
@@ -87,6 +88,18 @@
 
   span {
     margin-left: 4px;
+  }
+}
+
+.projectSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+
+  .link {
+    padding-left: 40px;
+    font-size: 14px;
   }
 }
 

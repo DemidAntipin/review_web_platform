@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { forwardRef, ButtonHTMLAttributes } from 'react';
 import clsx from 'clsx';
 import s from './button.module.scss';
 
@@ -7,19 +7,20 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     fullWidth?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ 
     children, 
     variant = 'primary', 
     fullWidth, 
     className, 
     ...props 
-}) => {
+}, ref) => {
     return (
-        <button 
+        <button
+            ref={ref}
             className={clsx(s.button, s[variant], fullWidth && s.fullWidth, className)} 
             {...props}
         >
             {children}
         </button>
     );
-};
+});
