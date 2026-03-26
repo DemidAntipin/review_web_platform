@@ -15,6 +15,8 @@ class Comment(BaseDBModel):
     priority = Column(Enum(CommentPriority), nullable=False)
     status = Column(Enum(CommentStatus), default=CommentStatus.new)
     created_at = Column(DateTime, default=datetime.now())
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    deleted_at = Column(DateTime, nullable=True, index=True)
 
     reviewer = relationship("Reviewer", back_populates="comments")
     tasks = relationship("Task", back_populates="comment")

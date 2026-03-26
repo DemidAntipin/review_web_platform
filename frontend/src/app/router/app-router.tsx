@@ -27,28 +27,24 @@ export const AppRouter = createBrowserRouter([
     },
     {
         path: '/',
-        element: (
-            <ProtectedRoute>
-                <MainLayout />
-            </ProtectedRoute>
-        ),
-        errorElement: <div>Что-то пошло не так...</div>, 
+        element: <ProtectedRoute><MainLayout /></ProtectedRoute>,
         children: [
             {
-                index: true,
-                element: <Navigate to="/projects" replace />,
+                index: true, 
+                element: <Navigate to="projects" replace />,
             },
             {
                 path: 'projects',
-                element: <HomePage />,
-            },
-            {
-                path: 'projects/:projectId',
-                element: <Navigate to="/projects/:projectId/kanban" replace />
-            },
-            {
-                path: 'projects/:projectId/kanban',
-                element: <KanbanPage />,
+                children: [
+                    { index: true, element: <HomePage /> },
+                    {
+                        path: ':projectId',
+                        children: [
+                            { index: true, element: <Navigate to="kanban" replace /> },
+                            { path: 'kanban', element: <KanbanPage /> },
+                        ]
+                    }
+                ]
             }
         ],
     },

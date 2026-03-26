@@ -15,3 +15,4 @@ from src.models.activity_log import ActivityLog
 from src.models.attachment import Attachment
 from src.models.response import Response
 from src.models.reviewer import Reviewer
+from src.models.task_comment import TaskComment

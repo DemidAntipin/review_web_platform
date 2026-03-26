@@ -1,10 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task } from '@/entities/task/model/types';
+import { TaskPreview } from '@/entities/task/model/types';
 import { TaskCard } from '@/entities/task/ui/TaskCard';
 
 interface Props {
-    task: Task;
+    task: TaskPreview;
 }
 
 export const SortableTaskCard = ({ task }: Props) => {

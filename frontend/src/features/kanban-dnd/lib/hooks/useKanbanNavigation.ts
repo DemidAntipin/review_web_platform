@@ -1,14 +1,15 @@
 import { useRef, useEffect, useState } from 'react';
 
-export const useKanbanNavigation = (columns: { id: string }[]) => {
-    const [activeTab, setActiveTab] = useState(columns[0].id);
+export const useKanbanNavigation = (columns: readonly { id: number; label: string }[]) => {
+    const [activeTab, setActiveTab] = useState<number>(columns[0].id);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const columnsRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    
+    const columnsRef = useRef<Record<number, HTMLDivElement | null>>({});
 
-    const scrollToColumn = (id: string) => {
+    const scrollToColumn = (id: number) => {
         const element = columnsRef.current[id];
         if (element) {
-            element.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+            element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             setActiveTab(id);
         }
     };
@@ -19,7 +20,7 @@ export const useKanbanNavigation = (columns: { id: string }[]) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const id = entry.target.getAttribute('data-id');
-                        if (id) setActiveTab(id);
+                        if (id) setActiveTab(Number(id));
                     }
                 });
             },
@@ -28,7 +29,7 @@ export const useKanbanNavigation = (columns: { id: string }[]) => {
 
         Object.values(columnsRef.current).forEach(col => col && observer.observe(col));
         return () => observer.disconnect();
-    }, []);
+    }, [columns]);
 
     return { activeTab, scrollToColumn, scrollContainerRef, columnsRef };
 };

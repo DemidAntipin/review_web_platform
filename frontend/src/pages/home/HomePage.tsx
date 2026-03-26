@@ -1,108 +1,43 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ProjectCard } from '@/entities/project/ui/ProjectCard';
-import { Project } from '@/entities/project/model/types';
-import { SlidersHorizontal, Plus } from 'lucide-react';
-import s from './home-page.module.scss';
-import clsx from 'clsx';
+import { useProjectStore } from '@/entities/project/model/project.store';
+import { Plus } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
 import { useOutletContext } from 'react-router-dom';
+import { Loader } from '@/shared/ui/loader/Loader';
+import { useProjectSocket } from '@/entities/project/lib/hooks/useProjectSocket';
+import s from './home-page.module.scss';
 
 export const HomePage = () => {
     const { setPageTitle, setHeaderActions } = useOutletContext<any>();
+    
+    const { projects, isLoading, setProjects } = useProjectStore();
+
+    useProjectSocket();
+
     useEffect(() => {
         setPageTitle('Мои проекты');
         setHeaderActions(
-            <Button variant="primary" className={s.pageActionsSlot}>
+            <Button variant="primary">
                 <Plus size={20} /> Создать проект
             </Button>
         );
-        return () => setHeaderActions(null);
-    }, [setPageTitle, setHeaderActions]);
+        
+        setProjects();
 
-    const [projects] = useState<Project[]>([
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'in_progress',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        },
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'in_progress',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        },
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'completed',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        },
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'in_progress',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        },
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'accepted',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        },
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'in_progress',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        },
-        {
-            id: '1',
-            title: 'Методы автоматизации рецензирования',
-            journal: 'Вестник науки',
-            deadlineDays: 12,
-            status: 'closed',
-            tasksCount: 15,
-            completedTasks: 9,
-            authorId: 1
-        }
-    ]); 
+        return () => setHeaderActions(null);
+    }, [setPageTitle, setHeaderActions, setProjects]);
+
+    if (isLoading && projects.length === 0) {
+        return <div className={s.loaderWrap}><Loader /></div>;
+    }
 
     return (
         <div className={s.container}>
-            <h1 className={clsx(s.mobileTitle, s.mobileOnly)}>Мои проекты</h1>
             <div className={s.grid}>
-                {projects.map(p => <ProjectCard key={p.id} project={p} />)}
-            </div>
-
-            <div className={clsx(s.createBtnMobile, s.mobileOnly)}>
-                <Button variant="primary" fullWidth>
-                    <Plus size={20} /> Создать новый проект
-                </Button>
+                {projects.map(p => (
+                    <ProjectCard key={p.id} project={p} />
+                ))}
             </div>
         </div>
     );

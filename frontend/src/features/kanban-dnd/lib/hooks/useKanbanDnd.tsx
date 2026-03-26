@@ -1,8 +1,10 @@
 import { DragEndEvent, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
-import { Task, TaskStatus } from '@/entities/task/model/types';
+import { useKanbanStore } from '../../model/kanban.store';
+import { TaskStatus, ALL_TASK_STATUSES, STATUS_MAP } from '@/entities/task/model/types';
 
-export const useKanbanDnd = (tasks: Task[], setTasks: React.Dispatch<React.SetStateAction<Task[]>>) => {
+export const useKanbanDnd = (projectId: number) => {
+    const { moveTask, updateTaskStatus, tasks } = useKanbanStore();
+    
     const sensors = useSensors(
         useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
         useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
@@ -12,52 +14,30 @@ export const useKanbanDnd = (tasks: Task[], setTasks: React.Dispatch<React.SetSt
         const { active, over } = event;
         if (!over) return;
 
-        const activeTask = tasks.find(t => t.id === active.id);
+        const activeId = active.id as number;
+        const overId = over.id;
+
+        const activeTask = tasks.find(t => t.id === activeId);
         if (!activeTask) return;
 
-        const overTask = tasks.find(t => t.id === over.id);
         let targetStatus: TaskStatus;
-        let targetTaskId: string | null = null;
+        let targetOverTaskId: number = 0;
 
-        if (overTask) {
-            targetStatus = overTask.status;
-            targetTaskId = overTask.id;
+        if (typeof overId === 'number' && STATUS_MAP[overId]) {
+            targetStatus = STATUS_MAP[overId];
         } else {
-            targetStatus = over.id as TaskStatus;
-            targetTaskId = null;
+            const overTask = tasks.find(t => t.id === overId);
+            if (overTask) {
+                targetStatus = overTask.status;
+                targetOverTaskId = overTask.id;
+            } else return;
         }
 
-        if (activeTask.status === targetStatus && targetTaskId) {
-            setTasks(prev => {
-                const oldIndex = prev.findIndex(t => t.id === active.id);
-                const newIndex = prev.findIndex(t => t.id === targetTaskId);
-                if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-                    return arrayMove(prev, oldIndex, newIndex);
-                }
-                return prev;
-            });
-            return;
+        moveTask(activeId, targetOverTaskId, targetStatus);
+
+        if (targetStatus !== activeTask.status) {
+            updateTaskStatus(projectId, activeId, targetStatus);
         }
-
-        setTasks(prev => {
-            const withoutActive = prev.filter(t => t.id !== active.id);
-
-            let insertIndex: number;
-
-            if (targetTaskId) {
-                const targetIndex = withoutActive.findIndex(t => t.id === targetTaskId);
-                insertIndex = targetIndex;
-            } else {
-                const lastIndexInColumn = withoutActive.reduce((lastIdx, t, idx) => {
-                    return t.status === targetStatus ? idx : lastIdx;
-                }, -1);
-                insertIndex = lastIndexInColumn + 1;
-            }
-
-            const updated = [...withoutActive];
-            updated.splice(insertIndex, 0, { ...activeTask, status: targetStatus });
-            return updated;
-        });
     };
 
     return { sensors, handleDragEnd };

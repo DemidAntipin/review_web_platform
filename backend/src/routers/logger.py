@@ -1,19 +1,14 @@
-from fastapi import APIRouter, HTTPException, Depends
-from src.models.user.user import User
-from src.models.user.user_role import UserRole
-from src.models.project.project import Project
+from fastapi import APIRouter
 from sqlalchemy import select, and_
 from src.models.activity_log import ActivityLog
 from src.dtos.log import ActivityLogDTO, LogRequestDTO
-from src.core.dependencies import DBSession, CurrentUser
-from typing import List, Annotated
+from src.core.dependencies import DBSession, AdminUser
+from typing import List
 
 router = APIRouter(prefix="/logs", tags=["logs"])
 
 @router.post("/", response_model=List[ActivityLogDTO])
-async def get_logs(data: LogRequestDTO, db: DBSession, current_user: CurrentUser):
-    if current_user.role != UserRole.admin:
-        raise HTTPException(status_code=403, detail="Недостаточно прав для выполнения операции")
+async def get_logs(data: LogRequestDTO, db: DBSession, current_user: AdminUser):
     filters=[]
     if data.project_ids:
         filters.append(ActivityLog.project_id.in_(data.project_ids))    

@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react';
 
 export const useMobileAutoScroll = (
     isDragging: boolean,
-    activeTab: string,
-    columns: { id: string }[],
-    scrollToColumn: (id: string) => void
+    activeTab: number,
+    columns: readonly { id: number; label: string }[],
+    scrollToColumn: (id: number) => void
 ) => {
     const activeTabRef = useRef(activeTab);
     const lastScrollTime = useRef(0);
@@ -40,13 +40,14 @@ export const useMobileAutoScroll = (
             if (clientX > width - ZONE && currentIndex < columns.length - 1) {
                 lastScrollTime.current = now;
                 scrollToColumn(columns[currentIndex + 1].id);
-            } else if (clientX < ZONE && currentIndex > 0) {
+            } 
+            else if (clientX < ZONE && currentIndex > 0) {
                 lastScrollTime.current = now;
                 scrollToColumn(columns[currentIndex - 1].id);
             }
         };
 
-        window.addEventListener('touchmove', handleTouchMove);
+        window.addEventListener('touchmove', handleTouchMove, { passive: true });
         return () => window.removeEventListener('touchmove', handleTouchMove);
     }, [isDragging, columns, scrollToColumn]);
 };

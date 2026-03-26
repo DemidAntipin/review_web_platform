@@ -33,7 +33,7 @@ export const MainLayout = () => {
 
             <header className={s.header}>
                 <div className={s.headerContent}>
-                    <h1 className={clsx(s.pageTitle, s.desktopOnly)}>{pageTitle}</h1>                   
+                    <h1 className={clsx(s.pageTitle, s.desktopOnly)} onClick={() => navigate("/projects")}>{pageTitle}</h1>                   
                     {user && <UserInfo user={user} className={s.mobileOnly} dropdownPosition="bottom-left" />}
                 </div>
             </header>

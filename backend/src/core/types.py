@@ -1,6 +1,7 @@
 from typing import Annotated
-from pydantic import Field, AfterValidator
-from src.core.utils.validators import validate_string, validate_password
+from pydantic import Field, AfterValidator, BeforeValidator
+from datetime import datetime
+from src.core.utils.validators import validate_string, validate_password, validate_preview_description, validate_datetime
 
 ID = Annotated[int, Field(gt=0)]
 
@@ -15,3 +16,9 @@ JournalStr = Annotated[str, Field(min_length=3, max_length=255), AfterValidator(
 DescriptionStr = Annotated[str, Field(max_length=1000), AfterValidator(validate_string)]
 
 ActionTypeStr = Annotated[str, Field(pattern=r"^[A-Z_]+$")]
+
+MarkdownStr = Annotated[str, Field(max_length=20000), AfterValidator(validate_string)]
+
+MarkdownShortStr = Annotated[str, Field(max_length=150), AfterValidator(validate_preview_description)]
+
+UTCDatetime = Annotated[datetime, BeforeValidator(validate_datetime)]

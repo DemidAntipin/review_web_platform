@@ -3,7 +3,7 @@
   height: 100vh;
   width: 100%;
   grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: var(--header-height) auto 1fr; /* Добавлена строка для экшн-бара */
+  grid-template-rows: var(--header-height) auto 1fr;
   grid-template-areas: 
     "sidebar header"
     "sidebar actions"
@@ -79,7 +79,7 @@
 }
 
 .pageActionsSlot {
-  grid-column: span 6; // Занимает оставшиеся 3 колонки
+  grid-column: span 6;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -94,6 +94,29 @@
   .gridContainer > div {
     grid-column: span 12; 
   }
+}
+
+.navLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.2s;
+
+    svg {
+        color: var(--text-secondary);
+    }
+
+    &.active {
+        color: var(--accent-color);
+        svg {
+            color: var(--accent-color);
+        }
+    }
 }
 
 .mobileOnly { display: none; }
@@ -141,8 +164,11 @@
   }
 
   .headerContent {
-    justify-content: stretch;
-    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    width: 100%;
   }
 
   .pageTitle { display: none; }
@@ -168,27 +194,28 @@
         z-index: 100;
         padding-bottom: env(safe-area-inset-bottom);
     }
-}
 
-.navLink {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    color: var(--text-secondary);
-    font-size: 10px;
-    font-weight: 500;
-    transition: color 0.2s;
+    .navLink {
+      padding: 8px 24px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      border-radius: 24px;
+      transition: all 0.2s ease;
 
-    svg {
-        color: var(--text-secondary);
-    }
+      &:hover {
+        background-color: var(--border-color);
+        color: var(--text-primary);
+      }
 
-    &.active {
+      &.active {
+        background-color: var(--background-main);
         color: var(--accent-color);
-        svg {
-            color: var(--accent-color);
-        }
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      svg {
+        flex-shrink: 0;
+      }
     }
 }

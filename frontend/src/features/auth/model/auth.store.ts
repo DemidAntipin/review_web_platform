@@ -4,6 +4,7 @@ import type { User as UserDTO, RegisterData } from './auth.types';
 import { authService } from '../api/auth.api';
 import { ROLE_MAP } from '@/shared/config/roles';
 import type { User } from '@/entities/user/model/types';
+import { WebsocketService } from '@/shared/api/websocket';
 
 interface AuthState {
   user: User | null;
@@ -26,7 +27,8 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const data = await authService.login(username, password);
-          set({ token: data.access_token });
+          const token = data.access_token;
+          set({ token });
           
           await get().checkAuth();
         } catch (e) {
@@ -49,8 +51,9 @@ export const useAuthStore = create<AuthState>()(
             ...rest,
             role: ROLE_MAP[serverRole as keyof typeof ROLE_MAP] || 'Гость'
           };
-
           set({ user: transformedUser });
+          WebsocketService.connect(transformedUser.id, currentToken);
+
         } catch (e) {
           get().logout();
         }
@@ -70,6 +73,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         set({ user: null, token: null });
+        WebsocketService.disconnect(); 
       },
     }),
     {

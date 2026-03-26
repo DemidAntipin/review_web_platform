@@ -18,6 +18,7 @@ class User(BaseDBModel):
     projects = relationship("ProjectMember", back_populates="user")
     tasks = relationship("Task", back_populates="assignee")
     logs = relationship("ActivityLog", back_populates="user")
+    comments = relationship("TaskComment", back_populates="author")
 
     def update(self, data: UserUpdateDTO):
         update_data = data.model_dump(exclude_unset=True, exclude={'password'})

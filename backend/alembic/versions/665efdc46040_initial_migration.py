@@ -1,8 +1,8 @@
-"""add_all_models
+"""initial_migration
 
-Revision ID: da09f1b5b12e
-Revises: 9ae3f9e3cfea
-Create Date: 2026-02-25 14:23:56.004158
+Revision ID: 665efdc46040
+Revises: 
+Create Date: 2026-03-26 10:00:29.652306
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'da09f1b5b12e'
-down_revision: Union[str, Sequence[str], None] = '9ae3f9e3cfea'
+revision: str = '665efdc46040'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -29,8 +29,10 @@ def upgrade() -> None:
     sa.Column('status', sa.Enum('in_progress', 'done', 'accepted', name='projectstatus'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_projects_deleted_at'), 'projects', ['deleted_at'], unique=False)
     op.create_index(op.f('ix_projects_id'), 'projects', ['id'], unique=False)
     op.create_index(op.f('ix_projects_journal'), 'projects', ['journal'], unique=False)
     op.create_index(op.f('ix_projects_title'), 'projects', ['title'], unique=False)
@@ -64,11 +66,14 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('role', sa.Enum('author', 'coauthor', 'editor', 'admin', name='userrole'), nullable=False),
     sa.Column('joined_at', sa.DateTime(), nullable=True),
+    sa.Column('left_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_project_members_id'), 'project_members', ['id'], unique=False)
+    op.create_index(op.f('ix_project_members_project_id'), 'project_members', ['project_id'], unique=False)
+    op.create_index(op.f('ix_project_members_user_id'), 'project_members', ['user_id'], unique=False)
     op.create_table('reviewers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('project_id', sa.Integer(), nullable=False),
@@ -79,17 +84,21 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_reviewers_id'), 'reviewers', ['id'], unique=False)
+    op.create_index(op.f('ix_reviewers_project_id'), 'reviewers', ['project_id'], unique=False)
     op.create_table('comments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('reviewer_id', sa.Integer(), nullable=False),
     sa.Column('content_md', sa.Text(), nullable=False),
     sa.Column('type', sa.Enum('text_change', 'experiment', 'analysis', 'source', 'question', name='commenttype'), nullable=False),
     sa.Column('priority', sa.Enum('low', 'medium', 'high', name='commentpriority'), nullable=False),
-    sa.Column('status', sa.Enum('new', 'in_progress', 'completed', 'ready_to_review', 'closed', name='commentstatus'), nullable=True),
+    sa.Column('status', sa.Enum('new', 'in_progress', 'completed', 'closed', name='commentstatus'), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['reviewer_id'], ['reviewers.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_comments_deleted_at'), 'comments', ['deleted_at'], unique=False)
     op.create_index(op.f('ix_comments_id'), 'comments', ['id'], unique=False)
     op.create_table('responses',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -104,17 +113,19 @@ def upgrade() -> None:
     op.create_table('tasks',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('comment_id', sa.Integer(), nullable=False),
-    sa.Column('assignee_id', sa.Integer(), nullable=False),
+    sa.Column('assignee_id', sa.Integer(), nullable=True),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description_md', sa.Text(), nullable=False),
     sa.Column('type', sa.Enum('text_change', 'experiment', 'analysis', 'source', 'question', name='tasktype'), nullable=False),
-    sa.Column('status', sa.Enum('todo', 'in_progress', 'completed', 'ready_to_review', 'closed', name='taskstatus'), nullable=True),
+    sa.Column('status', sa.Enum('todo', 'in_progress', 'completed', 'ready_for_review', 'closed', name='taskstatus'), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.Column('completed_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['assignee_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['comment_id'], ['comments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_tasks_deleted_at'), 'tasks', ['deleted_at'], unique=False)
     op.create_index(op.f('ix_tasks_id'), 'tasks', ['id'], unique=False)
     op.create_table('attachments',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -126,22 +137,44 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_attachments_id'), 'attachments', ['id'], unique=False)
+    op.create_table('task_comments',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('task_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.String(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['task_id'], ['tasks.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_task_comments_id'), 'task_comments', ['id'], unique=False)
+    op.create_index(op.f('ix_task_comments_task_id'), 'task_comments', ['task_id'], unique=False)
+    op.create_index(op.f('ix_task_comments_user_id'), 'task_comments', ['user_id'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_index(op.f('ix_task_comments_user_id'), table_name='task_comments')
+    op.drop_index(op.f('ix_task_comments_task_id'), table_name='task_comments')
+    op.drop_index(op.f('ix_task_comments_id'), table_name='task_comments')
+    op.drop_table('task_comments')
     op.drop_index(op.f('ix_attachments_id'), table_name='attachments')
     op.drop_table('attachments')
     op.drop_index(op.f('ix_tasks_id'), table_name='tasks')
+    op.drop_index(op.f('ix_tasks_deleted_at'), table_name='tasks')
     op.drop_table('tasks')
     op.drop_index(op.f('ix_responses_id'), table_name='responses')
     op.drop_table('responses')
     op.drop_index(op.f('ix_comments_id'), table_name='comments')
+    op.drop_index(op.f('ix_comments_deleted_at'), table_name='comments')
     op.drop_table('comments')
+    op.drop_index(op.f('ix_reviewers_project_id'), table_name='reviewers')
     op.drop_index(op.f('ix_reviewers_id'), table_name='reviewers')
     op.drop_table('reviewers')
+    op.drop_index(op.f('ix_project_members_user_id'), table_name='project_members')
+    op.drop_index(op.f('ix_project_members_project_id'), table_name='project_members')
     op.drop_index(op.f('ix_project_members_id'), table_name='project_members')
     op.drop_table('project_members')
     op.drop_index(op.f('ix_activity_logs_id'), table_name='activity_logs')
@@ -153,5 +186,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_projects_title'), table_name='projects')
     op.drop_index(op.f('ix_projects_journal'), table_name='projects')
     op.drop_index(op.f('ix_projects_id'), table_name='projects')
+    op.drop_index(op.f('ix_projects_deleted_at'), table_name='projects')
     op.drop_table('projects')
     # ### end Alembic commands ###

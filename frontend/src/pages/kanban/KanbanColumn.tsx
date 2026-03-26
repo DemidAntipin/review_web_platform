@@ -1,14 +1,13 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Task } from '@/entities/task/model/types';
+import { TaskPreview } from '@/entities/task/model/types';
 import { SortableTaskCard } from '@/features/kanban-dnd/ui/SortableTaskCard';
 import s from './kanban.module.scss';
-import clsx from 'clsx';
 
 interface Props {
-    id: string;
+    id: number;
     label: string;
-    tasks: Task[];
+    tasks: TaskPreview[];
     innerRef?: (el: HTMLDivElement | null) => void;
 }
 

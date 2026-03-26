@@ -1,13 +1,12 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from datetime import datetime
-from src.core.types import ID, ActionTypeStr, DescriptionStr
+from src.core.types import ID, ActionTypeStr, DescriptionStr, UTCDatetime
 
 class LogRequestDTO(BaseModel):
     user_ids: Optional[List[ID]] = None
     project_ids: Optional[List[ID]] = None
-    start_period: Optional[datetime] = None
-    end_period: Optional[datetime] = None
+    start_period: Optional[UTCDatetime] = None
+    end_period: Optional[UTCDatetime] = None
 
 class ActivityLogDTO(BaseModel):
     id: ID
@@ -15,7 +14,7 @@ class ActivityLogDTO(BaseModel):
     project_id: ID
     action_type: ActionTypeStr
     description: DescriptionStr
-    created_at: datetime
+    created_at: UTCDatetime
 
     class Config:
         from_attributes = True

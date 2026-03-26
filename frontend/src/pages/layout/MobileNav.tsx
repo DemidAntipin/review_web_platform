@@ -1,20 +1,29 @@
-import { LayoutGrid, Folder, User } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { LayoutGrid, Users, MessageSquareQuote } from 'lucide-react';
+import { NavLink, useParams } from 'react-router-dom';
 import s from './layout.module.scss';
+import clsx from 'clsx';
 
-export const MobileNav = () => (
-    <nav className={s.mobileFooter}>
-        <NavLink to="/reviewers" className={s.navLink}>
-            <Folder size={24} />
-            <span>Рецензенты</span>
-        </NavLink>
-        <NavLink to="/kanban" className={s.navLink}>
-            <LayoutGrid size={24} />
-            <span>Канбан-Доска</span>
-        </NavLink>
-        <NavLink to="/responses" className={s.navLink}>
-            <User size={24} />
-            <span>Ответы</span>
-        </NavLink>
-    </nav>
-);
+export const MobileNav = () => {
+    const { projectId } = useParams<{ projectId: string }>();
+
+    if (!projectId) return null; 
+
+    const navItems = [
+        { to: `/projects/${projectId}/reviewers`, label: 'Рецензенты', Icon: Users },
+        { to: `/projects/${projectId}/kanban`, label: 'Канбан', Icon: LayoutGrid },
+        { to: `/projects/${projectId}/responses`, label: 'Ответы', Icon: MessageSquareQuote },
+    ];
+    return (
+        <nav className={s.mobileFooter}>
+            {navItems.map(({ to, label, Icon }) => (
+                <NavLink 
+                    key={to} 
+                    to={to} 
+                    className={({ isActive }) => clsx(s.navLink, isActive && s.active)}>
+                    <Icon size={22} />
+                    <span>{label}</span>
+                </NavLink>
+            ))}
+        </nav>
+    );
+};
