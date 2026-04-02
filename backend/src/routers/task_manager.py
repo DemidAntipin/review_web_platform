@@ -207,15 +207,15 @@ async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSe
     if not task:
         raise HTTPException(404, detail="Задача не найдена")
     if current_user.role == UserRole.coauthor:
-        if task.assignee_id != current_user.id:
+        if task.assignee_id != current_user.user.id:
             raise HTTPException(403, detail="Недостаточно прав. Вы не являетесь исполнителем задачи.")
-        if set(data.model_dump().keys()) > {"status"}:
+        if set(data.model_dump(exclude_unset=True).keys()) > {"status"}:
             raise HTTPException(403, detail="Исполнитель может менять только статус")
         allowed = {TaskStatus.todo, TaskStatus.in_progress, TaskStatus.completed}
         if data.status and data.status not in allowed:
             raise HTTPException(403, f"Недопустимый статус для исполнителя")
     elif current_user.role == UserRole.editor:
-        if set(data.model_dump().keys()) > {"status"}:
+        if set(data.model_dump(exclude_unset=True).keys()) > {"status"}:
             raise HTTPException(403, detail="Редактор может менять только статус")
         allowed = {TaskStatus.completed, TaskStatus.ready_for_review, TaskStatus.in_progress}
         if data.status and data.status not in allowed:

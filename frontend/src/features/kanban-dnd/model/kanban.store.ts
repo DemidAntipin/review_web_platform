@@ -62,20 +62,27 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
 
     moveTask: (activeId, overId, targetStatus) => {
         set(state => {
-            const newTasks = [...state.tasks];
-            const activeIdx = newTasks.findIndex(t => t.id === activeId);
+            const tasks = [...state.tasks];
+            const activeIdx = tasks.findIndex(t => t.id === activeId);
             if (activeIdx === -1) return state;
 
-            const movedTask = { ...newTasks[activeIdx] };
+            const movedTask = { ...tasks[activeIdx] };
             if (targetStatus) movedTask.status = targetStatus;
 
-            const filtered = newTasks.filter(t => t.id !== activeId);
-            const overIdx = typeof overId === 'number' ? filtered.findIndex(t => t.id === overId) : -1;
+            const withoutActive = tasks.filter(t => t.id !== activeId);
+            
+            let insertIdx = -1;
+            
+            if (overId === 'END') {
+                insertIdx = withoutActive.length;
+            } else {
+                const overIdx = withoutActive.findIndex(t => t.id === overId);
+                insertIdx = overIdx === -1 ? withoutActive.length : overIdx;
+            }
 
-            const insertIdx = overIdx === -1 ? filtered.length : overIdx;
-            filtered.splice(insertIdx, 0, movedTask);
+            withoutActive.splice(insertIdx, 0, movedTask);
 
-            return { tasks: filtered };
+            return { tasks: withoutActive };
         });
     },
 

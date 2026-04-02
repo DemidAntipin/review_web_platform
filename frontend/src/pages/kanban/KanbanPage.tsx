@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { DndContext, closestCorners, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCorners, pointerWithin, DragOverlay } from '@dnd-kit/core';
 import { KanbanColumn } from './KanbanColumn';
 import { useKanbanStore } from '@/features/kanban-dnd/model/kanban.store';
 import { useKanbanDnd } from '@/features/kanban-dnd/lib/hooks/useKanbanDnd';
@@ -11,17 +11,17 @@ import { Loader } from '@/shared/ui/loader/Loader';
 import s from './kanban.module.scss';
 import { TaskCard } from '@/entities/task/ui/TaskCard';
 import clsx from 'clsx';
-import { STATUS_TO_ID, TaskStatus } from '@/entities/task/model/types';
+import { STATUS_MAP, TaskStatus } from '@/entities/task/model/types';
 import { useProjectStore } from '@/entities/project/model/project.store';
 import { useKanbanSocket } from '@/features/kanban-dnd/lib/hooks/useKanbanSocket';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
 import { ArrowLeft } from 'lucide-react';
 
 const COLUMNS = [
-    { id: STATUS_TO_ID.todo, status: 'todo', label: 'Новые' },
-    { id: STATUS_TO_ID.in_progress, status: 'in_progress', label: 'В работе' },
-    { id: STATUS_TO_ID.completed, status: 'completed', label: 'Выполнено' },
-    { id: STATUS_TO_ID.ready_for_review, status: 'ready_for_review', label: 'Готово' },
+    { id: 'todo' as TaskStatus, label: 'Новые' },
+    { id: 'in_progress' as TaskStatus, label: 'В работе' },
+    { id: 'completed' as TaskStatus, label: 'Выполнено' },
+    { id: 'ready_for_review' as TaskStatus, label: 'Готово' },
 ] as const;
 
 export const KanbanPage = () => {
@@ -59,10 +59,10 @@ export const KanbanPage = () => {
         };
     }, [project_id, currentProject, setTasks, setPageTitle, setHeaderActions]);
 
-    const { activeTab, scrollToColumn, scrollContainerRef, columnsRef } = useKanbanNavigation(COLUMNS as any);
+    const { activeTab, scrollToColumn, scrollContainerRef, columnsRef } = useKanbanNavigation(COLUMNS);
     const { sensors, handleDragEnd } = useKanbanDnd(project_id);
     
-    useMobileAutoScroll(isDragging, activeTab as any, COLUMNS as any, scrollToColumn);
+    useMobileAutoScroll(isDragging, activeTab, COLUMNS, scrollToColumn);
 
     const activeTask = tasks.find(t => t.id === activeId);
 
@@ -97,9 +97,9 @@ export const KanbanPage = () => {
                     {COLUMNS.map(col => (
                         <KanbanColumn 
                             key={col.id}
-                            id={col.id}
+                            id={col.id} // Передается 'todo', 'in_progress' и т.д.
                             label={col.label}
-                            tasks={tasks.filter(t => t.status === col.status)}
+                            tasks={tasks.filter(t => t.status === col.id)}
                             innerRef={(el) => { columnsRef.current[col.id] = el; }}
                         />
                     ))}

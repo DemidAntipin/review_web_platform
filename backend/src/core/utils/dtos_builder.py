@@ -15,9 +15,6 @@ from src.models.user.user import User
 from src.models.project.project import Project
 from src.dtos.task.task import *
 from src.core.database import DBSession
-import logging
-
-logger = logging.getLogger("blat")
 
 
 async def get_task_preview(task_id: ID) -> TaskPreviewDTO:
@@ -63,7 +60,6 @@ async def get_task_preview(task_id: ID) -> TaskPreviewDTO:
         "comments_count": r.task_comments_count or 0,
         "attachments_count": r.attachments_count or 0
     })
-    logger.error(data)
     return data
 
 async def get_project_preview(project_id: ID) -> ProjectPreviewDTO:

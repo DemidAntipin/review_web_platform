@@ -130,7 +130,7 @@ async def add_member_project(project_id: int, data: ProjectMemberDTO, db: DBSess
 @router.delete("/{project_id}/members/leave")
 async def leave_project(project_id: int, db: DBSession, current_user: ProjectMemberAny, background_tasks: BackgroundTasks):
     result = await db.execute(select(ProjectMember).join(Project).options(selectinload(ProjectMember.project)) 
-                              .where(ProjectMember.project_id == project_id, ProjectMember.user_id == current_user.id, Project.deleted_at == None))
+                              .where(ProjectMember.project_id == project_id, ProjectMember.user_id == current_user.user.id, Project.deleted_at == None))
     member = result.scalar_one_or_none()
     member.left_at = datetime.now()
     await db.commit()

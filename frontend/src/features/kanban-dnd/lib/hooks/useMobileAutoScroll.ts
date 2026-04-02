@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react';
 
 export const useMobileAutoScroll = (
     isDragging: boolean,
-    activeTab: number,
-    columns: readonly { id: number; label: string }[],
-    scrollToColumn: (id: number) => void
+    activeTab: string | number,
+    columns: readonly { id: string | number; label: string }[],
+    scrollToColumn: (id: string | number) => void
 ) => {
     const activeTabRef = useRef(activeTab);
     const lastScrollTime = useRef(0);
@@ -12,18 +12,6 @@ export const useMobileAutoScroll = (
     useEffect(() => {
         activeTabRef.current = activeTab;
     }, [activeTab]);
-
-    useEffect(() => {
-        if (!isDragging) {
-            document.body.style.overflow = '';
-            return;
-        }
-
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isDragging]);
 
     useEffect(() => {
         if (!isDragging || window.innerWidth > 768) return;

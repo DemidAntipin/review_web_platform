@@ -20,10 +20,12 @@ export const SortableTaskCard = ({ task }: Props) => {
     const style = {
         transform: CSS.Translate.toString(transform),
         transition,
-        opacity: isDragging ? 0.4 : 1,
         cursor: 'grab'
     };
 
+    if (isDragging) {
+        return <div ref={setNodeRef} style={{ opacity: 0 }} />;
+    }
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
             <TaskCard task={task} />

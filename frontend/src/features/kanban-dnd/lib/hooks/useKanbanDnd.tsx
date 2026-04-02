@@ -1,6 +1,6 @@
 import { DragEndEvent, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useKanbanStore } from '../../model/kanban.store';
-import { TaskStatus, ALL_TASK_STATUSES, STATUS_MAP } from '@/entities/task/model/types';
+import { TaskStatus, STATUS_MAP } from '@/entities/task/model/types';
 
 export const useKanbanDnd = (projectId: number) => {
     const { moveTask, updateTaskStatus, tasks } = useKanbanStore();
@@ -15,22 +15,24 @@ export const useKanbanDnd = (projectId: number) => {
         if (!over) return;
 
         const activeId = active.id as number;
-        const overId = over.id;
+        const overId = over.id; // string | number
 
         const activeTask = tasks.find(t => t.id === activeId);
         if (!activeTask) return;
 
         let targetStatus: TaskStatus;
-        let targetOverTaskId: number = 0;
+        let targetOverTaskId: number | string;
 
-        if (typeof overId === 'number' && STATUS_MAP[overId]) {
-            targetStatus = STATUS_MAP[overId];
+        if (typeof overId === 'string') {
+            // Если это строка, значит мы попали на саму колонку (её ID = статус)
+            targetStatus = overId as TaskStatus;
+            targetOverTaskId = 'END'; 
         } else {
+            // Если это число, значит мы попали на другую карточку
             const overTask = tasks.find(t => t.id === overId);
-            if (overTask) {
-                targetStatus = overTask.status;
-                targetOverTaskId = overTask.id;
-            } else return;
+            if (!overTask) return;
+            targetStatus = overTask.status;
+            targetOverTaskId = overTask.id;
         }
 
         moveTask(activeId, targetOverTaskId, targetStatus);
