@@ -35,3 +35,20 @@
 }
 
 .fullWidth { width: 100%; }
+
+.dashed {
+    background: transparent;
+    border: 2px dashed var(--text-primary);
+    color: var(--text-primary);
+    height: 40px;
+    
+    &:hover {
+        background: var(--bg-sidebar);
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    svg {
+        color: inherit;
+    }
+}

@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { Button } from '@/shared/ui/button/Button';
-import s from './kanban.module.scss';
+import s from './board.module.scss';
 import clsx from 'clsx';
 
 interface StatusStripProps {

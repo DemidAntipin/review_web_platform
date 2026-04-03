@@ -4,11 +4,10 @@ import { DndContext, closestCorners, pointerWithin, DragOverlay } from '@dnd-kit
 import { KanbanColumn } from './KanbanColumn';
 import { useKanbanStore } from '@/features/kanban-dnd/model/kanban.store';
 import { useKanbanDnd } from '@/features/kanban-dnd/lib/hooks/useKanbanDnd';
-import { StatusStrip } from './StatusStrip';
-import { useKanbanNavigation } from '@/features/kanban-dnd/lib/hooks/useKanbanNavigation';
+import { StatusStrip } from '@/shared/ui/board/StatusStrip';
+import { useBoardNavigation } from '@/shared/lib/hooks/useBoardNavigation';
 import { useMobileAutoScroll } from '@/features/kanban-dnd/lib/hooks/useMobileAutoScroll';
 import { Loader } from '@/shared/ui/loader/Loader';
-import s from './kanban.module.scss';
 import { TaskCard } from '@/entities/task/ui/TaskCard';
 import clsx from 'clsx';
 import { STATUS_MAP, TaskStatus } from '@/entities/task/model/types';
@@ -16,6 +15,9 @@ import { useProjectStore } from '@/entities/project/model/project.store';
 import { useKanbanSocket } from '@/features/kanban-dnd/lib/hooks/useKanbanSocket';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
 import { ArrowLeft } from 'lucide-react';
+import { BoardGrid } from '@/shared/ui/board/BoardGrid';
+import { Board } from '@/shared/ui/board/Board';
+import s from '@/shared/ui/board/board.module.scss';
 
 const COLUMNS = [
     { id: 'todo' as TaskStatus, label: 'Новые' },
@@ -38,7 +40,7 @@ export const KanbanPage = () => {
     const [activeId, setActiveId] = useState<number | null>(null);
     const isDragging = activeId !== null;
 
-    useEffect(() => {
+     useEffect(() => {
         if (!project_id) return;
 
         setTasks(project_id);
@@ -59,7 +61,7 @@ export const KanbanPage = () => {
         };
     }, [project_id, currentProject, setTasks, setPageTitle, setHeaderActions]);
 
-    const { activeTab, scrollToColumn, scrollContainerRef, columnsRef } = useKanbanNavigation(COLUMNS);
+    const { activeTab, scrollToColumn, scrollContainerRef, columnsRef } = useBoardNavigation(COLUMNS);
     const { sensors, handleDragEnd } = useKanbanDnd(project_id);
     
     useMobileAutoScroll(isDragging, activeTab, COLUMNS, scrollToColumn);
@@ -86,29 +88,32 @@ export const KanbanPage = () => {
             onDragCancel={() => setActiveId(null)}
             autoScroll={false}
         >
-            <div className={s.container}>
+            <Board>
                 <StatusStrip 
                     columns={COLUMNS} 
                     activeTab={activeTab} 
                     onTabClick={scrollToColumn}
                 />
 
-                <div className={clsx(s.boardGrid, isDragging && s.isDragging)} ref={scrollContainerRef}>
+                <BoardGrid 
+                    ref={scrollContainerRef} 
+                    columnsCount={COLUMNS.length}
+                    className={clsx(isDragging && s.isDragging)}
+                >
                     {COLUMNS.map(col => (
                         <KanbanColumn 
                             key={col.id}
-                            id={col.id} // Передается 'todo', 'in_progress' и т.д.
+                            id={col.id}
                             label={col.label}
                             tasks={tasks.filter(t => t.status === col.id)}
                             innerRef={(el) => { columnsRef.current[col.id] = el; }}
                         />
                     ))}
-                </div>
-            </div>
-
+                </BoardGrid>
+            </Board>
             <DragOverlay dropAnimation={null}>
                 {activeTask ? (
-                    <div className={s.dragOverlayItem}>
+                    <div>
                         <TaskCard task={activeTask} />
                     </div>
                 ) : null}

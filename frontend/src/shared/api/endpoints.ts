@@ -18,9 +18,9 @@ export const ENDPOINTS = {
         COMMENTS: (project_id: number, task_id: number) => `/projects/${project_id}/tasks/${task_id}/comments`,
     },
     REVIEWERS: {
-        ROOT: (project_id: number) => `/projects/${project_id}/reviewers`,
+        LIST: (project_id: number) => `/projects/${project_id}/reviewers`,
         ADD: (project_id: number) => `/projects/${project_id}/reviewers/add`,
         COMMENTS: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments`,
     },
-    LOGS: '/logs/'
+    LOGS: '/logs'
 };

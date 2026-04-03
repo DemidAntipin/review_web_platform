@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-export const useKanbanNavigation = (columns: readonly { id: string | number; label: string }[]) => {
+export const useBoardNavigation = (columns: readonly { id: string | number; label: string }[]) => {
     const [activeTab, setActiveTab] = useState<string | number>(columns[0].id);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     

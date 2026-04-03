@@ -75,7 +75,7 @@ async def update_comment(project_id: ID, comment_id: ID, data: CommentUpdateDTO,
 
     return comment
 
-@router.get("/reviewers/", response_model=ProjectReviewersPageDTO)
+@router.get("/reviewers", response_model=ProjectReviewersPageDTO)
 async def get_reviewers_board(project_id: ID, db: DBSession, current_user: ProjectMemberAny):
     query = (
         select(
@@ -100,7 +100,7 @@ async def get_reviewers_board(project_id: ID, db: DBSession, current_user: Proje
     for r in results:
         rev_id = r.Reviewer.id
         if rev_id not in reviewers:
-            reviewers[rev_id] = ReviewerCommentsDTO.model_validate(r.Reviewer)
+            reviewers[rev_id] = ReviewerCommentsDTO.model_validate({**ReviewerDTO.model_validate(r.Reviewer).model_dump()})
             reviewers[rev_id].comments = []
         if r.Comment:
             comment_dto = CommentShortDTO.model_validate(r.Comment)

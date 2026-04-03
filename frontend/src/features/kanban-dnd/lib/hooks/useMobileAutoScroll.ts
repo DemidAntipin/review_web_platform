@@ -16,8 +16,8 @@ export const useMobileAutoScroll = (
     useEffect(() => {
         if (!isDragging || window.innerWidth > 768) return;
 
-        const handleTouchMove = (e: TouchEvent) => {
-            const clientX = e.touches[0].clientX;
+        const handleTouchMove = (e: PointerEvent) => {
+            const clientX = e.clientX;
             const now = Date.now();
             if (now - lastScrollTime.current < 400) return;
 
@@ -35,7 +35,7 @@ export const useMobileAutoScroll = (
             }
         };
 
-        window.addEventListener('touchmove', handleTouchMove, { passive: true });
-        return () => window.removeEventListener('touchmove', handleTouchMove);
+        window.addEventListener('pointermove', handleTouchMove, { passive: false, capture: true });
+        return () => window.removeEventListener('pointermove', handleTouchMove, { capture: true });
     }, [isDragging, columns, scrollToColumn]);
 };
