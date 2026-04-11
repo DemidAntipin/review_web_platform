@@ -183,3 +183,16 @@ async def get_reviewer_dto(reviewer_id: ID) -> ReviewerDTO:
             return None
             
         return ReviewerDTO.model_validate(reviewer)
+    
+async def get_member_preview(project_id: ID, user_id: ID) -> ProjectMemberPreviewDTO:
+    query = (
+        select(ProjectMember)
+        .options(selectinload(ProjectMember.user))
+        .where(ProjectMember.project_id == project_id, ProjectMember.user_id == user_id)
+    )
+    async with DBSession() as db:
+        result = await db.execute(query)
+        member = result.scalar_one_or_none()
+        if not member:
+            return None
+        return ProjectMemberPreviewDTO.model_validate(member)

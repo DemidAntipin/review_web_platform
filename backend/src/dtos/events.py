@@ -31,6 +31,11 @@ class MemberRemovedEvent(BaseEvent):
     target_user_id: ID
     role: str
 
+class MemberUpdatedEvent(BaseEvent):
+    action_type: ActionTypeStr = EventType.MEMBER_UPDATED.value
+    target_user_id: ID
+    role: str
+
 class ReviewerAddedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.REVIEWER_ADDED.value
     reviewer_id: ID

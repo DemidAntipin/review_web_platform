@@ -47,7 +47,7 @@ export const Sidebar = ({ user }: SidebarProps) => {
             </nav>
 
             <div className={s.bottom}>
-                <UserInfo user={user} className={s.desktopProfile} dropdownPosition="top-left" />
+                <UserInfo user={user} className={s.desktopProfile} dropdownPosition="top-start" />
             </div>
         </aside>
     );

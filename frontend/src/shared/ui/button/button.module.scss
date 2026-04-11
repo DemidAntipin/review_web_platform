@@ -34,6 +34,12 @@
     &:hover { background: var(--secondary-bg); }
 }
 
+.danger {
+    background: var(--danger-color);
+    color: var(--text-on-accent);
+    &:hover {background: var(--danger-hover);}
+}
+
 .fullWidth { width: 100%; }
 
 .dashed {

@@ -1,0 +1,116 @@
+.filterMenu {
+  padding: 12px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  padding-left: 4px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 14px;
+  color: var(--text-primary);
+
+  &:hover {
+    background: var(--secondary-bg);
+  }
+
+  input {
+    display: none;
+  }
+
+  input:checked + .customCheckbox {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.customCheckbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: transparent;
+
+  svg {
+    color: white;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s;
+  }
+}
+
+.highlight {
+  font-weight: 500;
+}
+
+.sortRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.select {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: var(--border-radius-sm, 6px);
+  border: 1px solid var(--border-color);
+  
+  background: var(--background-main); 
+  color: var(--text-primary);
+  
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  appearance: none;
+
+  &:focus {
+    border-color: var(--accent-color);
+  }
+
+  option {
+    background: var(--background-card);
+    color: var(--text-primary);
+  }
+}

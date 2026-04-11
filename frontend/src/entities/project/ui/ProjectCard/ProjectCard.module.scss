@@ -124,8 +124,11 @@
     .accepted {color: var(--status-success); background: color-mix(in srgb, var(--status-success), transparent 90%)}
     .closed {color: var(--text-secondary); background: color-mix(in srgb, var(--status-neutral), transparent 90%)}
 
+    .teamWrapper {
+        margin-left: auto;
+    }
+
     .teamBtn {
-        margin-left: auto; 
         background: var(--secondary-bg);
         color: var(--text-primary);
         border: 1px solid var(--border-color);

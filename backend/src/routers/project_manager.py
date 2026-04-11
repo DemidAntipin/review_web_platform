@@ -5,7 +5,7 @@ from sqlalchemy import select, exists, func, distinct
 from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.orm import selectinload
 from src.dtos.project.project import ProjectBaseDTO, ProjectDTO, ProjectUpdateDTO, ProjectPreviewDTO
-from src.dtos.project.project_member import ProjectMemberDTO
+from src.dtos.project.project_member import ProjectMemberDTO, ProjectMemberPreviewDTO, ProjectMemberUpdateDTO
 from src.models.user.user_role import UserRole
 from src.models.project_member import ProjectMember
 from src.models.task.task import Task
@@ -14,7 +14,7 @@ from src.models.comment.comment import Comment
 from src.core.dependencies import DBSession, CurrentUser, ProjectAuthor, ProjectMemberAny
 from typing import List
 from datetime import datetime
-from src.dtos.events import ProjectArchivedEvent, ProjectCreatedEvent, ProjectUpdatedEvent, MemberAddedEvent, MemberRemovedEvent
+from src.dtos.events import ProjectArchivedEvent, ProjectCreatedEvent, ProjectUpdatedEvent, MemberAddedEvent, MemberRemovedEvent, MemberUpdatedEvent
 from src.core.events.event_dispatcher import EventDispatcher
 from src.routers import task_manager
 
@@ -33,7 +33,7 @@ async def list_projects(db: DBSession, current_user: CurrentUser):
         .outerjoin(Comment, Comment.reviewer_id == Reviewer.id)
         .outerjoin(Task, Task.comment_id == Comment.id)
         .join(ProjectMember, ProjectMember.project_id == Project.id)
-        .where(ProjectMember.user_id == current_user.id)
+        .where(ProjectMember.user_id == current_user.id, Project.deleted_at == None)
         .group_by(Project.id)
     )
     response = await db.execute(query)
@@ -52,6 +52,20 @@ async def get_project(project_id: int, db: DBSession, current_user: ProjectMembe
     result = await db.execute(query)
     responses = result.fetchone()
     return responses.Project
+
+@router.get("/{project_id}/members", response_model=list[ProjectMemberPreviewDTO])
+async def get_project_members(project_id: int, db: DBSession, current_user: ProjectMemberAny):
+    query = (
+        select(ProjectMember)
+        .options(selectinload(ProjectMember.user))  
+        .where(
+            ProjectMember.project_id == project_id,
+            ProjectMember.left_at == None
+        )
+    )
+    result = await db.execute(query)
+    members = result.scalars().all()
+    return members
 
 @router.post("/create_project", response_model=ProjectDTO)
 async def create_project(data: ProjectBaseDTO, db: DBSession, current_user: CurrentUser, background_tasks: BackgroundTasks):
@@ -73,7 +87,7 @@ async def archive_project(project_id: int, db: DBSession, current_user: ProjectA
     responses.Project.deleted_at = datetime.now()
     await db.commit()
 
-    event = ProjectArchivedEvent(user_id=current_user.user.id, project_id=project_id, payload={"project_id": project_id})
+    event = ProjectArchivedEvent(user_id=current_user.user.id, project_id=project_id)
     EventDispatcher.create_event(background_tasks, event)
 
     return {"message": "Проект перемещён в архив"}
@@ -110,7 +124,7 @@ async def add_member_project(project_id: int, data: ProjectMemberDTO, db: DBSess
         raise HTTPException(status_code=400, detail="Пользователь уже является участником проекта")
     
     if responses.was_member:
-        result = await db.execute(select(ProjectMember).where(ProjectMember.project_id == data.project_id, ProjectMember.user_id == data.user_id))
+        result = await db.execute(select(ProjectMember).where(ProjectMember.project_id == project_id, ProjectMember.user_id == data.user_id))
         member = result.scalar_one_or_none()
         if not member:
             raise HTTPException(500, "Ошибка при получении записи участника")
@@ -122,7 +136,35 @@ async def add_member_project(project_id: int, data: ProjectMemberDTO, db: DBSess
     await db.commit()
     await db.refresh(member)
 
-    event = MemberAddedEvent(user_id=current_user.user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name)
+    event = MemberAddedEvent(user_id=current_user.user.id, project_id=project_id, target_user_id=member.user_id, role=member.role.name)
+    EventDispatcher.create_event(background_tasks, event)
+
+    return member
+
+@router.patch("/{project_id}/members/{member_id}", response_model=ProjectMemberDTO)
+async def update_member_project(project_id: int, member_id: int, data: ProjectMemberUpdateDTO, db: DBSession, current_user: ProjectAuthor, background_tasks: BackgroundTasks):
+    checks = [
+            exists(select(User.id).where(User.id == member_id)).label("user_exists"),
+            exists(select(ProjectMember.id).where(ProjectMember.project_id == project_id, ProjectMember.user_id == member_id, ProjectMember.left_at == None)).label("is_member")
+        ]
+    query = select(*checks)
+    result = await db.execute(query)
+    responses = result.fetchone()
+
+    if not responses.user_exists:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    if not responses.is_member:
+        raise HTTPException(status_code=400, detail="Пользователь не является участником проекта")
+    
+    result = await db.execute(select(ProjectMember).where(ProjectMember.project_id == project_id, ProjectMember.user_id == member_id))
+    member = result.scalar_one_or_none()
+    if not member:
+        raise HTTPException(500, "Ошибка при получении записи участника")
+    member.update(data)
+    await db.commit()
+    await db.refresh(member)
+
+    event = MemberUpdatedEvent(user_id=current_user.user.id, project_id=project_id, target_user_id=member.user_id, role=member.role.name)
     EventDispatcher.create_event(background_tasks, event)
 
     return member
@@ -135,7 +177,7 @@ async def leave_project(project_id: int, db: DBSession, current_user: ProjectMem
     member.left_at = datetime.now()
     await db.commit()
 
-    event = MemberRemovedEvent(user_id=current_user.user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name, payload={"project_id": project_id, "user_id": current_user.id})
+    event = MemberRemovedEvent(user_id=current_user.user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name)
     EventDispatcher.create_event(background_tasks, event)
 
     return {"message": "Вы успешно покинули проект"}
@@ -162,7 +204,7 @@ async def remove_member(project_id: int, user_id: int, db: DBSession, current_us
     member.left_at = datetime.now()
     await db.commit()
 
-    event = MemberRemovedEvent(user_id=current_user.user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name, payload={"project_id": project_id, "user_id": member.user_id})
+    event = MemberRemovedEvent(user_id=current_user.user.id, project_id=member.project_id, target_user_id=member.user_id, role=member.role.name)
     EventDispatcher.create_event(background_tasks, event)
 
     return {"message": "Пользователь исключён из команды проекта"}

@@ -1,0 +1,33 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  
+  position: relative;
+}
+
+.dateInput {
+  width: 100%;
+  min-width: 0; 
+  box-sizing: border-box;
+}
+
+[data-theme='dark'] .dateInput {
+  color-scheme: dark;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

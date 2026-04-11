@@ -12,6 +12,8 @@
 
   --accent-color: #2563eb;
   --accent-hover: #1d4ed8;
+  --danger-color: #ef4444;
+  --danger-hover: #dc2626;
   
   --border-color: #e2e8f0;
   --status-review: #f59e0b;
@@ -35,6 +37,7 @@
   --border-color: #334155;
   
   --accent-color: #60a5fa;
+  --danger-color: #ff4444;
   --status-review: #fbbf24;
   --status-success: #34d399;
   --status-neutral: #94a3b8;

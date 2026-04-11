@@ -18,6 +18,7 @@ class ProjectUpdateDTO(BaseModel):
 class ProjectDTO(ProjectBaseDTO):
     id: ID
     status: ProjectStatus
+    created_at: UTCDatetime
 
     model_config = ConfigDict(from_attributes=True)
 

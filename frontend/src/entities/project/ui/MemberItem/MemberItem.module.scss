@@ -1,0 +1,89 @@
+.memberItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: var(--border-radius-sm);
+  transition: background 0.2s;
+}
+
+.memberInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 80px;
+  flex-shrink: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.role {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+  }
+}
+
+.dangerBtn {
+  color: #ef4444; 
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+  }
+}
+
+.confirmContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+  padding: 10px 0;
+
+  p {
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+}
+
+.confirmActions {
+  display: flex;
+  gap: 12px;
+  
+  button {
+    flex: 1;
+  }
+}

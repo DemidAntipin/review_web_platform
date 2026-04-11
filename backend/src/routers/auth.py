@@ -1,7 +1,8 @@
+from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from src.models.user.user import User
 from src.core.utils.security import create_access_token, check_password, get_password_hash
-from sqlalchemy import select, exists
+from sqlalchemy import case, func, select, exists
 from fastapi.security import OAuth2PasswordRequestForm
 from src.dtos.auth.user import UserCreateDTO, UserUpdateDTO, UserDTO
 from src.dtos.auth.token import TokenDTO
@@ -55,3 +56,12 @@ async def update_current_user(data: UserUpdateDTO, db: DBSession, current_user: 
     await db.commit()
     await db.refresh(current_user)
     return current_user
+
+@router.get("/users/search", response_model=List[UserDTO])
+async def search_users(q: str, db: DBSession, current_user: CurrentUser):
+    if len(q) < 2:
+        return []
+    sort_priority = case((func.lower(User.username) == q.lower(), 0), (User.username.ilike(f"{q}%"), 1), else_=2)
+    query = (select(User).where(User.username.ilike(f"%{q}%")).order_by(sort_priority, User.username).limit(5))
+    result = await db.execute(query)
+    return result.scalars().all()

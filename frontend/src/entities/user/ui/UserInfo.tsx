@@ -1,54 +1,61 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { User as UserIcon, Bell, Settings, Moon, Sun, LogOut, ChevronDown } from 'lucide-react';
+import { User as UserIcon, Settings, Moon, Sun, LogOut, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import { User } from '../model/types';
-import { IconButton } from '@/shared/ui/icon_button/IconButton';
-import { Dropdown, DropdownItem } from '@/shared/ui/dropdown/Dropdown';
+import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { useAuthStore } from '@/features/auth/model/auth.store';
 import { useTheme } from '@/app/providers/ThemeProvider';
 import s from './user_info.module.scss';
+import { Placement } from '@floating-ui/react';
 
 interface UserInfoProps {
     user: User;
     className?: string;
-    onNotificationClick?: () => void;
-    dropdownPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'right-top';
+    dropdownPosition?: Placement;
 }
 
-export const UserInfo: React.FC<UserInfoProps> = ({ user, className, onNotificationClick, dropdownPosition = 'bottom-left' }) => {
+export const UserInfo: React.FC<UserInfoProps> = ({ user, className, dropdownPosition }) => {
     const { logout } = useAuthStore();
     const { theme, toggleTheme } = useTheme();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const menuItems: DropdownItem[] = [
-        { label: 'Настройки', icon: <Settings size={18} />, to: '/settings' },
-        { label: theme === 'dark' ? 'Светлая тема' : 'Тёмная тема', icon: theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />, onClick: toggleTheme },
-        { label: 'Выйти', icon: <LogOut size={18} />, onClick: logout, variant: 'danger', divider: true },
-    ];
+    
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     return (
         <div className={clsx(s.profileWrapper, className)}>
             <Dropdown
-                onOpenChange={setIsMenuOpen}
-                position={dropdownPosition}
-                items={menuItems}
+                position={dropdownPosition ? dropdownPosition : 'bottom-end'}
+                onOpenChange={setIsDropdownOpen}
                 trigger={
-                    <div className={s.userInfo} style={{ cursor: 'pointer' }}>
+                    <div className={s.userInfo}>
                         <div className={s.avatar}>
-                            {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <UserIcon size={20} />}
+                             {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <UserIcon size={20} />}
                         </div>
                         <div className={s.text}>
                             <div className={s.name}>{user.username}</div>
                             <div className={s.role}>{user.role}</div>
                         </div>
-                        <ChevronDown size={16} className={clsx(s.arrow, isMenuOpen && s.arrowActive)} />
+                        <ChevronDown 
+                            size={16} 
+                            className={clsx(s.arrow, isDropdownOpen && s.arrowActive)} 
+                        />
                     </div>
                 }
-            />         
-            <IconButton onClick={onNotificationClick} size="sm">
-                <Bell size={20} />
-            </IconButton>
+            >
+                <div className={s.menuList}>
+                    <NavLink to="/settings" className={s.menuItem}>
+                        <Settings size={18} /> <span>Настройки</span>
+                    </NavLink>
+                    <button onClick={toggleTheme} className={s.menuItem}>
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        <span>{theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}</span>
+                    </button>
+                    <div className={s.divider} />
+                    <button onClick={logout} className={clsx(s.menuItem, s.danger)}>
+                        <LogOut size={18} /> <span>Выйти</span>
+                    </button>
+                </div>
+            </Dropdown>
         </div>
     );
 };

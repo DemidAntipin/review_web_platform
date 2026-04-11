@@ -23,6 +23,7 @@ class WebSocketService {
         this.socket.onmessage = (event) => {
             try {
                 const { event_type, project_id, payload } = JSON.parse(event.data);
+                console.log(event_type, project_id, payload);
                 
                 const dataToHandle = { 
                     ...payload, 

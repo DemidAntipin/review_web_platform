@@ -1,95 +1,74 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useFloating, autoUpdate, offset, flip, shift, useInteractions, useClick, useDismiss, useRole, FloatingFocusManager, useTransitionStatus, FloatingPortal, Placement } from '@floating-ui/react';
 import clsx from 'clsx';
 import s from './dropdown.module.scss';
-import { Button } from '../button/Button';
-
-export interface DropdownItem {
-    label: string;
-    icon?: React.ReactNode;
-    onClick?: () => void;
-    to?: string;
-    variant?: 'default' | 'danger';
-    divider?: boolean;
-}
-
-type DropdownPosition = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'right-top';
 
 interface DropdownProps {
     trigger: React.ReactNode;
-    items: DropdownItem[];
+    children: React.ReactNode;
     className?: string;
-    position?: DropdownPosition;
+    position?: Placement;
     onOpenChange?: (isOpen: boolean) => void;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({ 
     trigger, 
-    items, 
-    className, 
-    position = 'bottom-right', 
-    onOpenChange
+    children, 
+    position = 'bottom-end', 
+    className,
+    onOpenChange 
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        onOpenChange?.(isOpen);
-    }, [isOpen, onOpenChange]);
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: (nextOpen) => {
+            setIsOpen(nextOpen);
+            onOpenChange?.(nextOpen);
+        },
+        middleware: [
+            offset(8),
+            flip({ fallbackAxisSideDirection: 'end' }),
+            shift({ padding: 10 }),
+        ],
+        whileElementsMounted: autoUpdate,
+        placement: position,
+        strategy: 'fixed',
+    });
 
-    const positionClasses: Record<DropdownPosition, string> = {
-        'bottom-right': s.bottomRight,
-        'bottom-left': s.bottomLeft,
-        'top-right': s.topRight,
-        'top-left': s.topLeft,
-        'right-top': s.rightTop,
-    };
+    const { isMounted, status } = useTransitionStatus(context, {
+        duration: 100,
+    });
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    const click = useClick(context);
+    const dismiss = useDismiss(context);
+    const role = useRole(context);
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
     return (
-        <div className={clsx(s.wrapper, className)} ref={menuRef}>
-            <div onClick={() => setIsOpen(!isOpen)} style={{ cursor: 'pointer' }}>
+        <div className={clsx(s.wrapper, className)}>
+            <div ref={refs.setReference} {...getReferenceProps()} className={s.trigger}>
                 {trigger}
             </div>
 
-            {isOpen && (
-                <div className={clsx(s.menu, positionClasses[position])}>
-                    {items.map((item, index) => (
-                        <React.Fragment key={index}>
-                            {item.divider && <div className={s.divider} />}
-                            {item.to ? (
-                                <NavLink 
-                                    to={item.to} 
-                                    className={clsx(s.item, item.variant && s[item.variant])} 
-                                    onClick={() => setIsOpen(false)}>
-                                    {item.icon}
-                                    <span>{item.label}</span>
-                                </NavLink>
-                            ) : (
-                                <Button
-                                    variant="ghost"
-                                    fullWidth
-                                    className={clsx(s.item, item.variant === 'danger' && s.danger)}
-                                    onClick={() => {
-                                        item.onClick?.();
-                                        setIsOpen(false);
-                                    }}>
-                                    {item.icon}
-                                    <span>{item.label}</span>
-                                </Button>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </div>
+            {isMounted && (
+                <FloatingPortal>
+                    <FloatingFocusManager context={context} modal={false}>
+                        <div
+                            ref={refs.setFloating}
+                            style={{
+                                ...floatingStyles,
+                                visibility: context.x === null ? 'hidden' : 'visible',
+                            }}
+                            {...getFloatingProps()}
+                            className={s.menu}
+                            data-status={status}
+                        >
+                            {children}
+                        </div>
+                    </FloatingFocusManager>
+                </FloatingPortal>
             )}
         </div>
     );
