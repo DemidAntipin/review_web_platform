@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ProjectPreview, Member, ProjectStatus, SortDirection, SortField } from './types';
+import { ProjectPreview, Member, ProjectStatus, SortDirection, ProjectSortField } from './types';
 import { projectApi } from '../api/project.api';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -9,7 +9,7 @@ interface ProjectState {
     projectMembers: Record<number, Member[]>;
     isLoading: boolean;
     error: string | null;
-    sortField: SortField;
+    sortField: ProjectSortField;
     sortDirection: SortDirection;
     
     setProjects: () => Promise<void>;
@@ -22,6 +22,8 @@ interface ProjectState {
     updateMemberInStore: (projectId: number, userId: number, role: number) => void;
     removeMemberFromStore: (projectId: number, userId: number) => void;
 
+    removeProjectMembers: (projectId: number) => void;
+
     searchQuery: string;
     showHidden: boolean;
     selectedJournals: string[];
@@ -33,7 +35,7 @@ interface ProjectState {
     toggleJournal: (journal: string) => void;
     resetFilters: () => void;
 
-    setSort: (field: SortField, direction: SortDirection) => void;
+    setSort: (field: ProjectSortField, direction: SortDirection) => void;
     toggleSortDirection: () => void;
 }
 
@@ -129,6 +131,12 @@ export const useProjectStore = create<ProjectState>()(
                         [projectId]: currentList.filter(m => m.user_id !== userId)
                     }
                 };
+            }),
+
+            removeProjectMembers: (projectId: number) => set((state) => {
+                const nextMembers = { ...state.projectMembers };
+                delete nextMembers[projectId];
+                return { projectMembers: nextMembers };
             }),
 
             setSearchQuery: (searchQuery) => set({ searchQuery }),

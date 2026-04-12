@@ -70,3 +70,6 @@ export interface TaskComment {
     user_id: number;
     created_at: string;
 }
+
+export type TaskSortField = 'created_at' | 'title' | 'deadline';
+export type SortDirection = 'asc' | 'desc';

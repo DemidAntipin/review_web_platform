@@ -1,8 +1,8 @@
 import React from 'react';
-import { SlidersHorizontal, Check, ArrowUpDown, SortAsc, SortDesc } from 'lucide-react';
+import { SlidersHorizontal, Check, SortAsc, SortDesc } from 'lucide-react';
 import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
-import { ProjectStatus, SortDirection, SortField, STATUS_MAP } from '@/entities/project/model/types';
+import { ProjectStatus, SortDirection, ProjectSortField } from '@/entities/project/model/types';
 import clsx from 'clsx';
 import s from './ProjectFilters.module.scss';
 import { Button } from '@/shared/ui/button/Button';
@@ -23,17 +23,17 @@ interface Props {
     showHidden: boolean;
     onToggleHidden: () => void;
     onReset: () => void;
-    sortField: SortField;
+    sortField: ProjectSortField;
     sortDirection: SortDirection;
-    onSortChange: (field: SortField, direction: SortDirection) => void;
+    onSortChange: (field: ProjectSortField, direction: SortDirection) => void;
 }
 
-export const ProjectFilters: React.FC<Props> = ({
+export const ProjectFilters = React.memo(({
     selectedStatuses, onStatusChange,
     journals, selectedJournals, onJournalChange,
     showHidden, onToggleHidden,
     onReset, sortField, sortDirection, onSortChange,
-}) => {
+}: Props) => {
     return (
         <Dropdown trigger={
             <IconButton size="md">
@@ -101,7 +101,7 @@ export const ProjectFilters: React.FC<Props> = ({
                         <select 
                             className={s.select} 
                             value={sortField} 
-                            onChange={(e) => onSortChange(e.target.value as SortField, sortDirection)}
+                            onChange={(e) => onSortChange(e.target.value as ProjectSortField, sortDirection)}
                         >
                             <option value="created_at">По дате</option>
                             <option value="title">По названию</option>
@@ -121,4 +121,4 @@ export const ProjectFilters: React.FC<Props> = ({
             </div>
         </Dropdown>
     );
-};
+});

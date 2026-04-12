@@ -15,7 +15,7 @@ export const useKanbanDnd = (projectId: number) => {
         if (!over) return;
 
         const activeId = active.id as number;
-        const overId = over.id; // string | number
+        const overId = over.id;
 
         const activeTask = tasks.find(t => t.id === activeId);
         if (!activeTask) return;
@@ -24,11 +24,9 @@ export const useKanbanDnd = (projectId: number) => {
         let targetOverTaskId: number | string;
 
         if (typeof overId === 'string') {
-            // Если это строка, значит мы попали на саму колонку (её ID = статус)
             targetStatus = overId as TaskStatus;
             targetOverTaskId = 'END'; 
         } else {
-            // Если это число, значит мы попали на другую карточку
             const overTask = tasks.find(t => t.id === overId);
             if (!overTask) return;
             targetStatus = overTask.status;

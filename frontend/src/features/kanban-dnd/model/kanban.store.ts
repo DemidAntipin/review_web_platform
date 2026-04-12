@@ -1,11 +1,14 @@
 import { create } from 'zustand';
-import { TaskPreview, TaskStatus, STATUS_MAP, PRIORITY_MAP, STATUS_TO_ID, transformTask } from '@/entities/task/model/types';
+import { TaskPreview, TaskStatus, STATUS_MAP, PRIORITY_MAP, STATUS_TO_ID, transformTask, TaskSortField } from '@/entities/task/model/types';
 import { taskApi } from '@/entities/task/api/task.api';
+import { SortDirection } from '@/entities/project/model/types';
 
 interface KanbanState {
     tasks: TaskPreview[];
     isLoading: boolean;
     error: string | null;
+    sortField: TaskSortField;
+    sortDirection: SortDirection;
     
     setTasks: (projectId: number) => Promise<void>;
     
@@ -16,12 +19,46 @@ interface KanbanState {
 
     moveTask: (activeId: number, overId: number | string, targetStatus?: TaskStatus) => void;
     updateTaskStatus: (projectId: number, taskId: number, status: TaskStatus) => Promise<void>;
+
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+
+    selectedTypes: string[];
+    selectedPriorities: string[];
+    selectedReviewers: number[];
+    selectedComments: number[];
+
+    toggleType: (type: string) => void;
+    togglePriority: (priority: string) => void;
+    toggleReviewer: (reviewerId: number) => void;
+    toggleComment: (commentId: number, reviewerId: number) => void;
+    resetFilters: () => void;
+
+    setSort: (field: TaskSortField, direction: SortDirection) => void;
+    toggleSortDirection: () => void;
 }
 
 export const useKanbanStore = create<KanbanState>((set, get) => ({
     tasks: [],
     isLoading: false,
     error: null,
+
+    searchQuery: '',
+    setSearchQuery: (searchQuery) => set({ searchQuery }),
+
+    selectedTypes: [],
+    selectedPriorities: [],
+    selectedReviewers: [],
+    selectedComments: [],
+
+    sortField: 'created_at',
+    sortDirection: 'desc',
+
+    setSort: (sortField, sortDirection) => set({ sortField, sortDirection }),
+        
+    toggleSortDirection: () => set((state) => ({ 
+        sortDirection: state.sortDirection === 'asc' ? 'desc' : 'asc' 
+    })),
 
     setTasks: async (projectId) => {
         set({ isLoading: true, error: null });
@@ -93,5 +130,62 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
         } catch (e) {
             get().setTasks(projectId);
         }
-    }
+    },
+
+    toggleType: (type) => set((s) => ({
+        selectedTypes: s.selectedTypes.includes(type) 
+            ? s.selectedTypes.filter(t => t !== type) 
+            : [...s.selectedTypes, type]
+    })),
+
+    togglePriority: (priority) => set((s) => ({
+        selectedPriorities: s.selectedPriorities.includes(priority)
+            ? s.selectedPriorities.filter(p => p !== priority)
+            : [...s.selectedPriorities, priority]
+    })),
+
+    toggleReviewer: (reviewerId) => set((s) => {
+        const isSelected = s.selectedReviewers.includes(reviewerId);
+        const relatedCommentIds = s.tasks
+            .filter(t => t.reviewer_id === reviewerId && t.comment_id)
+            .map(t => t.comment_id as number);
+
+        if (isSelected) {
+            return {
+                selectedReviewers: s.selectedReviewers.filter(id => id !== reviewerId),
+                selectedComments: s.selectedComments.filter(id => !relatedCommentIds.includes(id))
+            };
+        } else {
+            return {
+                selectedReviewers: [...s.selectedReviewers, reviewerId]
+            };
+        }
+    }),
+
+    toggleComment: (commentId, reviewerId) => set((s) => {
+        const isSelected = s.selectedComments.includes(commentId);
+        
+        if (!isSelected) {
+            return {
+                selectedComments: [...s.selectedComments, commentId],
+                selectedReviewers: s.selectedReviewers.includes(reviewerId) 
+                    ? s.selectedReviewers 
+                    : [...s.selectedReviewers, reviewerId]
+            };
+        } else {
+            return {
+                selectedComments: s.selectedComments.filter(id => id !== commentId)
+            };
+        }
+    }),
+
+    resetFilters: () => set({
+        searchQuery: '',
+        selectedTypes: [],
+        selectedPriorities: [],
+        selectedReviewers: [],
+        selectedComments: [],
+        sortField: 'created_at',
+        sortDirection: 'desc'
+    }),
 }));

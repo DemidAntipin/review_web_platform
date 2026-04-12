@@ -220,3 +220,22 @@
       }
     }
 }
+
+.searchWrap {
+  display: flex;
+  flex: 1;
+  max-width: 400px;
+  gap: 10px;
+
+  .searchInput {
+    flex: 1;
+    padding: 10px var(--padding-inner);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--background-card);
+    color: var(--text-primary);
+    &::placeholder {
+        color: var(--text-secondary);
+    }
+  }
+}

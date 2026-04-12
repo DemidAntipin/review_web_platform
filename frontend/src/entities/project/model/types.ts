@@ -48,5 +48,5 @@ export const STATUS_MAP: Record<number, ProjectStatus> = {
     4: 'closed'
 };
 
-export type SortField = 'created_at' | 'title' | 'deadline';
+export type ProjectSortField = 'created_at' | 'title' | 'deadline';
 export type SortDirection = 'asc' | 'desc';
