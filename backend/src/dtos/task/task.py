@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 from typing import Optional, List
 from src.models.task.task_type import TaskType
 from src.models.task.task_status import TaskStatus
@@ -23,18 +23,16 @@ class TaskCommentDTO(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class TaskCommentPreviewDTO(BaseModel):
-    username: UsernameStr
-    role: UserRole
-    message: str
-    created_at: UTCDatetime
+class TaskCommentPreviewDTO(TaskCommentDTO):
+    username: UsernameStr = None
+    role: UserRole = None
 
     model_config = ConfigDict(from_attributes=True)
 
 class AttachmentDTO(BaseModel):
     id: ID
     task_id: ID
-    file_uri: str
+    file_url: str
     file_type: str
     uploaded_at: UTCDatetime
 

@@ -1,14 +1,17 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, File, HTTPException, BackgroundTasks, UploadFile
 from sqlalchemy import select, func, and_, case, distinct
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.functions import coalesce
 from typing import List
 from datetime import datetime
+from src.core.utils.dtos_builder import get_task_comment_preview
 from src.dtos.events import ReviewerAddedEvent, CommentAddedEvent, CommentUpdatedEvent, TaskUpdatedEvent, TaskDeletedEvent, CommentDecomposedEvent, AttachmentUploadedEvent, TaskCommentAddedEvent
 from src.core.events.event_dispatcher import EventDispatcher
 from src.core.dependencies import DBSession, ProjectAuthor, ProjectMemberAny, ProjectCoauthor
 from src.core.types import ID
+from src.logic.attachment_service import AttachmentService
 from src.models.comment.comment import Comment
+from src.models.project_member import ProjectMember
 from src.models.task.task import Task
 from src.models.task.task_status import TaskStatus
 from src.models.reviewer import Reviewer
@@ -280,7 +283,7 @@ async def decompose_comment(project_id: ID, reviewer_id: ID, comment_id: ID, dat
 
     return tasks
 
-@router.post("/tasks/{task_id}/chat")
+@router.post("/tasks/{task_id}/chat", response_model=TaskCommentPreviewDTO)
 async def add_task_comment(project_id: ID, task_id: ID, data: TaskCommentCreateDTO, db: DBSession, current_user: ProjectMemberAny, background_tasks: BackgroundTasks):
     query = (
         select(Task.id)
@@ -299,13 +302,54 @@ async def add_task_comment(project_id: ID, task_id: ID, data: TaskCommentCreateD
     await db.commit()
     await db.refresh(chat_message)
 
-    event = TaskCommentAddedEvent(user_id=current_user.user.id, project_id=project_id, task_id=task_id, payload={"task_comment_id": chat_message.id})
+    event = TaskCommentAddedEvent(user_id=current_user.user.id, project_id=project_id, task_id=task_id, chat_message_id=chat_message.id)
     EventDispatcher.create_event(background_tasks, event)
 
-    return {"success": "ok"}
+    return await get_task_comment_preview(chat_message.id)
 
-@router.post("/{task_id}/attachments", response_model=AttachmentDTO)
-async def upload_attachment(project_id: ID, task_id: ID, data: AttachmentCreateDTO, db: DBSession, current_user: ProjectCoauthor, background_tasks: BackgroundTasks):
+@router.get("/tasks/{task_id}/chat", response_model=List[TaskCommentPreviewDTO])
+async def get_task_comments(project_id: ID, task_id: ID, db: DBSession, current_user: ProjectMemberAny):
+    query = (
+        select(Task.id)
+        .join(Comment, Comment.id == Task.comment_id)
+        .join(Reviewer, Comment.reviewer_id == Reviewer.id)
+        .where(Task.id == task_id, Task.deleted_at == None, Reviewer.project_id == project_id).limit(1)
+        )
+    result = await db.execute(query)
+    task = result.scalar_one_or_none()
+    if not task:
+        raise HTTPException(404, detail="Задача не найдена")
+    
+    query = (
+        select(
+            TaskComment.id,
+            TaskComment.task_id,
+            TaskComment.user_id,
+            User.username,
+            ProjectMember.role,
+            TaskComment.message,
+            TaskComment.created_at
+        )
+        .join(User, TaskComment.user_id == User.id)
+        .join(Task, TaskComment.task_id == Task.id)
+        .join(Comment, Task.comment_id == Comment.id)
+        .join(Reviewer, Comment.reviewer_id == Reviewer.id)
+        .join(
+            ProjectMember, 
+            and_(
+                ProjectMember.user_id == User.id,
+                ProjectMember.project_id == Reviewer.project_id
+            )
+        )
+        .where(TaskComment.task_id == task_id)
+        .order_by(TaskComment.created_at.asc())
+    )
+    result = await db.execute(query)
+    comments = result.mappings().all()
+    return comments
+
+@router.post("/tasks/{task_id}/attachments", response_model=AttachmentDTO)
+async def upload_attachment(project_id: ID, task_id: ID, db: DBSession, current_user: ProjectCoauthor, background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     query = (
         select(Task.id)
         .join(Comment, Comment.id == Task.comment_id)
@@ -317,12 +361,35 @@ async def upload_attachment(project_id: ID, task_id: ID, data: AttachmentCreateD
 
     if not task:
         raise HTTPException(404, detail="Задача не найдена")
-    attachment = Attachment(task_id=task_id, file_url=data.file_url, file_type=data.file_type)
-    db.add(attachment)
+    attachment = await AttachmentService.upload_file(db, task_id, file)
     await db.commit()
     await db.refresh(attachment)
 
-    event = AttachmentUploadedEvent(user_id=current_user.user.id, project_id=project_id, task_id=task_id, payload={"attachment_id":attachment.id})
+    event = AttachmentUploadedEvent(user_id=current_user.user.id, project_id=project_id, task_id=task_id, attachment_id=attachment.id)
     EventDispatcher.create_event(background_tasks, event)
     
     return attachment
+
+@router.get("/tasks/{task_id}/attachments", response_model=List[AttachmentDTO])
+async def get_attachments(project_id: ID, task_id: ID, db: DBSession, current_user: ProjectMemberAny):
+    query = (
+        select(Task.id)
+        .join(Comment, Comment.id == Task.comment_id)
+        .join(Reviewer, Comment.reviewer_id == Reviewer.id)
+        .where(Task.id == task_id, Task.deleted_at == None, Reviewer.project_id == project_id).limit(1)
+        )
+    result = await db.execute(query)
+    task = result.scalar_one_or_none()
+
+    if not task:
+        raise HTTPException(404, detail="Задача не найдена")
+
+    query = (
+        select(Attachment)
+        .where(Attachment.task_id == task_id)
+        .order_by(Attachment.uploaded_at.asc())
+    )
+    result = await db.execute(query)
+    attachments = result.scalars().all()
+    
+    return attachments

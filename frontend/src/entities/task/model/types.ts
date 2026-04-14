@@ -66,9 +66,20 @@ export interface TaskPreview {
 
 export interface TaskComment {
     id: number;
-    message: string;
+    task_id: number;
     user_id: number;
+    username: string;
+    role: number;
+    message: string;
     created_at: string;
+}
+
+export interface Attachment {
+    id: number;
+    task_id: number;
+    file_url: string;
+    file_type: string;
+    uploaded_at: string;
 }
 
 export type TaskSortField = 'created_at' | 'title' | 'deadline';

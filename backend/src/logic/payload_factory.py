@@ -38,14 +38,12 @@ class EventPayloadFactory:
 
     @staticmethod
     async def __task_comment_preview(event: TaskCommentAddedEvent) -> Dict[str, Any]:
-        comment_id = event.payload.get("task_comment_id")
-        dto = await dtos_builder.get_task_comment_preview(comment_id)
+        dto = await dtos_builder.get_task_comment_preview(event.chat_message_id)
         return dto.model_dump() if dto else {}
 
     @staticmethod
     async def __attachment_preview(event: AttachmentUploadedEvent) -> Dict[str, Any]:
-        attachment_id = event.payload.get("attachment_id")
-        dto = await dtos_builder.get_attachment_dto(attachment_id)
+        dto = await dtos_builder.get_attachment_dto(event.attachment_id)
         return dto.model_dump() if dto else {}
 
     @staticmethod

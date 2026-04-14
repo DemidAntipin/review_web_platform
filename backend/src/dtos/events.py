@@ -65,7 +65,9 @@ class CommentDecomposedEvent(BaseEvent):
 class AttachmentUploadedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.ATTACHMENT_UPLOADED.value
     task_id: ID
+    attachment_id: ID
 
 class TaskCommentAddedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.TASK_COMMENT_ADDED.value
     task_id: ID
+    chat_message_id: ID

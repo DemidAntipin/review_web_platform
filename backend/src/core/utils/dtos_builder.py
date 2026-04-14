@@ -100,12 +100,11 @@ async def get_task_comment_preview(comment_id: ID) -> TaskCommentPreviewDTO:
         result = await db.execute(query)
     r = result.fetchone()
     if not r: return None
-    return TaskCommentPreviewDTO(
-        username=r.username,
-        role=r.role,
-        message=r.TaskComment.message,
-        created_at=r.TaskComment.created_at
-    )
+    return TaskCommentPreviewDTO.model_validate({
+            **TaskCommentDTO.model_validate(r.TaskComment).model_dump(),
+            "username": r.username,
+            "role": r.role
+        })
 
 async def get_attachment_dto(attachment_id: ID) -> AttachmentDTO:
     async with DBSession() as db:

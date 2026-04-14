@@ -18,7 +18,8 @@ export const ENDPOINTS = {
     TASKS: {
         LIST: (project_id: number) => `/projects/${project_id}/tasks`,
         BY_ID: (project_id: number, task_id: number) => `/projects/${project_id}/tasks/${task_id}`,
-        COMMENTS: (project_id: number, task_id: number) => `/projects/${project_id}/tasks/${task_id}/comments`,
+        CHAT: (project_id: number, task_id: number) => `/projects/${project_id}/tasks/${task_id}/chat`,
+        ATTACHMENTS: (project_id: number, task_id: number) => `/projects/${project_id}/tasks/${task_id}/attachments`,
     },
     REVIEWERS: {
         LIST: (project_id: number) => `/projects/${project_id}/reviewers`,

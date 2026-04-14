@@ -2,9 +2,10 @@ import { useEffect } from 'react';
 import { WebsocketService } from '@/shared/api/websocket';
 import { useKanbanStore } from '../../model/kanban.store';
 import { TaskPreview } from '../../../../entities/task/model/types';
+import { TaskComments } from '@/features/task_comment/ui/TaskComment';
 
 export const useKanbanSocket = (projectId: number) => {
-    const { updateTask, removeTask, addTasks } = useKanbanStore();
+    const { updateTask, removeTask, addTasks, taskCommentsInc } = useKanbanStore();
 
     useEffect(() => {
         if (!projectId) return;
@@ -34,11 +35,16 @@ export const useKanbanSocket = (projectId: number) => {
         const unsubDecompose = WebsocketService.on('COMMENT_DECOMPOSED', (payload: { tasks: TaskPreview[] }) => {
             addTasks(payload.tasks);
         });
+        const unsubChatMessage = WebsocketService.on('TASK_COMMENT_ADDED', (payload) => {
+            if (!payload.task_id) return;
+            taskCommentsInc(payload.task_id);
+        })
 
         return () => {
             unsubUpdate();
             unsubDelete();
             unsubDecompose();
+            unsubChatMessage();
         };
     }, []);
 };

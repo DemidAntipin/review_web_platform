@@ -1,0 +1,144 @@
+.container {
+  width: 240px;
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid transparent;
+  transition: border-color 0.2s, background-color 0.2s;
+
+  &.isDragging {
+    border-color: var(--primary-color);
+    background-color: rgba(var(--primary-rgb), 0.05);
+    
+    * {
+      pointer-events: none;
+    }
+  }
+}
+
+.list {
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 40px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+  }
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  background: var(--bg-primary);
+  border: 1px solid transparent;
+
+  &:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-color);
+
+    .download {
+      opacity: 1;
+    }
+  }
+}
+
+.icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.download {
+  color: var(--primary-color);
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+
+  &:hover {
+    opacity: 1;
+    background: rgba(var(--primary-rgb), 0.1);
+    border-radius: 4px;
+  }
+}
+
+.empty {
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--primary-color);
+  background: rgba(var(--primary-rgb), 0.05);
+  border-radius: 6px;
+}
+
+.spin {
+  animation: rotate 1.5s linear infinite;
+}
+
+.footer {
+  padding: 10px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.addBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

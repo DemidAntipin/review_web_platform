@@ -5,11 +5,8 @@ import { UserInfo } from '@/entities/user/ui/UserInfo';
 import s from './layout.module.scss';
 import { useAuthStore } from '@/features/auth/model/auth.store';
 import { Loader } from '@/shared/ui/loader/Loader';
-import { SlidersHorizontal } from 'lucide-react';
-import { IconButton } from '@/shared/ui/icon_button/IconButton';
 import { MobileNav } from './MobileNav';
 import clsx from 'clsx';
-import { ProjectFilters } from '@/features/project/ui/ProjectFilters/ProjectFilters';
 
 export const MainLayout = () => {
     const [pageTitle, setPageTitle] = useState('');

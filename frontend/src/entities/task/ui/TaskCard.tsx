@@ -3,6 +3,11 @@ import { IconButton } from '@/shared/ui/icon_button/IconButton';
 import s from './taskcard.module.scss';
 import clsx from 'clsx';
 import { TaskPreview, TaskType } from '../model/types';
+import { TaskComments } from '@/features/task_comment/ui/TaskComment';
+import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
+import { useParams } from 'react-router-dom';
+import { Button } from '@/shared/ui/button/Button';
+import { AttachmentList } from '@/features/attachments/ui/AttachmentList';
 
 interface TaskCardProps { task: TaskPreview; }
 
@@ -15,6 +20,8 @@ const TYPE_CONFIG: Record<TaskType, { icon: any, label: string }> = {
 };
 
 export const TaskCard = ({ task }: TaskCardProps) => {
+    const { projectId } = useParams<{ projectId: string }>(); 
+    const project_id = Number(projectId);
     const typeInfo = TYPE_CONFIG[task.type as TaskType] || { icon: FileText, label: task.type };
     const { icon: TypeIcon, label: typeLabel } = typeInfo;
     return (
@@ -38,8 +45,25 @@ export const TaskCard = ({ task }: TaskCardProps) => {
             <div className={s.cardFooter}>
                 <span className={s.username}>{task.assignee || "Нет исполнителя"}</span>
                 <div className={s.stats}>
-                    <div className={s.statItem}><Paperclip size={18} /> {task.attachments_count}</div>
-                    <div className={s.statItem}><MessageSquare size={18} /> {task.comments_count}</div>
+                    <Dropdown 
+                        position="bottom-end"
+                        trigger={
+                            <Button className={s.statItem} variant='ghost'>
+                                <Paperclip size={18} /> {task.attachments_count}
+                            </Button>
+                        }>
+                        <AttachmentList projectId={project_id} taskId={task.id} />
+                    </Dropdown>
+                    <Dropdown 
+                        position="bottom-end"
+                        trigger={
+                            <Button className={s.statItem} variant='ghost'>
+                                <MessageSquare size={18} /> {task.comments_count}
+                            </Button>
+                        }
+                    >
+                        <TaskComments projectId={project_id} taskId={task.id} />
+                    </Dropdown>
                 </div>
             </div>
         </div>
