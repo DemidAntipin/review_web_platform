@@ -17,5 +17,14 @@ export const attachmentApi = {
                 headers: { 'Content-Type': 'multipart/form-data' }
             }
         );
-    }
+    },
+    getPreview: (projectId: number, taskId: number, attachmentId: number) =>
+        $api.get(ENDPOINTS.TASKS.ATTACHMENT_PREVIEW(projectId, taskId, attachmentId), {
+            responseType: 'blob'
+        }),
+
+    download: (projectId: number, taskId: number, attachmentId: number) =>
+        $api.get(ENDPOINTS.TASKS.ATTACHMENT_DOWNLOAD(projectId, taskId, attachmentId), {
+            responseType: 'blob'
+        })
 };

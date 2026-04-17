@@ -11,3 +11,6 @@ python-multipart
 werkzeug>=2.3.0
 asyncpg
 httpx
+pypandoc
+weasyprint
+charset-normalizer

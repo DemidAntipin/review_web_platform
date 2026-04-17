@@ -8,6 +8,7 @@ import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/shared/ui/button/Button';
 import { AttachmentList } from '@/features/attachments/ui/AttachmentList';
+import { useRef } from 'react';
 
 interface TaskCardProps { task: TaskPreview; }
 
@@ -20,12 +21,13 @@ const TYPE_CONFIG: Record<TaskType, { icon: any, label: string }> = {
 };
 
 export const TaskCard = ({ task }: TaskCardProps) => {
+    const cardRef = useRef<HTMLDivElement>(null);
     const { projectId } = useParams<{ projectId: string }>(); 
     const project_id = Number(projectId);
     const typeInfo = TYPE_CONFIG[task.type as TaskType] || { icon: FileText, label: task.type };
     const { icon: TypeIcon, label: typeLabel } = typeInfo;
     return (
-        <div className={s.card}>
+        <div className={s.card} ref={cardRef}>
             <div className={s.cardHeader}>
                 <div className={s.badges}>
                     <span className={s.labelBadge}>R{task.reviewer_id}-C{task.comment_id}</span>
@@ -46,7 +48,8 @@ export const TaskCard = ({ task }: TaskCardProps) => {
                 <span className={s.username}>{task.assignee || "Нет исполнителя"}</span>
                 <div className={s.stats}>
                     <Dropdown 
-                        position="bottom-end"
+                        position="bottom"
+                        containerRef={cardRef}
                         trigger={
                             <Button className={s.statItem} variant='ghost'>
                                 <Paperclip size={18} /> {task.attachments_count}
@@ -55,7 +58,8 @@ export const TaskCard = ({ task }: TaskCardProps) => {
                         <AttachmentList projectId={project_id} taskId={task.id} />
                     </Dropdown>
                     <Dropdown 
-                        position="bottom-end"
+                        position="bottom"
+                        containerRef={cardRef}
                         trigger={
                             <Button className={s.statItem} variant='ghost'>
                                 <MessageSquare size={18} /> {task.comments_count}

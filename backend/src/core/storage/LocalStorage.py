@@ -5,7 +5,6 @@ from src.core.storage.BaseStorage import BaseStorage
 
 class LocalStorage(BaseStorage):
     UPLOAD_DIR = "uploads"
-    BASE_URL = "/static-files"
 
     @classmethod
     async def save(cls, file: UploadFile, filename: str) -> str:
@@ -17,4 +16,9 @@ class LocalStorage(BaseStorage):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        return f"{cls.BASE_URL}/{filename}"
+        return filename
+    
+    @classmethod
+    def get_path(cls, file_url: str) -> str:
+        filename = os.path.basename(file_url)
+        return os.path.abspath(os.path.join(cls.UPLOAD_DIR, filename))

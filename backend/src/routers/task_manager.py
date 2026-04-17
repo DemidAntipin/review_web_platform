@@ -393,3 +393,27 @@ async def get_attachments(project_id: ID, task_id: ID, db: DBSession, current_us
     attachments = result.scalars().all()
     
     return attachments
+
+@router.get("/tasks/{task_id}/attachments/{attachment_id}/preview")
+async def preview_attachment(task_id: ID, attachment_id: ID, db: DBSession, current_user: ProjectMemberAny):
+    query = (
+        select(Attachment)
+        .where(Attachment.task_id == task_id, Attachment.id == attachment_id).limit(1)
+        )
+    result = await db.execute(query)
+    attachment = result.scalar_one_or_none()
+    if not attachment:
+        raise HTTPException(status_code=404, detail="Вложение не найдено")
+    return await AttachmentService.get_file_preview(attachment)
+
+@router.get("/tasks/{task_id}/attachments/{attachment_id}/download")
+async def download_attachment(task_id: ID, attachment_id: ID, db: DBSession, current_user: ProjectMemberAny):
+    query = (
+        select(Attachment)
+        .where(Attachment.task_id == task_id, Attachment.id == attachment_id).limit(1)
+        )
+    result = await db.execute(query)
+    attachment = result.scalar_one_or_none()
+    if not attachment:
+        raise HTTPException(status_code=404, detail="Вложение не найдено")
+    return await AttachmentService.download_file(attachment)

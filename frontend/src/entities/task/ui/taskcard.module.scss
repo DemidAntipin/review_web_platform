@@ -104,4 +104,8 @@
   align-items: center;
   gap: 4px;
   color: var(--text-secondary);
+
+  &:hover{
+    background-color: var(--border-color);
+  }
 }

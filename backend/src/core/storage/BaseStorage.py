@@ -6,3 +6,8 @@ class BaseStorage(ABC):
     @abstractmethod
     async def save(cls, file: UploadFile, filename: str) -> str:
         pass
+
+    @classmethod
+    @abstractmethod
+    def get_path(cls, file_url: str) -> str:
+        pass

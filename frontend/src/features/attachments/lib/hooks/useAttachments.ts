@@ -28,9 +28,26 @@ export const useAttachments = (projectId: number, taskId: number) => {
         }
     };
 
+    const downloadFile = async (attachmentId: number, fileName: string) => {
+        try {
+            const { data } = await attachmentApi.download(projectId, taskId, attachmentId);
+            
+            const url = window.URL.createObjectURL(new Blob([data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode?.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error("Ошибка при скачивании файла", e);
+        }
+    };
+
     useEffect(() => {
         if (taskId) fetchAttachments();
     }, [taskId]);
 
-    return { attachments, uploadFile, isUploading, refresh: fetchAttachments };
+    return { attachments, uploadFile, isUploading, downloadFile, refresh: fetchAttachments };
 };
