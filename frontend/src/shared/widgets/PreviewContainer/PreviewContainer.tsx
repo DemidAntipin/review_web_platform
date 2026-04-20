@@ -1,53 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
-import s from './PreviewContainer.module.scss'; // Используем ваши стили лоадера
+import { Loader2, FileWarning } from 'lucide-react';
+import s from './PreviewContainer.module.scss';
 
 interface Props {
     url: string;
-    isText: boolean;
+    isText?: boolean;
+    isHtml?: boolean;
 }
 
-export const PreviewContainer = ({ url, isText }: Props) => {
+export const PreviewContainer = ({ url, isText, isHtml }: Props) => {
     const [content, setContent] = useState<string | null>(null);
-    const [loading, setLoading] = useState(isText);
+    const [loading, setLoading] = useState(isText || isHtml);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
-        if (isText) {
+        if (isText || isHtml) {
             setLoading(true);
+            setError(false);
             fetch(url)
-                .then(res => res.text())
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.text();
+                })
                 .then(text => {
                     setContent(text);
                     setLoading(false);
+                })
+                .catch(() => {
+                    setError(true);
+                    setLoading(false);
                 });
         }
-    }, [url, isText]);
+    }, [url, isText, isHtml]);
 
-    if (loading) {
-        return <div className={s.loader}><Loader2 className={s.spin} /> <span>Загрузка содержимого...</span></div>;
+    if (loading) return <div className={s.loader}><Loader2 className={s.spin} /> <span>Загрузка...</span></div>;
+    if (error) return <div className={s.error}><FileWarning /> <span>Ошибка загрузки</span></div>;
+
+    if (isHtml && content) {
+        return <div className={s.htmlPreview} dangerouslySetInnerHTML={{ __html: content }} />;
     }
 
-    if (isText) {
+    if (isText && content) {
         return (
-            <pre style={{ 
-                whiteSpace: 'pre-wrap', 
-                wordBreak: 'break-all',
-                background: 'var(--background-card)',
-                padding: '12px',
-                borderRadius: '8px',
-                fontSize: '13px',
-                maxHeight: '70vh',
-                overflow: 'auto'
-            }}>
+            <pre className={s.textPreview}>
                 <code>{content}</code>
             </pre>
         );
     }
 
-    return (
-        <iframe 
-            src={url} 
-            style={{ width: '100%', height: '75vh', border: 'none', borderRadius: '4px' }} 
-        />
-    );
+    return <iframe src={url} className={s.iframePreview} title="Preview" />;
 };

@@ -18,6 +18,8 @@ class EventPayloadFactory:
             EventType.ATTACHMENT_UPLOADED.value: EventPayloadFactory.__attachment_preview,
             EventType.COMMENT_DECOMPOSED.value: EventPayloadFactory.__tasks_list_preview,
             EventType.REVIEWER_ADDED.value: EventPayloadFactory.__reviewer_preview,
+            EventType.REVIEWER_UPDATED.value: EventPayloadFactory.__reviewer_preview,
+            EventType.REVIEWER_REMOVED.value: EventPayloadFactory.__reviewer_removed,
         }
 
         handler = handlers.get(event.action_type)
@@ -71,3 +73,10 @@ class EventPayloadFactory:
     @staticmethod
     async def __project_archieved(event: ProjectArchivedEvent) -> Dict[str, Any]:
         return {"project_id": event.project_id}
+    
+    @staticmethod
+    async def __reviewer_removed(event: ReviewerRemovedEvent) -> Dict[str, Any]:
+        return {
+            "reviewer_id": event.reviewer_id,
+            "project_id": event.project_id
+        }

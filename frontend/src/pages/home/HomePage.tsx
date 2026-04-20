@@ -70,8 +70,8 @@ export const HomePage = () => {
 
             if (selectedJournals.length > 0 && !selectedJournals.includes(p.journal)) return false;
 
-            const isHidden = hiddenIds.has(p.id);
-            if (showHidden ? !isHidden : isHidden) return false;
+            const matchesHidden = showHidden || !hiddenIds.has(p.id);
+            if (!matchesHidden) return false;
 
             if (selectedStatuses.length > 0) {
                 const currentStatus = typeof p.status === 'number' ? STATUS_MAP[p.status] : p.status;

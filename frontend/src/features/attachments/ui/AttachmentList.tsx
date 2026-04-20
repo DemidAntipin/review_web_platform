@@ -8,12 +8,13 @@ import { Dialog } from '@/shared/ui/dialog/Dialog';
 import { ENDPOINTS } from '@/shared/api/endpoints';
 import { useAttachmentPreview } from '../lib/hooks/useAttachmentsPreview';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
+import { PreviewContainer } from '@/shared/widgets/PreviewContainer/PreviewContainer';
 
 export const AttachmentList = ({ projectId, taskId }: { projectId: number, taskId: number }) => {
     const { attachments, uploadFile, isUploading, downloadFile } = useAttachments(projectId, taskId);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { previewUrl, isLoading, loadPreview, clearPreview } = useAttachmentPreview(projectId, taskId);
+    const { preview, isLoading, loadPreview, clearPreview } = useAttachmentPreview(projectId, taskId);
     const [selectedName, setSelectedName] = useState<string | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,10 +24,22 @@ export const AttachmentList = ({ projectId, taskId }: { projectId: number, taskI
 
     const onDragOver = (e: React.DragEvent) => {
         e.preventDefault();
+        e.stopPropagation();
+        if (!isDragging) setIsDragging(true);
+    };
+
+    const onDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
         setIsDragging(true);
     };
 
-    const onDragLeave = () => {
+    const onDragLeave = (e: React.DragEvent) => {
+        e.stopPropagation();
+
+        if (e.currentTarget.contains(e.relatedTarget as Node)) {
+            return;
+        }
         setIsDragging(false);
     };
 
@@ -44,9 +57,16 @@ export const AttachmentList = ({ projectId, taskId }: { projectId: number, taskI
         <div 
             className={clsx(s.container, isDragging && s.isDragging)}
             onDragOver={onDragOver}
+            onDragEnter={onDragEnter}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
         >
+             {isDragging && (
+                <div className={s.dragOverlay}>
+                    <Plus size={40} />
+                    <span>Перетащите файл для загрузки</span>
+                </div>
+            )}
             <div className={s.list}>
                 {attachments.length === 0 && !isUploading && (
                     <div className={s.empty}>
@@ -88,17 +108,18 @@ export const AttachmentList = ({ projectId, taskId }: { projectId: number, taskI
                     );
                 })}
 
-                <Dialog
-                    isOpen={!!selectedName} 
+                <Dialog 
+                    isOpen={!!preview} 
                     onClose={() => { setSelectedName(null); clearPreview(); }} 
                     title={selectedName || ''}>
                     {isLoading ? (
                         <div className={s.loader}><Loader2 className={s.spin} size={20} /></div>
                     ) : (
-                        previewUrl && (
-                            <iframe 
-                                src={previewUrl} 
-                                style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '8px' }} 
+                        preview && (
+                            <PreviewContainer 
+                                url={preview.url} 
+                                isText={preview.type.startsWith('text/plain') || preview.type.includes('javascript') || preview.type.includes('json')} 
+                                isHtml={preview.type.includes('text/html')}
                             />
                         )
                     )}

@@ -27,6 +27,7 @@ export const ENDPOINTS = {
         LIST: (project_id: number) => `/projects/${project_id}/reviewers`,
         ADD: (project_id: number) => `/projects/${project_id}/reviewers/add`,
         COMMENTS: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments`,
+        BY_ID: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}`,
     },
     LOGS: '/logs'
 };

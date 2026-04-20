@@ -20,6 +20,7 @@ interface KanbanState {
     moveTask: (activeId: number, overId: number | string, targetStatus?: TaskStatus) => void;
     updateTaskStatus: (projectId: number, taskId: number, status: TaskStatus) => Promise<void>;
     taskCommentsInc: (taskId: number) => void;
+    attachmentInc: (taskId: number) => void;
 
     searchQuery: string;
     setSearchQuery: (query: string) => void;
@@ -98,6 +99,14 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
         tasks: state.tasks.map((task) =>
             task.id === taskId
                 ? { ...task, comments_count: (task.comments_count ?? 0) + 1 }
+                : task
+        ),
+    })),
+
+    attachmentInc: (taskId) => set((state) => ({
+        tasks: state.tasks.map((task) =>
+            task.id === taskId
+                ? { ...task, attachments_count: (task.attachments_count ?? 0) + 1 }
                 : task
         ),
     })),

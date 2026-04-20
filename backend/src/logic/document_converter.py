@@ -11,7 +11,7 @@ class DocumentConverter:
     }
 
     BROWSER_SUPPORTED_FORMATS = {".pdf", ".jpg", ".jpeg", ".png", ".gif"}
-    CODE_FORMATS = {".py", ".js", ".ts", ".cpp", ".h", ".cs", ".sql", ".json", ".yaml", ".yml"}
+    CODE_FORMATS = {".py", ".js", ".ts", ".cpp", ".h", ".cs", ".sql", ".json", ".yaml", ".yml", ".tsx"}
 
     @staticmethod
     def convert(source: str, to_format: str, is_file: bool = True) -> str:

@@ -19,9 +19,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-lang-cyrillic \
     texlive-science \
     fonts-noto-core \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
     lmodern \
     cm-super \
     && rm -rf /var/lib/apt/lists/*

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useCallback } from 'react';
+import { ReactNode, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './dialog.module.scss';
 
@@ -10,6 +10,8 @@ interface DialogProps {
 }
 
 export const Dialog = ({ isOpen, onClose, title, children }: DialogProps) => {
+    const mouseDownTarget = useRef<EventTarget | null>(null);
+    
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
     }, [onClose]);
@@ -25,10 +27,30 @@ export const Dialog = ({ isOpen, onClose, title, children }: DialogProps) => {
         };
     }, [isOpen, handleKeyDown]);
 
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        mouseDownTarget.current = e.target;
+    };
+
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (
+            mouseDownTarget.current === e.currentTarget && 
+            e.target === e.currentTarget
+        ) {
+            onClose();
+        }
+        mouseDownTarget.current = null;
+    };
+
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
     if (!isOpen) return null;
 
     return createPortal(
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.overlay} onMouseDown={handleMouseDown} onClick={handleMouseUp}>
             <div 
                 className={styles.content} 
                 onClick={(e) => e.stopPropagation()}

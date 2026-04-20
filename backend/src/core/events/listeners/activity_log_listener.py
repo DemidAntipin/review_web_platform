@@ -12,6 +12,8 @@ class ActivityLogListener(EventListener):
         EventType.MEMBER_REMOVED.value: "Из команды удалён пользователь с id {target_user_id}, роль {role})",
         EventType.MEMBER_UPDATED.value: "Обновлен участник команды с id {target_user_id}, текущая роль {role}",
         EventType.REVIEWER_ADDED.value: "В проект добавлена рецензия от {reveiwer_id}",
+        EventType.REVIEWER_UPDATED.value: "Обновлен рецензент с id {reviewer_id}",
+        EventType.REVIEWER_REMOVED.value: "Удален рецензент с id {reviewer_id}",
         EventType.COMMENT_ADDED.value: "Выделено новое замечание из рецензии с id {reviewer_id}",
         EventType.COMMENT_UPDATED.value: "Обновлено замечание с id {comment_id}. Обновлены поля: {changed_fields}",
         EventType.TASK_UPDATED.value: "Обновлена задача с id {task_id}. Обновлены поля: {changed_fields}",

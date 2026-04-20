@@ -1,18 +1,18 @@
-export type CommentPriority = 'low' | 'medium' | 'high';
-export type CommentType = 'text_change' | 'experiment' | 'analysis' | 'source' | 'question';
+export type CommentPriority = 'Низкий' | 'Средний' | 'Высокий';
+export type CommentType = 'Правка текста' | 'Эксперимент' | 'Анализ' | 'Источник' | 'Вопрос';
 
 export const COMMENT_PRIORITY_MAP: Record<number, CommentPriority> = {
-    1: 'low',
-    2: 'medium',
-    3: 'high'
+    1: 'Низкий',
+    2: 'Средний',
+    3: 'Высокий'
 };
 
 export const COMMENT_TYPE_MAP: Record<number, CommentType> = {
-    1: 'text_change',
-    2: 'experiment',
-    3: 'analysis',
-    4: 'source',
-    5: 'question'
+    1: 'Правка текста',
+    2: 'Эксперимент',
+    3: 'Анализ',
+    4: 'Источник',
+    5: 'Вопрос'
 };
 
 export const transformComment = (comment: any): ReviewerComment => {

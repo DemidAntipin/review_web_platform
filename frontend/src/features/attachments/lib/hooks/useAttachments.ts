@@ -1,10 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { attachmentApi } from '../../api/attachments.api';
 import { Attachment } from '@/entities/task/model/types';
+import { useAttachmentsSocket } from './useAttachmentsSocket';
 
 export const useAttachments = (projectId: number, taskId: number) => {
     const [attachments, setAttachments] = useState<Attachment[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+
+    const pushAttachment = useCallback((newAttachment: Attachment) => {
+            setAttachments(prev => {
+                console.log("pushAttachment")
+                if (prev.some(c => c.id === newAttachment.id)) return prev;
+                return [...prev, newAttachment];
+            });
+        }, []);
+
+    useAttachmentsSocket({ 
+            taskId, 
+            onAttachmentAdded: pushAttachment 
+        });
+    
 
     const fetchAttachments = async () => {
         try {
@@ -19,7 +34,9 @@ export const useAttachments = (projectId: number, taskId: number) => {
         setIsUploading(true);
         try {
             const { data } = await attachmentApi.upload(projectId, taskId, file);
-            setAttachments(prev => [...prev, data]);
+            console.log(data);
+            console.log("загружаю вложение");
+            pushAttachment(data);
         } catch (e: any) {
             console.error("DEBUG UPLOAD ERROR:", e.response?.data || e.message);
             alert("Ошибка при загрузке: " + (e.response?.data?.detail || "неизвестная ошибка"));
@@ -49,5 +66,5 @@ export const useAttachments = (projectId: number, taskId: number) => {
         if (taskId) fetchAttachments();
     }, [taskId]);
 
-    return { attachments, uploadFile, isUploading, downloadFile, refresh: fetchAttachments };
+    return { attachments, uploadFile, isUploading, downloadFile };
 };

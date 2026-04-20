@@ -1,0 +1,128 @@
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--background-main);
+  overflow: hidden;
+  height: 600px;
+}
+
+.tabs {
+  display: flex;
+  background-color: var(--secondary-bg);
+  border-bottom: 1px solid var(--background-card);
+  padding: 4px 8px 0;
+  gap: 4px;
+  flex-shrink: 0;
+
+  button {
+    flex: 1; 
+    padding: 10px 16px;
+    border: none;
+    background-color: var(--bg-header);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--text-primary);
+      background-color: var(--border-color);
+    }
+
+    &.activeTab {
+      background-color: var(--background-main);
+      color: var(--accent-color);
+      box-shadow: 0 1px 0 var(--background-main);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+    }
+
+    @media (min-width: 768px) {
+      flex: none;
+      min-width: 200px;
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.textarea, .preview {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  padding: 16px;
+  background: transparent;
+  overflow-y: auto;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 250px;
+  padding: 16px;
+  border: none;
+  resize: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  display: block;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.preview {
+  width: 100%;
+  padding: 16px;
+  background-color: var(--background-main);
+  overflow-y: auto;
+  max-height: 600px;
+
+  .empty {
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  :global(.markdown-body) {
+    background: transparent;
+  }
+}
+
+.markdownBody {
+  font-size: 1rem;
+  color: var(--text-primary);
+
+  :global {
+    .katex-display {
+      padding-right: 25px;
+      margin: 1em 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+ }
+
+  h1, h2 {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+    margin-top: 1.5em;
+  }
+
+  code {
+    background-color: rgba(175, 184, 193, 0.2);
+    padding: 0.2em 0.4em;
+    border-radius: 6px;
+    font-size: 85%;
+  }
+}

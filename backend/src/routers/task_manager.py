@@ -5,7 +5,7 @@ from sqlalchemy.sql.functions import coalesce
 from typing import List
 from datetime import datetime
 from src.core.utils.dtos_builder import get_task_comment_preview
-from src.dtos.events import ReviewerAddedEvent, CommentAddedEvent, CommentUpdatedEvent, TaskUpdatedEvent, TaskDeletedEvent, CommentDecomposedEvent, AttachmentUploadedEvent, TaskCommentAddedEvent
+from src.dtos.events import ReviewerAddedEvent, CommentAddedEvent, CommentUpdatedEvent, ReviewerUpdatedEvent, TaskUpdatedEvent, TaskDeletedEvent, CommentDecomposedEvent, AttachmentUploadedEvent, TaskCommentAddedEvent
 from src.core.events.event_dispatcher import EventDispatcher
 from src.core.dependencies import DBSession, ProjectAuthor, ProjectMemberAny, ProjectCoauthor
 from src.core.types import ID
@@ -34,6 +34,22 @@ async def add_reviewer(project_id: ID, data: ReviewerCreateDTO, db:DBSession, cu
     await db.refresh(reviewer)
 
     event = ReviewerAddedEvent(user_id=current_user.user.id, project_id=project_id, reviewer_id=reviewer.id)
+    EventDispatcher.create_event(background_tasks, event)
+
+    return reviewer
+
+@router.patch("/reviewers/{reviewer_id}", response_model=ReviewerDTO)
+async def update_reviewer(project_id: ID, reviewer_id: ID, data: ReviewerCreateDTO, db:DBSession, current_user: ProjectAuthor, background_tasks: BackgroundTasks): 
+    query=(select(Reviewer).where(Reviewer.id == reviewer_id, Reviewer.project_id == project_id).limit(1))
+    result = await db.execute(query)
+    reviewer = result.scalar_one_or_none()
+    if not reviewer:
+        raise HTTPException(status_code=404, detail="Рецензент не найден")
+    reviewer.update(data)
+    await db.commit()
+    await db.refresh(reviewer)
+
+    event = ReviewerUpdatedEvent(user_id=current_user.user.id, project_id=project_id, reviewer_id=reviewer.id)
     EventDispatcher.create_event(background_tasks, event)
 
     return reviewer

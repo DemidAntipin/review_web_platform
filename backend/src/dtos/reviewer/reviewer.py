@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List
+from typing import List, Optional
 from src.core.types import ID, UsernameStr, MarkdownStr
 from src.dtos.reviewer.reviewer_comment import CommentShortDTO
 
@@ -9,6 +9,10 @@ class ReviewerBaseDTO(BaseModel):
 
 class ReviewerCreateDTO(ReviewerBaseDTO):
     pass
+
+class ReviewerUpdateDTO(BaseModel):
+    name: Optional[UsernameStr]
+    general_comment: Optional[MarkdownStr]
 
 class ReviewerDTO(ReviewerBaseDTO):
     id: ID  

@@ -89,7 +89,7 @@ export const ProjectFilters = React.memo(({
                         <div className={s.customCheckbox}>
                             <Check size={12} />
                         </div>
-                        <span className={s.highlight}>Скрытые проекты</span>
+                        <span className={s.highlight}>Отображать скрытые</span>
                     </label>
                 </div>
                 

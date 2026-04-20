@@ -40,6 +40,14 @@ class ReviewerAddedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.REVIEWER_ADDED.value
     reviewer_id: ID
 
+class ReviewerUpdatedEvent(BaseEvent):
+    action_type: ActionTypeStr = EventType.REVIEWER_UPDATED.value
+    reviewer_id: ID
+
+class ReviewerRemovedEvent(BaseEvent):
+    action_type: ActionTypeStr = EventType.REVIEWER_REMOVED.value
+    reviewer_id: ID
+
 class CommentAddedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.COMMENT_ADDED.value
     reveiwer_id: ID

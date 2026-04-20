@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { attachmentApi } from '../../api/attachments.api';
 
 export const useAttachmentPreview = (projectId: number, taskId: number) => {
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [preview, setPreview] = useState<{ url: string, type: string } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const loadPreview = async (attachmentId: number) => {
         setIsLoading(true);
         try {
             const { data } = await attachmentApi.getPreview(projectId, taskId, attachmentId);
-            console.log( data );
+            const type = data.type;
             const url = URL.createObjectURL(data);
-            setPreviewUrl(url);
+            setPreview({ url, type });
         } catch (e) {
             console.error('Failed to load preview', e);
         } finally {
@@ -20,9 +20,9 @@ export const useAttachmentPreview = (projectId: number, taskId: number) => {
     };
 
     const clearPreview = () => {
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        setPreviewUrl(null);
+        if (preview?.url) URL.revokeObjectURL(preview.url);
+        setPreview(null);
     };
 
-    return { previewUrl, isLoading, loadPreview, clearPreview };
+    return { preview, isLoading, loadPreview, clearPreview };
 };

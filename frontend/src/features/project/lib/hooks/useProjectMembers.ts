@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Member, MemberModalType } from '@/entities/project/model/types';
 import { projectMemberApi } from '../../api/member.api';
 import { useProjectStore } from '@/entities/project/model/project.store';
@@ -6,6 +6,7 @@ import { useProjectStore } from '@/entities/project/model/project.store';
 const EMPTY_MEMBERS: Member[] = [];
 
 export const useProjectMembers = (projectId: number) => {
+    const removeProjectMembers = useProjectStore(state => state.removeProjectMembers);
     const members = useProjectStore(state => state.projectMembers[projectId] || EMPTY_MEMBERS);
     const setMembers = useProjectStore(state => state.setMembers);
     const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +25,12 @@ export const useProjectMembers = (projectId: number) => {
         }
 
     }, [projectId, setMembers]);
+
+    useEffect(() => {
+        return () => {
+            removeProjectMembers(projectId);
+        };
+    }, [projectId, removeProjectMembers]);
 
     const closeModal = useCallback(() => {
         setActiveModal(null);

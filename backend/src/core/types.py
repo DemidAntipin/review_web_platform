@@ -5,7 +5,7 @@ from src.core.utils.validators import validate_string, validate_password, valida
 
 ID = Annotated[int, Field(gt=0)]
 
-UsernameStr = Annotated[str, Field(min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9._]+$"), AfterValidator(validate_string)]
+UsernameStr = Annotated[str, Field(min_length=3, max_length=255, pattern=r"^[a-zA-Z0-9а-яА-Я._\s]+$"), AfterValidator(validate_string)]
 
 PasswordStr = Annotated[str, Field(min_length=8, max_length=128), AfterValidator(validate_password)]
 
