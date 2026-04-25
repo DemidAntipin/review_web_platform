@@ -21,7 +21,9 @@ export const KanbanControls = () => {
         resetFilters: state.resetFilters,
         sortField: state.sortField,
         sortDirection: state.sortDirection,
-        setSort: state.setSort
+        setSort: state.setSort,
+        showHidden: state.showHidden,
+        setShowHidden: state.setShowHidden
     })));
 
     const reviewersList = useReviewerStore((state) => state.reviewers);
@@ -95,6 +97,8 @@ export const KanbanControls = () => {
                 sortDirection={kanbanData.sortDirection}
                 onSortChange={kanbanData.setSort}
                 onReset={kanbanData.resetFilters}
+                onToggleHidden={() => kanbanData.setShowHidden(!kanbanData.showHidden)}
+                showHidden={kanbanData.showHidden}
             />
         </div>
     );

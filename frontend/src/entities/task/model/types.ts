@@ -1,24 +1,32 @@
-export type TaskPriority = 'low' | 'medium' | 'high';
-export type TaskStatus = 'todo' | "in_progress" | "completed" | "ready_for_review" | "closed"
+export type TaskPriority = 'Низкий' | 'Средний' | 'Высокий';
+export type TaskStatus = 'Новые' | "В работе" | "Завершено" | "Готово к ответу" | "Закрыто"
 
-export const ALL_TASK_STATUSES: TaskStatus[] = ["todo", "in_progress", "completed", "ready_for_review", "closed"];
+export const ALL_TASK_STATUSES: TaskStatus[] = ["Новые", "В работе", "Завершено", "Готово к ответу", "Закрыто"];
 
 export const STATUS_MAP: Record<number, TaskStatus> = {
-    1: "todo",
-    2: 'in_progress',
-    3: 'completed',
-    4: 'ready_for_review',
-    5: 'closed'
+    1: "Новые",
+    2: 'В работе',
+    3: 'Завершено',
+    4: 'Готово к ответу',
+    5: 'Закрыто'
 };
 
-export type TaskType = 'text_change' | 'experiment' | 'analysis' | 'source' | 'question';
+export type TaskType = 'Правка текста' | 'Эксперимент' | 'Анализ' | 'Источник' | 'Вопрос';
 
 export const TYPE_MAP: Record<number, TaskType> = {
-    1: 'text_change',
-    2: 'experiment',
-    3: 'analysis',
-    4: 'source',
-    5: 'question'
+    1: 'Правка текста',
+    2: 'Эксперимент',
+    3: 'Анализ',
+    4: 'Источник',
+    5: 'Вопрос'
+};
+
+export const TYPE_TO_ID: Record<TaskType, number> = {
+    'Правка текста': 1,
+    'Эксперимент': 2,
+    'Анализ': 3,
+    'Источник': 4,
+    'Вопрос': 5
 };
 
 export const transformTask = (task: any) => {
@@ -31,22 +39,36 @@ export const transformTask = (task: any) => {
 };
 
 export const PRIORITY_MAP: Record<number, TaskPriority> = {
-    1: "low",
-    2: 'medium',
-    3: 'high'
+    1: "Низкий",
+    2: 'Средний',
+    3: 'Высокий'
+};
+
+export const PRIORITY_TO_ID: Record<TaskPriority, number> = {
+    "Низкий": 1,
+    'Средний': 2,
+    'Высокий': 3
 };
 
 export const STATUS_TO_ID: Record<TaskStatus, number> = {
-    todo: 1,
-    in_progress: 2,
-    completed: 3,
-    ready_for_review: 4,
-    closed: 5
+    Новые: 1,
+    "В работе": 2,
+    Завершено: 3,
+    "Готово к ответу": 4,
+    Закрыто: 5
 };
 
 export interface Column {
     id: TaskStatus;
     title: string;
+}
+
+export interface Task {
+    id: number;
+    title: string;
+    type: number;
+    assignee_id?: number;
+    description_md: string;
 }
 
 export interface TaskPreview {
@@ -82,5 +104,5 @@ export interface Attachment {
     uploaded_at: string;
 }
 
-export type TaskSortField = 'created_at' | 'title' | 'deadline';
+export type TaskSortField = 'created_at' | 'title';
 export type SortDirection = 'asc' | 'desc';

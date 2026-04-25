@@ -10,17 +10,20 @@ import { Button } from '@/shared/ui/button/Button';
 import { AttachmentList } from '@/features/attachments/ui/AttachmentList';
 import { useRef } from 'react';
 
-interface TaskCardProps { task: TaskPreview; }
+interface TaskCardProps { 
+    task: TaskPreview;
+    actionMenu?: React.ReactNode;
+}
 
 const TYPE_CONFIG: Record<TaskType, { icon: any, label: string }> = {
-    text_change: { icon: FileText, label: 'Правка текста' },
-    experiment: { icon: FlaskConical, label: 'Эксперимент' },
-    analysis: { icon: BarChart2, label: 'Анализ данных' },
-    source: { icon: Library, label: 'Источник' },
-    question: { icon: HelpCircle, label: 'Вопрос' },
+    "Правка текста": { icon: FileText, label: 'Правка текста' },
+    Эксперимент: { icon: FlaskConical, label: 'Эксперимент' },
+    Анализ: { icon: BarChart2, label: 'Анализ данных' },
+    Источник: { icon: Library, label: 'Источник' },
+    Вопрос: { icon: HelpCircle, label: 'Вопрос' },
 };
 
-export const TaskCard = ({ task }: TaskCardProps) => {
+export const TaskCard = ({ task, actionMenu }: TaskCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const { projectId } = useParams<{ projectId: string }>(); 
     const project_id = Number(projectId);
@@ -35,7 +38,9 @@ export const TaskCard = ({ task }: TaskCardProps) => {
                         {task.priority}
                     </span>
                 </div>
-                <IconButton size="sm"><MoreVertical size={16} /></IconButton>
+                <div onClick={e => e.stopPropagation()}>
+                    {actionMenu}
+                </div>
             </div>
             
             <h3 className={s.taskTitle}>{task.title}</h3>

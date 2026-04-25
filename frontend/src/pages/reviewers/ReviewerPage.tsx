@@ -10,6 +10,7 @@ import { useProjectStore } from '@/entities/project/model/project.store';
 import { ReviewersBoard } from '@/entities/reviewer/ui/ReviewersBoard';
 import { ReviewerForm } from '@/features/reviewer/ui/ReviewerForm/ReviewerForm';
 import { ReviewerControls } from '@/features/reviewer/ui/ReviewersControls';
+import { useReviewerSocket } from '@/features/reviewer/lib/hooks/useReviewerSocket';
 
 
 export const ReviewersPage = () => {
@@ -37,15 +38,17 @@ export const ReviewersPage = () => {
             setHeaderSearch(null);
             setHeaderActions(null);
         };
-    }, []);
+    }, [currentProject, setPageTitle]);
+
+    useReviewerSocket(project_id);
 
     useEffect(() => {
         if (!project_id) return;
         setReviewers(project_id);
     }, []);
 
-    const handleCreate = async (data: { name: string; general_comment: string }) => {
-        await addReviewer(project_id, data);
+    const handleCreate = (data: { name: string; general_comment: string }) => {
+        addReviewer(project_id, data);
         setIsModalOpen(false);
     };
 

@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { TaskPreview } from '@/entities/task/model/types';
 import { TaskCard } from '@/entities/task/ui/TaskCard';
+import { TaskMenu } from '@/entities/task/ui/TaskMenu/TaskMenu';
 
 interface Props {
     task: TaskPreview;
@@ -28,7 +29,7 @@ export const SortableTaskCard = ({ task }: Props) => {
     }
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <TaskCard task={task} />
+            <TaskCard task={task} actionMenu={<TaskMenu task={task} />} />
         </div>
     );
 };

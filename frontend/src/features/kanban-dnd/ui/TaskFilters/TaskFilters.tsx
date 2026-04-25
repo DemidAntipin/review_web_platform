@@ -26,6 +26,8 @@ interface Props {
     onPriorityChange: (v: string) => void;
     onReviewerChange: (id: number) => void;
     onCommentChange: (id: number, reviewer: number) => void;
+    showHidden: boolean;
+    onToggleHidden: () => void;
     onReset: () => void;
 
     sortField: TaskSortField;
@@ -37,7 +39,7 @@ export const TaskFilters: React.FC<Props> = ({
     types, priorities, reviewersData,
     selectedTypes, selectedPriorities, selectedReviewers, selectedComments,
     onTypeChange, onPriorityChange, onReviewerChange, onCommentChange, onReset,
-    sortField, sortDirection, onSortChange
+    sortField, sortDirection, onSortChange, showHidden, onToggleHidden
 }) => {
     return (
         <Dropdown trigger={<IconButton size="md"><SlidersHorizontal size={20} /></IconButton>}>
@@ -102,6 +104,20 @@ export const TaskFilters: React.FC<Props> = ({
                 </div>
                 <div className={s.divider} />
                 <div className={s.section}>
+                    <label className={s.filterItem}>
+                        <input 
+                            type="checkbox" 
+                            checked={showHidden}
+                            onChange={onToggleHidden}
+                        />
+                        <div className={s.customCheckbox}>
+                            <Check size={12} />
+                        </div>
+                        <span className={s.highlight}>Отображать скрытые</span>
+                    </label>
+                </div>
+                <div className={s.divider} />
+                <div className={s.section}>
                     <span className={s.sectionTitle}>Сортировка</span>
                     <div className={s.sortRow}>
                         <select 
@@ -111,7 +127,6 @@ export const TaskFilters: React.FC<Props> = ({
                         >
                             <option value="created_at">По дате</option>
                             <option value="title">По названию</option>
-                            <option value="deadline">По дедлайну</option>
                         </select>
                         
                         <IconButton  

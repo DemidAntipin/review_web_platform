@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from src.core.database import BaseDBModel
+from src.dtos.reviewer.reviewer_comment import CommentUpdateDTO
 from src.models.comment.comment_type import CommentType
 from src.models.comment.comment_status import CommentStatus
 from src.models.comment.comment_priority import CommentPriority
@@ -21,3 +22,9 @@ class Comment(BaseDBModel):
     reviewer = relationship("Reviewer", back_populates="comments")
     tasks = relationship("Task", back_populates="comment")
     response = relationship("Response", back_populates="comment", uselist=False)
+
+    def update(self, data: CommentUpdateDTO):
+        update_data = data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            if hasattr(self, field):
+                setattr(self, field, value)

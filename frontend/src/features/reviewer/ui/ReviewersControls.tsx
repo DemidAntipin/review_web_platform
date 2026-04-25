@@ -3,6 +3,8 @@ import { SearchInput } from "@/shared/ui/search_input/SearchInput";
 import { useMemo } from "react";
 import { useShallow } from "zustand/shallow";
 import { ReviewerFilters } from "./ReviewerFilters/ReviewerFilters";
+import { PRIORITY_MAP, TYPE_MAP } from "@/entities/task/model/types";
+import { COMMENT_PRIORITY_MAP, COMMENT_TYPE_MAP } from "@/entities/reviewer/model/types";
 
 export const ReviewerControls = () => {
     const store = useReviewerStore(useShallow((state) => ({
@@ -21,18 +23,10 @@ export const ReviewerControls = () => {
     })));
 
     const filterOptions = useMemo(() => {
-        const types = new Set<string>();
-        const priorities = new Set<string>();
-        store.reviewers.forEach(r => {
-            r.comments.forEach(c => {
-                if (c.type) types.add(c.type);
-                if (c.priority) priorities.add(c.priority);
-            });
-        });
         return {
-            types: Array.from(types).sort(),
-            priorities: Array.from(priorities).sort(),
-            reviewers: Array.from(store.reviewers).sort()
+            types: Object.values(COMMENT_TYPE_MAP),
+            priorities: Object.values(COMMENT_PRIORITY_MAP),
+            reviewers: store.reviewers
         };
     }, [store.reviewers]);
 

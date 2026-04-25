@@ -24,6 +24,7 @@ export const MemberForm: React.FC<MemberFormProps> = ({ initialValues, onSubmit,
         <form onSubmit={(e) => { e.preventDefault(); if (userId) onSubmit({ user_id: Number(userId), role: Number(role) }); }} className={s.form}>
             {!isEdit ? (
                 <UserSearchSelect
+                    label="Участник проекта"
                     value={searchTerm}
                     onChange={setSearchTerm}
                     suggestions={suggestions}

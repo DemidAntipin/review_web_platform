@@ -3,8 +3,12 @@ type WSHandler = (data: any) => void;
 class WebSocketService {
     private socket: WebSocket | null = null;
     private handlers: Map<string, Set<WSHandler>> = new Map();
+    private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    private readonly RECONNECT_INTERVAL = 3000;
 
     connect(userId: number, token: string) {
+        this.clearReconnect();
+
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.host;
         
@@ -38,7 +42,15 @@ class WebSocketService {
 
         this.socket.onclose = () => {
             this.socket = null;
+            this.reconnectTimer = setTimeout(() => this.connect(userId, token), this.RECONNECT_INTERVAL);
         };
+    }
+
+    private clearReconnect() {
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
     }
 
     on(type: string, handler: WSHandler) {
@@ -48,6 +60,7 @@ class WebSocketService {
     }
 
     disconnect() {
+        this.clearReconnect();
         this.socket?.close();
         this.socket = null;
     }

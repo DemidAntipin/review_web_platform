@@ -71,6 +71,13 @@ class TaskPreviewDTO(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class TaskDecompositionDTO(BaseModel):
+    id: Optional[ID] = None
+    title: str
+    description_md: Optional[MarkdownStr] = None
+    type: TaskType
+    assignee_id: Optional[ID] = None
+
 class TaskDetailDTO(TaskDTO):
     attachments: List[AttachmentDTO] = []
     task_comments: List[TaskCommentPreviewDTO] = []

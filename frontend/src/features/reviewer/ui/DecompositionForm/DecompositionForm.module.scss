@@ -1,0 +1,117 @@
+.container {
+    width: 100%;
+    position: relative;
+}
+
+.form {
+    background: var(--background-card);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+}
+
+
+.taskList {
+    background: var(--background-main);
+    padding: var(--padding-xs);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-radius: var(--border-radius);
+}
+
+.taskItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background: var(--background-card);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+        border-color: var(--accent-color);
+    }
+}
+
+.taskMain {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.priorityLine {
+    width: 3px;
+    height: 20px;
+    border-radius: 2px;
+    flex-shrink: 0;
+
+    &.priority_1 { background: var(--status-success); }
+    &.priority_2 { background: var(--status-review); }
+    &.priority_3 { background: var(--status-error); }
+}
+
+.taskContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.taskTitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.taskMeta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.taskTypeTag {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    background: var(--secondary-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    letter-spacing: 0.3px;
+}
+
+.taskAssignee {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.assigneeIcon {
+    color: var(--accent-color);
+    opacity: 0.8;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.footer {
+    padding: var(--padding-inner) var(--padding-outer);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.emptyState {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}

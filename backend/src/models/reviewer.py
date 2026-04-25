@@ -12,6 +12,7 @@ class Reviewer(BaseDBModel):
     name = Column(String, nullable=False)
     general_comment = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
+    deleted_at = Column(DateTime, nullable=True, index=True)
 
     project = relationship("Project", back_populates="reviewers")
     comments = relationship("Comment", back_populates="reviewer")

@@ -46,15 +46,15 @@
     text-transform: uppercase;
     letter-spacing: 0.02em;
 
-    &.high { 
+    &.Высокий { 
         background: color-mix(in srgb, var(--status-error), transparent 85%); 
         color: #ff4d4f; 
     }
-    &.medium { 
+    &.Средний { 
         background: color-mix(in srgb, var(--status-review), transparent 85%); 
         color: #faad14; 
     }
-    &.low { 
+    &.Низкий { 
         background: color-mix(in srgb, var(--status-success), transparent 85%); 
         color: #52c41a; 
     }

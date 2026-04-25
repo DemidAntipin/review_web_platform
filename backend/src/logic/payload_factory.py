@@ -20,6 +20,9 @@ class EventPayloadFactory:
             EventType.REVIEWER_ADDED.value: EventPayloadFactory.__reviewer_preview,
             EventType.REVIEWER_UPDATED.value: EventPayloadFactory.__reviewer_preview,
             EventType.REVIEWER_REMOVED.value: EventPayloadFactory.__reviewer_removed,
+            EventType.COMMENT_DELETED.value: EventPayloadFactory.__comment_removed,
+            EventType.COMMENT_UPDATED.value: EventPayloadFactory.__comment_preview,
+            EventType.COMMENT_ADDED.value: EventPayloadFactory.__comment_preview,
         }
 
         handler = handlers.get(event.action_type)
@@ -51,8 +54,24 @@ class EventPayloadFactory:
     @staticmethod
     async def __tasks_list_preview(event: CommentDecomposedEvent) -> Dict[str, Any]:
         tasks = await dtos_builder.get_tasks_by_comment(event.comment_id)
-        return {"tasks": [t.model_dump() for t in tasks]}
+        created = []
+        updated = []
+        for t in tasks:
+            if t.id in event.created:
+                created.append(t.model_dump())
+            elif t.id in event.updated:
+                updated.append(t.model_dump())
+        comment_dto = await dtos_builder.get_comment_preview_dto(event.comment_id)
+        return {"comment": comment_dto,
+                "created": created,
+                "updated": updated,
+                "deleted": event.deleted}
     
+    @staticmethod
+    async def __comment_preview(event: Union[CommentUpdatedEvent, CommentAddedEvent]) -> Dict[str, Any]:
+        dto = await dtos_builder.get_comment_preview_dto(event.comment_id)
+        return dto.model_dump() if dto else {}
+
     @staticmethod
     async def __reviewer_preview(event: ReviewerAddedEvent) -> Dict[str, Any]:
         dto = await dtos_builder.get_reviewer_dto(event.reviewer_id)
@@ -79,4 +98,11 @@ class EventPayloadFactory:
         return {
             "reviewer_id": event.reviewer_id,
             "project_id": event.project_id
+        }
+    
+    @staticmethod
+    async def __comment_removed(event: CommentDeletedEvent) -> Dict[str, Any]:
+        return {
+            "project_id": event.project_id,
+            "comment_id": event.comment_id
         }

@@ -50,7 +50,7 @@ export const ReviewerForm = ({
             <MarkdownEditor
                 label="Рецензия"
                 value={generalComment}
-                onChange={setGeneralComment}
+                onChange={(e) => setGeneralComment(e.target.value)}
                 placeholder="Введите текст рецензии..."
                 disabled={isLoading}
             />

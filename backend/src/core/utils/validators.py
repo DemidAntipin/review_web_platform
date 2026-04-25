@@ -16,7 +16,7 @@ def validate_password(v: str) -> str:
         raise ValueError("Пароль должен содержать хотя бы одну букву")
     return v
 
-def validate_preview_description(text: str, limit: int = 150) -> str:
+def validate_preview_description(text: str, limit: int = 140) -> str:
         if not text:
             return ""
         

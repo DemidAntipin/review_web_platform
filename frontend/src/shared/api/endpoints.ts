@@ -26,7 +26,14 @@ export const ENDPOINTS = {
     REVIEWERS: {
         LIST: (project_id: number) => `/projects/${project_id}/reviewers`,
         ADD: (project_id: number) => `/projects/${project_id}/reviewers/add`,
-        COMMENTS: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments`,
+        COMMENTS: (() => {
+            const base = (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments`;
+            base.DECOMPOSE = (project_id: number, reviewer_id: number, comment_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/${comment_id}/decompose`;
+            base.ADD = (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/add`;
+            base.BY_ID = (project_id: number, reviewer_id: number, comment_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/${comment_id}`;
+
+            return base;
+        })(),
         BY_ID: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}`,
     },
     LOGS: '/logs'

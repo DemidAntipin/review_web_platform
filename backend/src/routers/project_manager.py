@@ -16,10 +16,11 @@ from typing import List
 from datetime import datetime
 from src.dtos.events import ProjectArchivedEvent, ProjectCreatedEvent, ProjectUpdatedEvent, MemberAddedEvent, MemberRemovedEvent, MemberUpdatedEvent
 from src.core.events.event_dispatcher import EventDispatcher
-from src.routers import task_manager
+from src.routers import reviewers_manager, task_manager
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 router.include_router(task_manager.router, prefix="/{project_id}")
+router.include_router(reviewers_manager.router, prefix="/{project_id}")
 
 @router.get("/my_projects", response_model=List[ProjectPreviewDTO])
 async def list_projects(db: DBSession, current_user: CurrentUser):
@@ -33,7 +34,7 @@ async def list_projects(db: DBSession, current_user: CurrentUser):
         .outerjoin(Comment, Comment.reviewer_id == Reviewer.id)
         .outerjoin(Task, Task.comment_id == Comment.id)
         .join(ProjectMember, ProjectMember.project_id == Project.id)
-        .where(ProjectMember.user_id == current_user.id, Project.deleted_at == None)
+        .where(ProjectMember.user_id == current_user.id, Project.deleted_at == None, Task.deleted_at==None)
         .group_by(Project.id)
     )
     response = await db.execute(query)

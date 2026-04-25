@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from src.core.events.event_type import EventType
 from typing import List, Dict, Any
 from src.core.types import ID, ActionTypeStr, TitleStr, JournalStr, UsernameStr
+from src.dtos.task.task import TaskDTO
 
 class BaseEvent(BaseModel):
     user_id: ID
@@ -51,11 +52,16 @@ class ReviewerRemovedEvent(BaseEvent):
 class CommentAddedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.COMMENT_ADDED.value
     reveiwer_id: ID
+    comment_id: ID
 
 class CommentUpdatedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.COMMENT_UPDATED.value
     comment_id: ID
-    changed_fields: List[str] 
+    changed_fields: List[str]
+
+class CommentDeletedEvent(BaseEvent):
+    action_type: ActionTypeStr = EventType.COMMENT_DELETED.value
+    comment_id: ID
 
 class TaskUpdatedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.TASK_UPDATED.value
@@ -69,6 +75,10 @@ class TaskDeletedEvent(BaseEvent):
 class CommentDecomposedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.COMMENT_DECOMPOSED.value
     comment_id: ID
+    created: List[ID]
+    updated: List[ID]
+    deleted: List[ID]
+
 
 class AttachmentUploadedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.ATTACHMENT_UPLOADED.value

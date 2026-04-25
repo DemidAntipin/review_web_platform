@@ -34,12 +34,9 @@ export const useAttachments = (projectId: number, taskId: number) => {
         setIsUploading(true);
         try {
             const { data } = await attachmentApi.upload(projectId, taskId, file);
-            console.log(data);
-            console.log("загружаю вложение");
             pushAttachment(data);
         } catch (e: any) {
             console.error("DEBUG UPLOAD ERROR:", e.response?.data || e.message);
-            alert("Ошибка при загрузке: " + (e.response?.data?.detail || "неизвестная ошибка"));
         } finally {
             setIsUploading(false);
         }

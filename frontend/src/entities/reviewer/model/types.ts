@@ -23,12 +23,23 @@ export const transformComment = (comment: any): ReviewerComment => {
     };
 };
 
-export interface ReviewerComment {
+export interface ReviewerCommentBase {
+    priority: number;
+    type: number;
+    content_md: string;
+}
+
+export interface CreateCommentDto extends ReviewerCommentBase {}
+
+export interface UpdateCommentDto extends Partial<ReviewerCommentBase> {
+    status?: string;
+}
+
+export interface ReviewerComment extends Omit<ReviewerCommentBase, 'priority' | 'type'> {
     id: number;
     reviewer_id: number;
     priority: CommentPriority;
     type: CommentType;
-    content_md: string;
     status: string;
     tasks_count: number;
     completed_tasks_count: number;

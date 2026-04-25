@@ -9,17 +9,18 @@ interface Props {
     suggestions: UserSuggestion[];
     onSelect: (user: UserSuggestion) => void;
     placeholder?: string;
+    label: string;
 }
 
 export const UserSearchSelect: React.FC<Props> = ({ 
-    value, onChange, suggestions, onSelect, placeholder 
+    value, onChange, suggestions, onSelect, placeholder, label
 }) => {
     const [isOpen, setIsOpen] = React.useState(false);
 
     return (
         <div className={s.fieldGroup}>
             <Field
-                label="Участник проекта"
+                label={label}
                 type="text"
                 value={value}
                 onChange={(e) => {

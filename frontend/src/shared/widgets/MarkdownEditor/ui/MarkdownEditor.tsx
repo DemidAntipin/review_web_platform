@@ -5,27 +5,16 @@ import { EditorTabs } from './EditorTabs';
 import { MarkdownPreview } from './MarkdownPreview';
 import s from './MarkdownEditor.module.scss';
 
-interface MarkdownEditorProps {
+interface MarkdownEditorProps extends React.InputHTMLAttributes<HTMLTextAreaElement> {
     label: string;
     value: string;
-    onChange: (value: string) => void;
     placeholder?: string;
     error?: string;
     disabled?: boolean;
 }
 
-export const MarkdownEditor = ({ label, value, onChange, placeholder, error, disabled }: MarkdownEditorProps) => {
+export const MarkdownEditor = ({ label, value, onChange, placeholder, error, disabled, ...props}: MarkdownEditorProps) => {
     const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
-    const [localValue, setLocalValue] = useState(value);
-
-    useEffect(() => {
-        setLocalValue(value);
-    }, [value]);
-
-    const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setLocalValue(e.target.value);
-        onChange(e.target.value);
-    };
 
     const handleTabChange = (tab: 'edit' | 'preview') => setActiveTab(tab);
 
@@ -36,13 +25,15 @@ export const MarkdownEditor = ({ label, value, onChange, placeholder, error, dis
                 <div className={s.content}>
                     {activeTab === 'edit' ? (
                         <textarea
+                            {...props}
                             className={s.textarea}
-                            value={localValue}
-                            onChange={handleTextChange}
+                            value={value}
                             placeholder={placeholder}
+                            onChange={onChange}
+                            disabled={disabled}
                         />
                     ) : (
-                        <MarkdownPreview value={localValue} />
+                        <MarkdownPreview value={value} />
                     )}
                 </div>
             </div>

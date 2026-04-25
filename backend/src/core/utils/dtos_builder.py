@@ -4,7 +4,7 @@ from src.core.types import ID
 from src.dtos.project.project import ProjectDTO, ProjectPreviewDTO
 from src.dtos.project.project_member import ProjectMemberPreviewDTO
 from src.dtos.reviewer.reviewer import ReviewerDTO
-from src.dtos.reviewer.reviewer_comment import CommentDTO
+from src.dtos.reviewer.reviewer_comment import CommentDTO, CommentShortDTO
 from src.models.attachment import Attachment
 from src.models.project_member import ProjectMember
 from src.models.task_comment import TaskComment
@@ -72,7 +72,7 @@ async def get_project_preview(project_id: ID) -> ProjectPreviewDTO:
         .outerjoin(Reviewer, Reviewer.project_id == Project.id)
         .outerjoin(Comment, Comment.reviewer_id == Reviewer.id)
         .outerjoin(Task, Task.comment_id == Comment.id)
-        .where(Project.id == project_id)
+        .where(Project.id == project_id, Task.deleted_at == None)
         .group_by(Project.id)
     )
     async with DBSession() as db:
@@ -81,8 +81,8 @@ async def get_project_preview(project_id: ID) -> ProjectPreviewDTO:
         if not r: return None
         return ProjectPreviewDTO.model_validate({
             **ProjectDTO.model_validate(r.Project).model_dump(),
-            "total_tasks_count": r.total_tasks_count,
-            "completed_tasks_count": r.completed_tasks_count
+            "total_tasks_count": r.total_tasks_count or 0,
+            "completed_tasks_count": r.completed_tasks_count or 0
         })
 
 async def get_task_comment_preview(comment_id: ID) -> TaskCommentPreviewDTO:
@@ -111,10 +111,38 @@ async def get_attachment_dto(attachment_id: ID) -> AttachmentDTO:
         res = await db.get(Attachment, attachment_id)
         return AttachmentDTO.model_validate(res) if res else None
 
-async def get_comment_dto(comment_id: ID) -> CommentDTO:
+async def get_comment_preview_dto(comment_id: ID) -> CommentShortDTO:
+    task_count_sub = (
+        select(func.count(Task.id))
+        .where(Task.comment_id == comment_id, Task.deleted_at == None)
+        .scalar_subquery()
+    )   
+    completed_task_count_sub = (
+        select(func.count(Task.id)).filter(Task.completed_at != None)
+        .where(Task.comment_id == comment_id, Task.deleted_at == None)
+        .scalar_subquery()
+    )
+    query = (
+        select(
+            Comment,
+            task_count_sub.label("tasks_count"),
+            completed_task_count_sub.label("completed_tasks_count")
+        )
+        .where(Comment.id == comment_id, Comment.deleted_at == None)
+    )
     async with DBSession() as db:
-        res = await db.get(Comment, comment_id)
-        return CommentDTO.model_validate(res) if res else None
+        result = await db.execute(query)
+        row = result.fetchone()
+
+    if not row:
+        return None
+
+    return CommentShortDTO.model_validate({
+                **CommentDTO.model_validate(row.Comment).model_dump(),
+                "tasks_count": row.tasks_count,
+                "completed_tasks_count": row.completed_tasks_count
+            })
+
     
 async def get_member_preview(project_id: ID, user_id: ID) -> ProjectMemberPreviewDTO:
     query = (

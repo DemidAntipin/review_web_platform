@@ -5,7 +5,10 @@ import clsx from 'clsx';
 import { Button } from '@/shared/ui/button/Button';
 import { useState } from 'react';
 import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { TestMarkdownForm } from './TestMarkdownForm/TestMarkdownForm';
+import { Task } from '@/entities/task/model/types';
+import { DecompositionForm } from '@/features/reviewer/ui/DecompositionForm/DecompositionForm';
+import { useKanbanStore } from '@/features/kanban-dnd/model/kanban.store';
+import { useParams } from 'react-router-dom';
 
 interface CommentProps {
     comment: ReviewerComment;
@@ -21,7 +24,10 @@ const TYPE_CONFIG: Record<string, { icon: any, label: string }> = {
 };
 
 export const ReviewerCommentCard = ({ comment, actionMenu }: CommentProps) => {
+    const { projectId } = useParams<{ projectId: string }>();
+    const project_id = Number(projectId);
     const [isEditorOpen, setIsEditorOpen] = useState(false);
+    const decomposeComment = useKanbanStore(state => state.decomposeComment);
     const typeInfo = TYPE_CONFIG[comment.type] || { icon: FileText, label: comment.type };
     const { icon: TypeIcon, label: typeLabel } = typeInfo;
 
@@ -29,8 +35,8 @@ export const ReviewerCommentCard = ({ comment, actionMenu }: CommentProps) => {
         ? (comment.completed_tasks_count / comment.tasks_count) * 100 
         : 0;
 
-    const handleDecomposeSubmit = (content: string) => {
-        console.log('Данные из редактора:', content);
+    const handleDecomposeSubmit = (tasks: Partial<Task>[]) => {
+        decomposeComment(project_id, comment.reviewer_id, comment.id, tasks);
         setIsEditorOpen(false);
     };
 
@@ -75,10 +81,11 @@ export const ReviewerCommentCard = ({ comment, actionMenu }: CommentProps) => {
                 onClose={() => setIsEditorOpen(false)} 
                 title="Декомпозиция комментария"
             >
-                <TestMarkdownForm 
+                <DecompositionForm
+                    key={comment.id}
                     onSubmit={handleDecomposeSubmit}
-                    onCancel={() => setIsEditorOpen(false)}
-                />
+                    onCancel={() => setIsEditorOpen(false)} 
+                    reviewerComment={comment} />
             </Dialog>
         </div>
     );

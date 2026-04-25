@@ -16,6 +16,7 @@ class ActivityLogListener(EventListener):
         EventType.REVIEWER_REMOVED.value: "Удален рецензент с id {reviewer_id}",
         EventType.COMMENT_ADDED.value: "Выделено новое замечание из рецензии с id {reviewer_id}",
         EventType.COMMENT_UPDATED.value: "Обновлено замечание с id {comment_id}. Обновлены поля: {changed_fields}",
+        EventType.COMMENT_DELETED.value: "Удалено замечание с id {comment_id}",
         EventType.TASK_UPDATED.value: "Обновлена задача с id {task_id}. Обновлены поля: {changed_fields}",
         EventType.TASK_DELETED.value: "Удалена задача с id {task_id}",
         EventType.COMMENT_DECOMPOSED.value: "Созданы задачи на основе замечания {comment_id}",

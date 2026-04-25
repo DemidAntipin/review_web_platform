@@ -16,9 +16,16 @@ export const useKanbanSocket = (projectId: number) => {
             removeTask(payload.task_id);
         });
 
-        const unsubDecompose = WebsocketService.on('COMMENT_DECOMPOSED', (payload: { tasks: TaskPreview[] }) => {
-            addTasks(payload.tasks);
+        const unsubDecompose = WebsocketService.on('COMMENT_DECOMPOSED', (payload: { created: TaskPreview[], updated: TaskPreview[], deleted: number[] }) => {
+            addTasks(payload.created);
+            payload.updated.forEach(task => {
+                updateTask(task.id, task);                
+            });
+            payload.deleted.forEach(task => {
+                removeTask(task);
+            })
         });
+
         const unsubChatMessage = WebsocketService.on('TASK_COMMENT_ADDED', (payload) => {
             if (!payload.task_id) return;
             taskCommentsInc(payload.task_id);

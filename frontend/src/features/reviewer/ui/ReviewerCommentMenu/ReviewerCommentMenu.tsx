@@ -8,9 +8,10 @@ import { useAuthStore } from '@/features/auth/model/auth.store';
 import { useProjectMembers } from '@/features/project/lib/hooks/useProjectMembers';
 import { ROLE_MAP } from '@/shared/config/roles';
 import { Button } from '@/shared/ui/button/Button';
-import { ReviewerComment } from '@/entities/reviewer/model/types';
+import { ReviewerComment, ReviewerCommentBase } from '@/entities/reviewer/model/types';
 import s from './ReviewerCommentMenu.module.scss';
 import clsx from 'clsx';
+import { ReviewerCommentForm } from '../ReviewerCommentForm/ReviewerCommentForm';
 
 interface ReviewerCommentMenuProps {
     comment: ReviewerComment;
@@ -19,7 +20,7 @@ interface ReviewerCommentMenuProps {
 
 export const ReviewerCommentMenu: React.FC<ReviewerCommentMenuProps> = ({ comment, projectId }) => {
     const [activeModal, setActiveModal] = useState<'edit' | 'delete' | null>(null);
-    const { toggleCommentHide, hiddenCommentIds, removeComment } = useReviewerStore();
+    const { toggleCommentHide, hiddenCommentIds, removeComment, reviewers, updateComment } = useReviewerStore();
 
     const { user: currentUser } = useAuthStore();
     const { members } = useProjectMembers(projectId);
@@ -30,6 +31,13 @@ export const ReviewerCommentMenu: React.FC<ReviewerCommentMenuProps> = ({ commen
         const currentMember = members.find(m => m.user_id === currentUser?.id);
         return currentUser?.role === 'Админ' || ROLE_MAP[currentMember?.role as keyof typeof ROLE_MAP] === "Автор";
     }, [members, currentUser]);
+
+    const reviewer = reviewers.find(r => r.id === comment.reviewer_id);
+
+    const handleCommentSubmit = (data: Partial<ReviewerCommentBase>) => {
+        updateComment(projectId, reviewer!.id, comment.id, data);
+        setActiveModal(null)
+    };
 
     return (
         <div onClick={e => e.stopPropagation()}>
@@ -62,11 +70,23 @@ export const ReviewerCommentMenu: React.FC<ReviewerCommentMenuProps> = ({ commen
                     <p>Вы действительно хотите удалить это замечание?</p>
                     <div className={s.actions}>
                         <Button variant="secondary" onClick={() => setActiveModal(null)}>Отмена</Button>
-                        <Button variant="danger" onClick={() => removeComment(comment.reviewer_id, comment.id)}>
+                        <Button variant="danger" onClick={() => removeComment(projectId, comment.reviewer_id, comment.id)}>
                             Удалить
                         </Button>
                     </div>
                 </div>
+            </Dialog>
+
+            <Dialog 
+                isOpen={activeModal === 'edit'} 
+                onClose={() => setActiveModal(null)} 
+                title="Редактировать замечание"
+            >
+                <ReviewerCommentForm
+                    reviewer={reviewer!}
+                    initialData={comment}
+                    onClose={() => setActiveModal(null)} 
+                    onSubmit={(data) => handleCommentSubmit(data)} />
             </Dialog>
         </div>
     );

@@ -1,4 +1,4 @@
-import { Reviewer } from '@/entities/reviewer/model/types';
+import { CreateCommentDto, Reviewer, ReviewerComment } from '@/entities/reviewer/model/types';
 import { BoardGrid } from '@/shared/ui/board/BoardGrid';
 import { BoardColumn } from '@/shared/ui/board/BoardColumn';
 import { StatusStrip } from '@/shared/ui/board/StatusStrip';
@@ -7,10 +7,13 @@ import { useBoardNavigation } from '@/shared/lib/hooks/useBoardNavigation';
 import { Button } from '@/shared/ui/button/Button';
 import { Plus } from 'lucide-react';
 import s from './ReviewersBoard.module.scss';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ReviewerMenu } from '@/features/reviewer/ui/ReviewerMenu/ReviewerMenu';
 import { useParams } from 'react-router-dom';
 import { ReviewerCommentMenu } from '@/features/reviewer/ui/ReviewerCommentMenu/ReviewerCommentMenu';
+import { Dialog } from '@/shared/ui/dialog/Dialog';
+import { ReviewerCommentForm } from '@/features/reviewer/ui/ReviewerCommentForm/ReviewerCommentForm';
+import { useReviewerStore } from '../model/reviewer.store';
 
 interface ContentProps {
     reviewers: Reviewer[];
@@ -26,6 +29,14 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
     const project_id = Number(projectId);
 
     const { activeTab, scrollToColumn, scrollContainerRef, columnsRef } = useBoardNavigation(navItems);
+    const [selectedReviewer, setSelectedReviewer] = useState<Reviewer | null>(null);
+
+    const { addComment, isLoading } = useReviewerStore();
+
+    const handleCommentSubmit = (reviewerId: number, data: CreateCommentDto) => {
+        addComment(project_id, reviewerId, data);
+        setSelectedReviewer(null);
+    };
 
     return (
         <>
@@ -42,7 +53,7 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
                             {reviewer.comments.map(comment => (
                                 <ReviewerCommentCard key={comment.id} comment={comment} actionMenu={<ReviewerCommentMenu comment={comment} projectId={project_id} />} />
                             ))}
-                            <Button variant='dashed' fullWidth>
+                            <Button variant='dashed' fullWidth onClick={() => setSelectedReviewer(reviewer)}>
                                 <Plus size={18} /> <span>Добавить замечание</span>
                             </Button>
                         </div>
@@ -56,6 +67,19 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
                     </BoardColumn>
                 </div>
             </BoardGrid>
+
+            <Dialog 
+                isOpen={!!selectedReviewer} 
+                onClose={() => setSelectedReviewer(null)}
+                title="Новое замечание"
+            >
+                {selectedReviewer && (
+                    <ReviewerCommentForm 
+                        reviewer={selectedReviewer}
+                        onSubmit={(data) => handleCommentSubmit(selectedReviewer.id, data)}
+                        onClose={() => setSelectedReviewer(null)} />
+                )}
+            </Dialog>
         </>
     );
 };
