@@ -1,4 +1,4 @@
-import { CreateCommentDto, Reviewer, ReviewerComment } from '@/entities/reviewer/model/types';
+import { CreateCommentDto, Reviewer } from '@/entities/reviewer/model/types';
 import { BoardGrid } from '@/shared/ui/board/BoardGrid';
 import { BoardColumn } from '@/shared/ui/board/BoardColumn';
 import { StatusStrip } from '@/shared/ui/board/StatusStrip';
@@ -44,7 +44,8 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
             <BoardGrid columnsCount={reviewers.length + 1} ref={scrollContainerRef} className={s.boardGridFixed}>
                 {reviewers.map((reviewer, idx) => (
                     <BoardColumn 
-                        key={reviewer.id} 
+                        key={reviewer.id}
+                        data-id={reviewer.id} 
                         label={reviewer.name}
                         actionMenu={<ReviewerMenu reviewer={reviewer} projectId={project_id} />}
                         ref={(el) => { if (columnsRef.current) columnsRef.current[idx] = el; }}

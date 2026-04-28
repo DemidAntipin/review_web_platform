@@ -57,17 +57,21 @@ export const MainLayout = () => {
                 </div>
             </header>
 
-            <section className={s.actionsBar}>
+            <section className={clsx(s.actionsBar, !(headerSearch || headerActions) && s.mobileOnly)}>
                 <div className={s.gridContainer}>
                     <h1 className={clsx(s.pageTitle, s.mobileOnly)} onClick={() => navigate("/projects")}>
                         {pageTitle}
-                    </h1>   
-                    <div className={s.searchSection}>
-                        {headerSearch}
-                    </div>
-                    <div className={clsx(s.pageActionsSlot, s.desktopOnly)}>
-                        {headerActions}
-                    </div>
+                    </h1>
+                    {headerSearch && (
+                        <div className={s.searchSection}>
+                            {headerSearch}
+                        </div>
+                    )}
+                    {headerActions && (
+                        <div className={clsx(s.pageActionsSlot, s.desktopOnly)}>
+                            {headerActions}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -76,7 +80,11 @@ export const MainLayout = () => {
                     <Outlet context={{ setPageTitle, setHeaderActions, setHeaderSearch }} />
                 </div>
             </main>
-            <div className={clsx(s.mobileFooter, s.mobileOnly)}>{headerActions}</div>
+            {headerActions && (
+                <div className={clsx(s.mobileActionsFooter, s.mobileOnly)}>
+                    {headerActions}
+                </div>
+            )}
             <MobileNav />
         </div>
     );

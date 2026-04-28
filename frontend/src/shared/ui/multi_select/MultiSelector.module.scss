@@ -1,0 +1,40 @@
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--background-main);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    max-height: 120px;
+    overflow-y: auto;
+    transition: all 0.2s ease;
+
+    &:empty {
+        display: none;
+    }
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-primary);
+    animation: fadeIn 0.2s ease;
+
+    &:hover {
+        border-color: var(--accent-color);
+        background: var(--background-card);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+}

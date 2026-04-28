@@ -36,5 +36,5 @@ export const ENDPOINTS = {
         })(),
         BY_ID: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}`,
     },
-    LOGS: '/logs'
+    LOGS: '/logs/'
 };

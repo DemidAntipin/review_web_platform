@@ -7,6 +7,10 @@ class LogRequestDTO(BaseModel):
     project_ids: Optional[List[ID]] = None
     start_period: Optional[UTCDatetime] = None
     end_period: Optional[UTCDatetime] = None
+    limit: int
+    offset: int
+    sort_field: Optional[str] = "created_at"
+    sort_order: Optional[str] = "desc"
 
 class ActivityLogDTO(BaseModel):
     id: ID
@@ -18,3 +22,7 @@ class ActivityLogDTO(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ActivityLogResponse(BaseModel):
+    items: List[ActivityLogDTO]
+    total: int

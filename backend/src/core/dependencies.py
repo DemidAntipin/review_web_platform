@@ -38,7 +38,9 @@ async def get_current_user(db: DBSession, token: Annotated[str, Depends(oauth2_s
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 def check_user_permission(required_roles: List[UserRole]) -> User:
-    async def check_permission(db: DBSession, user: CurrentUser, project_id: int = Path(...)) -> User:
+    async def check_permission(db: DBSession, user: CurrentUser, project_id: int | None = None) -> User:
+        if user.role == UserRole.admin:
+            return UserMember(user=user, role=UserRole.admin)
         query = (
             select(Project.deleted_at, ProjectMember.role)
             .outerjoin(

@@ -6,6 +6,7 @@ import { LoginPage } from '@/pages/login/LoginPage';
 import { useAuthStore } from '@/features/auth/model/auth.store';
 import { KanbanPage } from '@/pages/kanban/KanbanPage';
 import { ReviewersPage } from '@/pages/reviewers/ReviewerPage';
+import { LogsPage } from '@/pages/logs/LogsPage';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     const token = useAuthStore((state) => state.token);
@@ -47,6 +48,10 @@ export const AppRouter = createBrowserRouter([
                         ]
                     }
                 ]
+            },
+            {
+                path: 'logs',
+                element: <LogsPage />
             }
         ],
     },

@@ -1,7 +1,7 @@
 import s from './field.module.scss';
 
 interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLSelectElement> {
-    label: string;
+    label?: string;
     error?: string;
     onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
 }

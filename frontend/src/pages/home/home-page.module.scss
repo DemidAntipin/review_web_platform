@@ -40,7 +40,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 8px;
-  padding-bottom: 100px; 
+  padding-bottom: 100px;
+
+  @media (max-width: 768px) { padding-bottom: 150px; }
 }
 
 .createBtnMobile {

@@ -37,6 +37,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     height: 100%;
+    padding: var(--padding-inner);
 }
 
 .content > .gridContainer {
@@ -55,7 +56,7 @@
 
 .actionsBar {
   grid-area: actions;
-  padding: var(--padding-outer) 0;
+  padding: var(--padding-inner) 0;
   background-color: var(--background-main);
 }
 
@@ -218,6 +219,29 @@
       svg {
         flex-shrink: 0;
       }
+    }
+}
+
+.mobileActionsFooter {
+    display: none;
+
+    @media (max-width: 768px) {
+        bottom: calc(65px + env(safe-area-inset-bottom));
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background: var(--background-card);
+        border-top: 1px solid var(--border-color);
+        z-index: 100;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    & > * {
+      margin: 16px 16px;
+      width: 100%;
     }
 }
 
