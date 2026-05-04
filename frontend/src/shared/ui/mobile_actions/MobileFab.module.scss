@@ -1,0 +1,19 @@
+.mobileFab {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileFab {
+    display: block;
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    right: 16px;
+    z-index: 100;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-xs);
+  }
+}

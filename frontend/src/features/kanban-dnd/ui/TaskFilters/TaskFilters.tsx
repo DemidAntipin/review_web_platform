@@ -33,13 +33,18 @@ interface Props {
     sortField: TaskSortField;
     sortDirection: SortDirection;
     onSortChange: (field: TaskSortField, direction: SortDirection) => void;
+
+    members: { user_id: number; username: string }[];
+    selectedAssignees: (number | null)[];
+    onAssigneeChange: (id: number | null) => void;
 }
 
 export const TaskFilters: React.FC<Props> = ({
     types, priorities, reviewersData,
     selectedTypes, selectedPriorities, selectedReviewers, selectedComments,
     onTypeChange, onPriorityChange, onReviewerChange, onCommentChange, onReset,
-    sortField, sortDirection, onSortChange, showHidden, onToggleHidden
+    sortField, sortDirection, onSortChange, showHidden, onToggleHidden, members,
+    selectedAssignees, onAssigneeChange
 }) => {
     return (
         <Dropdown trigger={<IconButton size="md"><SlidersHorizontal size={20} /></IconButton>}>
@@ -103,6 +108,34 @@ export const TaskFilters: React.FC<Props> = ({
                     ))}
                 </div>
                 <div className={s.divider} />
+
+                <div className={s.section}>
+                    <span className={s.sectionTitle}>Исполнитель</span>
+                    <label className={s.filterItem}>
+                        <input 
+                            type="checkbox" 
+                            checked={selectedAssignees.includes(null)}
+                            onChange={() => onAssigneeChange(null)}
+                        />
+                        <div className={s.customCheckbox}><Check size={12} /></div>
+                        <span>Нет исполнителя</span>
+                    </label>
+
+                    {members.map(member => (
+                        <label key={member.user_id} className={s.filterItem}>
+                            <input 
+                                type="checkbox" 
+                                checked={selectedAssignees.includes(member.user_id)}
+                                onChange={() => onAssigneeChange(member.user_id)}
+                            />
+                            <div className={s.customCheckbox}><Check size={12} /></div>
+                            <span>{member.username}</span>
+                        </label>
+                    ))}
+                </div>
+
+                <div className={s.divider} />
+
                 <div className={s.section}>
                     <label className={s.filterItem}>
                         <input 

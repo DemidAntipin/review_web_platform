@@ -5,7 +5,21 @@
   border-radius: var(--border-radius);
   background-color: var(--background-main);
   overflow: hidden;
-  height: 500px;
+  flex: 1;
+  width: var(--editor-width);
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  min-height: 400px;
+  height: 100%;
+}
+
+.fieldHeight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .tabs {
@@ -19,7 +33,6 @@
   button {
     flex: 1; 
     padding: 10px 16px;
-    border: none;
     background-color: var(--bg-header);
     cursor: pointer;
     font-size: 0.85rem;
@@ -50,32 +63,44 @@
 
 .content {
   flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  * {
+    max-width: 100%;
+    word-break: break-word;
+  }
 }
 
-.textarea, .preview {
-  width: 100%;
+.editorBody {
   height: 100%;
+  width: 100%;
+  max-height: 100%;
   flex: 1;
   padding: 16px;
-  background: transparent;
+  display: block;
+  box-sizing: border-box;
   overflow-y: auto;
+  border: none;
+  background: transparent;
+
+  &::-webkit-scrollbar { width: 3px;}
+  &::-webkit-scrollbar-thumb {
+      background: var(--text-secondary);
+      border-radius: 6px;
+  }
 }
 
 .textarea {
-  width: 100%;
-  min-height: 200px;
-  padding: 16px;
-  border: none;
+  @extend .editorBody;
   resize: none;
-  background: transparent;
+  field-sizing: content;
   color: var(--text-primary);
   font-family: monospace;
   font-size: 0.95rem;
   line-height: 1;
-  display: block;
 
   &:focus {
     outline: none;
@@ -83,18 +108,9 @@
 }
 
 .preview {
-  width: 100%;
-  padding: 20px;
+  @extend .editorBody;
   padding-right: 24px;
   background-color: var(--background-main);
-  overflow-y: auto;
-  box-sizing: border-box;
-
-  &::-webkit-scrollbar { width: 3px;}
-  &::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 6px;
-  }
 
   .empty {
     color: var(--text-secondary);
@@ -116,7 +132,6 @@
     .katex-display {
       padding: 10px 25px 10px 0;
       margin: 1em 0;
-      overflow-x: auto;
       overflow-y: hidden;
     }
  }

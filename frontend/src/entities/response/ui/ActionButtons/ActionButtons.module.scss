@@ -1,0 +1,24 @@
+.actionsList {
+  display: flex;
+  gap: 8px;
+  height: 40px;
+
+  &.isMobile {
+    flex-direction: column;
+    padding: 8px;
+    min-width: 200px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .desktopActions {
+    display: none;
+  }
+
+  .actionsList {
+    flex-direction: column;
+    padding: 8px;
+    height: 100%;
+  }
+}

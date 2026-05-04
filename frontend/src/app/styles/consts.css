@@ -1,9 +1,27 @@
 :root {
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --footer-height: 65px;
+  --fab-bottom-offset: calc(var(--footer-height) + 16px);
+  
   --padding-outer: 24px;
   --padding-inner: 16px;
   --padding-xs: 8px;
+  
+  --content-max-width: 1440px;
+  --editor-max-width: 900px;
 
-  --sidebar-width: 260px;
-  --header-height: 64px;
+  --z-header: 1000;
+  --z-mobile-nav: 2000;
+  --z-overlay: 2100;
+  --z-fab: 1500;
+
   --border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --padding-outer: 16px;
+    --header-height: 56px;
+  }
 }

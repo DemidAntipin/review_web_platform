@@ -19,9 +19,7 @@ class DocumentConverter:
         temp_out = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
         ext = os.path.splitext(source)[1].lower() if is_file else ".md"
         from_format = "markdown+tex_math_dollars+tex_math_single_backslash+smart+raw_tex" if ext in [".md", ".markdown"] else None
-        args = [
-            "--metadata", f"title={os.path.basename(source) if is_file else 'Ответ_рецензенту'}"
-        ]
+        args = []
         
         if to_format == "pdf":
             ext = os.path.splitext(source)[1].lower() if is_file else ".md"
@@ -39,7 +37,8 @@ class DocumentConverter:
                 args.append(f"--pdf-engine={engine}")
 
         try:
-            pypandoc.convert_file(
+            convert_func = pypandoc.convert_file if is_file else pypandoc.convert_text
+            convert_func(
                 source, 
                 to_format,
                 format=from_format,

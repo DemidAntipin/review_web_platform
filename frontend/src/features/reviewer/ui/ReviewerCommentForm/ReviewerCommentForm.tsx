@@ -23,7 +23,6 @@ export const ReviewerCommentForm = ({ reviewer, initialData, onSubmit, onClose }
     const [showContext, setShowContext] = useState(false);
 
     const handleSubmit = (e: React.SubmitEvent) => {
-        console.log(priority, type, content);
         e.preventDefault();
         onSubmit({
             content_md: content,
@@ -38,6 +37,7 @@ export const ReviewerCommentForm = ({ reviewer, initialData, onSubmit, onClose }
                 isOpen={showContext}
                 onToggle={() => setShowContext(!showContext)}
                 title="Текст рецензии"
+                className={s.overlay}
             >
                 <MarkdownPreview value={reviewer.general_comment} />
             </SideOverlay>
@@ -74,6 +74,7 @@ export const ReviewerCommentForm = ({ reviewer, initialData, onSubmit, onClose }
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="Опишите проблему..."
+                        className={s.editor}
                         required
                     />
                 </div>

@@ -4,7 +4,7 @@ import s from './icon_button.module.scss';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     size?: 'sm' | 'md' | 'lg';
-    variant?: 'ghost' | 'danger';
+    variant?: 'ghost' | 'danger' | 'primary';
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({ 

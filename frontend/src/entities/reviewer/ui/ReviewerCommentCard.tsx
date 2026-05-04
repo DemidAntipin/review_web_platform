@@ -15,7 +15,7 @@ interface CommentProps {
     actionMenu?: React.ReactNode;
 }
 
-const TYPE_CONFIG: Record<string, { icon: any, label: string }> = {
+export const TYPE_CONFIG: Record<string, { icon: any, label: string }> = {
     'Правка текста': { icon: FileText, label: 'Правка текста' },
     'Эксперимент': { icon: FlaskConical, label: 'Эксперимент' },
     'Анализ': { icon: BarChart2, label: 'Анализ' },

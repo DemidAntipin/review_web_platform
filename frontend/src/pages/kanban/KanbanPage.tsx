@@ -76,10 +76,6 @@ export const KanbanPage = () => {
 
     const activeTask = filteredTasks.find(t => t.id === activeId);
 
-    if (error) {
-        return <div className={s.errorWrap}><h1>{error}</h1></div>;
-    }
-
     if (isLoading && tasks.length === 0) {
         return <div className={s.loaderWrap}><Loader /></div>;
     }

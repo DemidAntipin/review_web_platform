@@ -10,6 +10,15 @@
     "sidebar content";
   overflow: hidden;
   background-color: var(--background-main);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-height) auto 1fr;
+    grid-template-areas: 
+      "header"
+      "actions"
+      "content";
+  }
 }
 
 .headerContent, .gridContainer {
@@ -17,7 +26,7 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 20px;
   width: 100%;
-  max-width: 1320px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 0 var(--padding-outer);
   box-sizing: border-box;
@@ -34,16 +43,21 @@
 
 .content {
     grid-area: content;
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 100%;
-    padding: var(--padding-inner);
-}
-
-.content > .gridContainer {
+    overflow: hidden;
     height: 100%;
     display: flex;
     flex-direction: column;
+    
+    @media (max-width: 768px) {
+        padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom));
+    }
+
+    & > .gridContainer {
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+        display: block;
+    }
 }
 
 .pageTitle {
@@ -51,6 +65,7 @@
   font-size: 24px;
   font-weight: 600;
   overflow: hidden;
+  cursor: pointer;
   height: 100%;
 }
 
@@ -88,8 +103,11 @@
 
 .content {
   grid-area: content;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
   background-color: var(--background-main);
   
   .gridContainer > div {
@@ -127,22 +145,19 @@
 }
 
 @media (max-width: 768px) {
-  .layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: 60px auto 1fr;
-    grid-template-areas: 
-      "header"
-      "actions"
-      "content";
+  .content{
+    height: auto;
+    padding-bottom: var(--footer-height);
+    overflow-y: hidden;
   }
 
   .gridContainer {
       display: flex;
       flex-direction: column;
-      padding: 0 16px;
+      padding: 0 8px;
       width: 100%;
       box-sizing: border-box;
-      overflow: visible;
+      overflow: hidden;
       height: auto;
     }
 
@@ -178,18 +193,18 @@
     display: none;
 
     @media (max-width: 768px) {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        height: 65px;
+        height: calc(var(--footer-height) + env(safe-area-inset-bottom));
         background: var(--background-card);
         border-top: 1px solid var(--border-color);
-        z-index: 100;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
         padding-bottom: env(safe-area-inset-bottom);
+        z-index: 1000;
     }
 
     & > * {
@@ -226,7 +241,7 @@
     display: none;
 
     @media (max-width: 768px) {
-        bottom: calc(65px + env(safe-area-inset-bottom));
+        bottom: calc(var(--footer-height) + env(safe-area-inset-bottom));
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -240,7 +255,7 @@
         padding-bottom: env(safe-area-inset-bottom);
     }
     & > * {
-      margin: 16px 16px;
+      margin: 8px;
       width: 100%;
     }
 }

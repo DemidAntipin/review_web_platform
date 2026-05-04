@@ -14,6 +14,8 @@ import { ReviewerCommentMenu } from '@/features/reviewer/ui/ReviewerCommentMenu/
 import { Dialog } from '@/shared/ui/dialog/Dialog';
 import { ReviewerCommentForm } from '@/features/reviewer/ui/ReviewerCommentForm/ReviewerCommentForm';
 import { useReviewerStore } from '../model/reviewer.store';
+import { MobileFab } from '@/shared/ui/mobile_actions/MobileFab';
+import { useMediaQuery } from '@/shared/lib/hooks/useMediaQuery';
 
 interface ContentProps {
     reviewers: Reviewer[];
@@ -31,7 +33,13 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
     const { activeTab, scrollToColumn, scrollContainerRef, columnsRef } = useBoardNavigation(navItems);
     const [selectedReviewer, setSelectedReviewer] = useState<Reviewer | null>(null);
 
+    const activeReviewer = useMemo(() => 
+        reviewers.find(r => r.id === activeTab), 
+    [reviewers, activeTab]);
+
     const { addComment, isLoading } = useReviewerStore();
+
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     const handleCommentSubmit = (reviewerId: number, data: CreateCommentDto) => {
         addComment(project_id, reviewerId, data);
@@ -54,9 +62,11 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
                             {reviewer.comments.map(comment => (
                                 <ReviewerCommentCard key={comment.id} comment={comment} actionMenu={<ReviewerCommentMenu comment={comment} projectId={project_id} />} />
                             ))}
-                            <Button variant='dashed' fullWidth onClick={() => setSelectedReviewer(reviewer)}>
-                                <Plus size={18} /> <span>Добавить замечание</span>
-                            </Button>
+                            {!isMobile &&
+                                <Button variant='dashed' fullWidth onClick={() => setSelectedReviewer(reviewer)}>
+                                    <Plus size={18} /> <span>Добавить замечание</span>
+                                </Button>
+                            }
                         </div>
                     </BoardColumn>
                 ))}
@@ -68,6 +78,15 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
                     </BoardColumn>
                 </div>
             </BoardGrid>
+
+            <MobileFab>
+                <Button variant='secondary' fullWidth onClick={onAddClick}>
+                    <span>Добавить рецензента</span>
+                </Button>
+                <Button variant='secondary' fullWidth onClick={() => activeReviewer && setSelectedReviewer(activeReviewer)}>
+                    <span>Добавить замечание</span>
+                </Button>
+            </MobileFab>
 
             <Dialog 
                 isOpen={!!selectedReviewer} 
@@ -88,10 +107,6 @@ const BoardContent = ({ reviewers, onAddClick }: ContentProps) => {
 export const ReviewersBoard = ({ reviewers = [], onAddClick }: ContentProps) => {
     return (
         <div className={s.container}>
-            <Button variant='dashed' fullWidth className={s.mobileOnly} onClick={onAddClick}>
-                <Plus size={18} /> <span>Новый рецензент</span>
-            </Button>
-
             {reviewers.length > 0 ? (
                 <BoardContent reviewers={reviewers} onAddClick={onAddClick} />
             ) : (

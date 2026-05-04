@@ -36,5 +36,12 @@ export const ENDPOINTS = {
         })(),
         BY_ID: (project_id: number, reviewer_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}`,
     },
+    RESPONSES: (() => {
+       const base = (project_id: number, reviewer_id: number, comment_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/${comment_id}/responses/`;
+       base.BY_ID = (project_id: number, reviewer_id: number, comment_id: number, response_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/${comment_id}/responses/${response_id}`;
+       base.EXPORT = (project_id: number, reviewer_id: number, comment_id: number, response_id: number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/${comment_id}/responses/${response_id}/export`;
+
+       return base
+    })(),
     LOGS: '/logs/'
 };

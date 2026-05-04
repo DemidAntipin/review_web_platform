@@ -5,11 +5,9 @@
     flex-direction: column;
     background: var(--background-main);
     overflow: hidden;
-    margin-bottom: var(--padding-outer);
 
     @media (max-width: 768px) {
-        height: calc(100% - 50px);
-        overflow: visible;
+        padding-bottom: var(--footer-height);
     }
 }
 
@@ -26,7 +24,7 @@
     gap: 16px;
     height: 100%;
     min-height: 0;
-    overflow-x: auto; 
+    overflow-y: hidden; 
     padding: 0 16px 16px 16px;
 
     &::-webkit-scrollbar {
@@ -40,7 +38,6 @@
     
     @media (max-width: 768px) {
         display: flex;
-        overflow-x: auto;
         scroll-snap-type: x mandatory;
         gap: 0;
         width: 100%;
@@ -69,7 +66,6 @@
         scroll-snap-align: center;
         scroll-snap-stop: always;
         margin: 0 16px;
-        height: auto;
     }
 }
 
@@ -90,7 +86,7 @@
     gap: 10px;
     padding: 2px 8px 16px 0px;
     scrollbar-gutter: stable;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     &::-webkit-scrollbar { width: 3px; }
     &::-webkit-scrollbar-thumb {
@@ -99,7 +95,7 @@
     }
     
     @media (max-width: 768px) {
-        overflow-y: auto;
+        overflow: auto;
         scrollbar-width: none;
         scrollbar-gutter: auto;
     }

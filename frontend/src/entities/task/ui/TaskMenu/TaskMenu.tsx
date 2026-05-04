@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useKanbanStore } from "@/features/kanban-dnd/model/kanban.store";
 import { PRIORITY_TO_ID, STATUS_TO_ID, TaskPreview, TaskPriority, TaskStatus, TaskType, TYPE_TO_ID } from "@/entities/task/model/types";
 import { Dropdown } from "@/shared/ui/dropdown/Dropdown";
@@ -26,12 +26,17 @@ export const TaskMenu: React.FC<TaskMenuProps> = ({ task }) => {
     const { projectId } = useParams<{ projectId: string }>();
     const project_id = Number(projectId);
     const [activeModal, setActiveModal] = useState<'edit' | 'delete' | null>(null);
-    const removeTask = useKanbanStore(state => state.removeTask);
-    const updateTask = useKanbanStore(state => state.updateTask);
     const toggleTaskHide = useKanbanStore(state => state.toggleTaskHide);
     const hiddenTasksIds = useKanbanStore(state => state.hiddenTasksIds);
 
     const reviewers = useReviewerStore(state => state.reviewers);
+    const setReviewers = useReviewerStore(state => state.setReviewers);
+
+    useEffect(() => {
+        if (!project_id) return;
+        setReviewers(project_id);
+    }, []);
+
     const reviewerComment = useMemo(() => {
         for (const r of reviewers) {
             const found = r.comments.find(c => c.id === task.comment_id);

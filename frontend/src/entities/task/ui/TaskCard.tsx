@@ -13,6 +13,7 @@ import { useRef } from 'react';
 interface TaskCardProps { 
     task: TaskPreview;
     actionMenu?: React.ReactNode;
+    onClick?: () => void;
 }
 
 const TYPE_CONFIG: Record<TaskType, { icon: any, label: string }> = {
@@ -23,14 +24,14 @@ const TYPE_CONFIG: Record<TaskType, { icon: any, label: string }> = {
     Вопрос: { icon: HelpCircle, label: 'Вопрос' },
 };
 
-export const TaskCard = ({ task, actionMenu }: TaskCardProps) => {
+export const TaskCard = ({ task, actionMenu, onClick }: TaskCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const { projectId } = useParams<{ projectId: string }>(); 
     const project_id = Number(projectId);
     const typeInfo = TYPE_CONFIG[task.type as TaskType] || { icon: FileText, label: task.type };
     const { icon: TypeIcon, label: typeLabel } = typeInfo;
     return (
-        <div className={s.card} ref={cardRef}>
+        <div className={s.card} ref={cardRef} onClick={onClick}>
             <div className={s.cardHeader}>
                 <div className={s.badges}>
                     <span className={s.labelBadge}>R{task.reviewer_id}-C{task.comment_id}</span>
@@ -51,7 +52,7 @@ export const TaskCard = ({ task, actionMenu }: TaskCardProps) => {
 
             <div className={s.cardFooter}>
                 <span className={s.username}>{task.assignee || "Нет исполнителя"}</span>
-                <div className={s.stats}>
+                <div className={s.stats} onClick={(e) => e.stopPropagation()}>
                     <Dropdown 
                         position="bottom"
                         containerRef={cardRef}

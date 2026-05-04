@@ -1,18 +1,54 @@
 .wrapper {
-    position: absolute;
-    top: -24px;
-    bottom: 24px;
-    left: -24px;
-    
-    width: calc(100% + 48px);
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
     pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: -1;
+}
+
+.overlayContent {
+    height: 100%;
+    flex: 1;
+    position: relative;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: all;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+    z-index: 0;
+}
+
+.push {
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+    visibility: hidden;
+    width: 0;
+    flex-shrink: 0;
+    height: 100%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .overlayContent {
+        width: 0;
+        opacity: 0;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
 
     &.active {
-        transform: translateX(-100%);
+        visibility: visible;
+        pointer-events: all;
+        width: var(--width-limit);
         .tabTrigger {
             background-color: var(--background-main);
+        }
+
+        .overlayContent{
+            width: var(--width-limit);
+            opacity: 1;
+            transform: translateX(0);
         }
     }
 
@@ -20,77 +56,107 @@
         position: fixed;
         inset: 0;
         width: 90%;
-        z-index: 2100;
-        transform: translateX(-100%);
+        z-index: 1200;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         
         &.active {
+            width: 90%;
             transform: translateX(0);
         }
     }
 }
 
-.overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--background-card);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    pointer-events: all;
-    z-index: -1;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
-}
-
 .tabTrigger {
     position: absolute;
-    top: 40px;
-    left: 0;
-    transform: translateX(-100%);
+    top: 10%;
+    z-index: 10;
     pointer-events: all;
-    
     display: flex;
     align-items: center;
-    gap: 8px;
     padding: 10px 14px;
-    
-    background: var(--background-card);
-    border: 1px solid var(--border-color);
-    border-right: none;
-    border-radius: 8px 0 0 8px;
-    
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--text-secondary);
     color: var(--accent-color);
     cursor: pointer;
-    white-space: nowrap;
+    pointer-events: all;
+    visibility: visible;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &:hover {
-        background: var(--border-color);
+    .left & {
+        left: 0;
+        transform: translateX(-100%);
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+    }
+
+    .right & {
+        right: 0;
+        transform: translateX(100%);
+        border-left: none;
+        border-radius: 0 8px 8px 0;
     }
 
     @media (max-width: 768px) {
         top: 10%;
-        left: auto;
-        right: 0;
-        transform: translateY(-50%) translateX(100%);
-        border-radius: 0 8px 8px 0;
-        border: 1px solid var(--accent-color);
-        border-left: none;
-
+        pointer-events: all;
+            visibility: visible;
+        .left & { 
+            left: auto; right: 0; 
+            transform: translateX(100%); 
+            border-radius: 0 8px 8px 0;
+            border-left: none;
+            border-right: 1px solid var(--border-color);
+        }
+        .right & { 
+            right: auto; left: 0; 
+            transform: translateX(-100%); 
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+            border-left: 1px solid var(--border-color);
+        }
         svg {
+            transition: transform 0.3s ease;
             transform: rotate(180deg);
         }
+    }
+}
+
+.hideTrigger {
+    display: none;
+}
+
+.left {
+    .overlayContent {
+        transform: translateX(100%);
+    }
+
+    @media (max-width: 768px) {
+        left: 0;
+        transform: translateX(-100%);
+    }
+}
+
+.right {  
+    .overlayContent {
+        transform: translateX(-100%);
+    }
+
+    @media (max-width: 768px) {
+        left: auto;
+        right: 0;
+        transform: translateX(100%);
     }
 }
 
 .header {
     padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
+    background-color: var(--secondary-bg);
     flex-shrink: 0;
     span {
         font-weight: 600;
         font-size: 13px;
-        color: var(--text-secondary);
+        color: var(--text-primary);
         text-transform: uppercase;
     }
 }

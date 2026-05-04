@@ -119,7 +119,7 @@ export const AttachmentList = ({ projectId, taskId }: { projectId: number, taskI
                             <PreviewContainer 
                                 url={preview.url} 
                                 isText={preview.type.startsWith('text/plain') || preview.type.includes('javascript') || preview.type.includes('json')} 
-                                isHtml={preview.type.includes('text/html')}
+                                isHtml={preview.type.includes('text/html')} className={s.preview}
                             />
                         )
                     )}
@@ -146,7 +146,7 @@ export const AttachmentList = ({ projectId, taskId }: { projectId: number, taskI
                     className={s.addBtn}
                     variant="primary"
                 >
-                    <Plus size={14} /> {isDragging ? "Бросайте!" : "Выбрать файл"}
+                    <Plus size={14} /> {isDragging ? "Бросьте файл сюда!" : "Загрузить вложение"}
                 </Button>
             </div>
         </div>

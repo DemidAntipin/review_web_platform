@@ -1,0 +1,76 @@
+.card {
+    background: var(--background-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+
+    &:hover {
+        border-color: var(--accent-color);
+        background: var(--background-hover);
+    }
+}
+
+.cardHeader {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.priorityBadge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+
+    &.Высокий { 
+        background: color-mix(in srgb, var(--status-error), transparent 85%); 
+        color: #ff4d4f;
+    }
+    &.Средний { 
+        background: color-mix(in srgb, var(--status-review), transparent 85%); 
+        color: #faad14;
+    }
+    &.Низкий { 
+        background: color-mix(in srgb, var(--status-success), transparent 85%); 
+        color: #52c41a;
+    }
+}
+
+.tagWrapper {
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color), transparent 92%);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-weight: 500;
+
+    span {
+        line-height: 1;
+    }
+}

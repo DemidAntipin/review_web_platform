@@ -3,9 +3,14 @@ import { useKanbanStore } from "../model/kanban.store";
 import { TaskFilters } from "./TaskFilters/TaskFilters";
 import { SearchInput } from "@/shared/ui/search_input/SearchInput";
 import { useReviewerStore } from "@/entities/reviewer/model/reviewer.store";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useProjectMembers } from "@/features/project/lib/hooks/useProjectMembers";
+import { useParams } from "react-router-dom";
 
 export const KanbanControls = () => {
+    const { projectId } = useParams<{ projectId: string }>(); 
+    const project_id = Number(projectId);
+
     const kanbanData = useKanbanStore(useShallow((state) => ({
         tasks: state.tasks,
         searchQuery: state.searchQuery,
@@ -23,8 +28,19 @@ export const KanbanControls = () => {
         sortDirection: state.sortDirection,
         setSort: state.setSort,
         showHidden: state.showHidden,
-        setShowHidden: state.setShowHidden
+        setShowHidden: state.setShowHidden,
+        selectedAssignees: state.selectedAssignees,
+        toggleAssignee: state.toggleAssignee
     })));
+
+    const { members, fetchMembers, isLoading } = useProjectMembers(project_id);
+
+    useEffect(() => {
+        if (members.length === 0 && !isLoading) {
+            fetchMembers();
+        }
+    }, [fetchMembers, members.length, isLoading]);
+
 
     const reviewersList = useReviewerStore((state) => state.reviewers);
 
@@ -99,6 +115,9 @@ export const KanbanControls = () => {
                 onReset={kanbanData.resetFilters}
                 onToggleHidden={() => kanbanData.setShowHidden(!kanbanData.showHidden)}
                 showHidden={kanbanData.showHidden}
+                members={members}
+                selectedAssignees={kanbanData.selectedAssignees}
+                onAssigneeChange={kanbanData.toggleAssignee}
             />
         </div>
     );

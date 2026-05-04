@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Field } from '@/shared/ui/field/Field';
 import s from './UserSearchSelect.module.scss';
 import { ProjectPreview } from '@/entities/project/model/types';
+import { ProjectSuggestion } from '@/features/project/api/member.api';
 
 interface Props {
     value: string;
     onChange: (val: string) => void;
-    suggestions: ProjectPreview[];
-    onSelect: (project: ProjectPreview) => void;
+    suggestions: ProjectSuggestion[];
+    onSelect: (project: ProjectSuggestion) => void;
     label: string;
 }
 
@@ -26,7 +27,7 @@ export const ProjectSearchSelect: React.FC<Props> = ({
                     setIsOpen(true);
                 }}
                 onFocus={() => setIsOpen(true)}
-                placeholder="Поиск проекта..."
+                placeholder="Введите название проекта"
                 autoComplete="off"
             />
             {isOpen && suggestions.length > 0 && (

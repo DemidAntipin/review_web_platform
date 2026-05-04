@@ -5,6 +5,8 @@
   background: var(--background-card);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
+  max-height: 80%;
+  overflow: auto;
   padding: 4px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(8px);
@@ -21,5 +23,14 @@
   &[data-status='close'] {
     opacity: 0;
     transition: opacity 0.1s ease-in;
+  }
+
+  &::-webkit-scrollbar { 
+      height: 3px; 
+      width: 3px; 
+  }
+  &::-webkit-scrollbar-thumb {
+      background: var(--text-secondary);
+      border-radius: var(--border-radius);
   }
 }

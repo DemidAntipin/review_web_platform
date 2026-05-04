@@ -1,0 +1,40 @@
+.selectorsContainer {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+
+  .statusBadge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px;
+    min-width: fit-content;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: auto;
+    height: 44px;
+    box-sizing: border-box;
+
+    &.approved {
+      color: var(--status-success);
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    &.pending {
+      color: var(--status-review);
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

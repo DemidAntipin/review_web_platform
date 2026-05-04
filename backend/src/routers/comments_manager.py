@@ -13,8 +13,10 @@ from src.models.project.project import Project
 from src.models.reviewer import Reviewer
 from src.models.task.task import Task
 from src.models.task.task_status import TaskStatus
+from src.routers import response_manager
 
 router = APIRouter(prefix="/comments", tags=["comments"])
+router.include_router(response_manager.router, prefix="/{comment_id}")
 
 @router.post("/add", response_model=CommentDTO)
 async def create_comment(project_id: ID, reviewer_id: ID, data: CommentCreateDTO, db: DBSession, current_user: ProjectAuthor, background_tasks: BackgroundTasks):   

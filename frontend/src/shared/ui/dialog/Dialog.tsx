@@ -41,12 +41,6 @@ export const Dialog = ({ isOpen, onClose, title, children }: DialogProps) => {
         mouseDownTarget.current = null;
     };
 
-    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            onClose();
-        }
-    };
-
     if (!isOpen) return null;
 
     return createPortal(

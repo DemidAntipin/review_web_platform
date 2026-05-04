@@ -38,31 +38,36 @@ export const ReviewerForm = ({
     };
 
     return (
-        <form onSubmit={handleSubmit} className={s.form}>
-            <Field 
-                label="Имя рецензента"
-                value={name}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-                required
-                disabled={isLoading}
-            />
+        <div className={s.formContainer}>
+            <form onSubmit={handleSubmit} className={s.form}>
+                <div className={s.body}>
+                    <Field 
+                        label="Имя рецензента"
+                        value={name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                        required
+                        disabled={isLoading}
+                    />
 
-            <MarkdownEditor
-                label="Рецензия"
-                value={generalComment}
-                onChange={(e) => setGeneralComment(e.target.value)}
-                placeholder="Введите текст рецензии..."
-                disabled={isLoading}
-            />
-            
-            <div className={s.actions}>
-                <Button variant="secondary" type="button" onClick={onCancel} disabled={isLoading}>
-                    Отмена
-                </Button>
-                <Button variant="primary" type="submit" disabled={!name.trim() || isLoading}>
-                    {isLoading ? 'Загрузка...' : submitText}
-                </Button>
-            </div>
-        </form>
+                    <MarkdownEditor
+                        label="Рецензия"
+                        value={generalComment}
+                        onChange={(e) => setGeneralComment(e.target.value)}
+                        placeholder="Введите текст рецензии..."
+                        disabled={isLoading}
+                        className={s.editor}
+                    />
+                </div>
+                
+                <footer className={s.footer}>
+                    <Button variant="secondary" type="button" onClick={onCancel} disabled={isLoading}>
+                        Отмена
+                    </Button>
+                    <Button variant="primary" type="submit" disabled={!name.trim() || isLoading}>
+                        {isLoading ? 'Загрузка...' : submitText}
+                    </Button>
+                </footer>
+            </form>
+        </div>
     );
 };

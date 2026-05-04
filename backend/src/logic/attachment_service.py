@@ -66,13 +66,3 @@ class AttachmentService:
         
         filename = attachment.file_url.split("_", 2)[-1]
         return FileResponse(path=file_path, filename=filename, media_type='application/octet-stream')
-
-    @staticmethod
-    async def export_content_response(content: str, target_format: str, filename: str) -> FileResponse:
-        result_path = DocumentConverter.convert(content, to_format=target_format, is_file=False)
-        
-        return FileResponse(
-            path=result_path,
-            filename=f"{filename}.{target_format}",
-            media_type="application/octet-stream"
-        )

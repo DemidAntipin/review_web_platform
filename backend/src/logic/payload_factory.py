@@ -23,6 +23,8 @@ class EventPayloadFactory:
             EventType.COMMENT_DELETED.value: EventPayloadFactory.__comment_removed,
             EventType.COMMENT_UPDATED.value: EventPayloadFactory.__comment_preview,
             EventType.COMMENT_ADDED.value: EventPayloadFactory.__comment_preview,
+            EventType.RESPONSE_SAVED.value: EventPayloadFactory.__response_preview,
+            EventType.RESPONSE_APPROVED.value: EventPayloadFactory.__response_preview,
         }
 
         handler = handlers.get(event.action_type)
@@ -106,3 +108,8 @@ class EventPayloadFactory:
             "project_id": event.project_id,
             "comment_id": event.comment_id
         }
+    
+    @staticmethod
+    async def __response_preview(event: Union[ResponseSavedEvent, ResponseApprovedEvent]) -> Dict[str, Any]:
+        dto = await dtos_builder.get_response_preview(event.comment_id)
+        return dto.model_dump() if dto else {}

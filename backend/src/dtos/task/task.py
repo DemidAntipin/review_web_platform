@@ -64,6 +64,7 @@ class TaskPreviewDTO(BaseModel):
     priority: CommentPriority
     status: TaskStatus
     assignee: Optional[UsernameStr] = None
+    assignee_id: Optional[ID] = None
     created_at: UTCDatetime
     deadline: UTCDatetime
     comments_count: int = 0

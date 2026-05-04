@@ -1,25 +1,26 @@
-import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState } from 'react';
 import { Field } from '@/shared/ui/field/Field';
-import { wrapCyrillicInMath } from '@/shared/lib/utils/markdown';
 import { EditorTabs } from './EditorTabs';
 import { MarkdownPreview } from './MarkdownPreview';
 import s from './MarkdownEditor.module.scss';
+import clsx from 'clsx';
 
 interface MarkdownEditorProps extends React.InputHTMLAttributes<HTMLTextAreaElement> {
-    label: string;
+    label?: string;
     value: string;
     placeholder?: string;
     error?: string;
     disabled?: boolean;
+    className?: string;
 }
 
-export const MarkdownEditor = ({ label, value, onChange, placeholder, error, disabled, ...props}: MarkdownEditorProps) => {
+export const MarkdownEditor = ({ label, value, onChange, placeholder, error, disabled, className, ...props}: MarkdownEditorProps) => {
     const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
     const handleTabChange = (tab: 'edit' | 'preview') => setActiveTab(tab);
 
     return (
-        <Field label={label} error={error} disabled={disabled}>
+        <Field label={label} error={error} disabled={disabled} className={clsx(s.fieldHeight, className)}>
             <div className={s.editorContainer}>
                 <EditorTabs activeTab={activeTab} onTabChange={handleTabChange} />
                 <div className={s.content}>

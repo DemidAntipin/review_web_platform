@@ -5,7 +5,6 @@ import { Edit2, Trash2, User } from "lucide-react";
 import s from './DecompositionForm.module.scss';
 import { useParams } from "react-router-dom";
 import { useProjectMembers } from "@/features/project/lib/hooks/useProjectMembers";
-import { useCallback, useEffect } from "react";
 
 export const DecompositionTaskItem = ({ task, onEdit, onDelete }: { 
     task: Partial<Task>, 

@@ -2,12 +2,12 @@
   --bg-logo: #1e293b;
   --bg-sidebar: #cbd5e1;
   --bg-header: #dddddd;
-  --background-main: #F8F9FA;
+  --background-main: #f1f5f9;
   --background-card: #ffffff;
-  --secondary-bg: #f1f5f9;
+  --secondary-bg: #e2e8f0;
   
   --text-primary: #0f172a;
-  --text-secondary: #475569;
+  --text-secondary: #64748b;
   --text-on-accent: #ffffff;
 
   --accent-color: #2563eb;
@@ -15,7 +15,7 @@
   --danger-color: #ef4444;
   --danger-hover: #dc2626;
   
-  --border-color: #e2e8f0;
+  --border-color: #cbd5e1;
   --status-review: #f59e0b;
   --status-success: #10b981;
   --status-neutral: #64748b;
@@ -31,7 +31,7 @@
   --background-main: #020617;
   --background-card: #1e293b;
   
-  --secondary-bg: #1e293b;
+  --secondary-bg: #334155;
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
   --border-color: #334155;

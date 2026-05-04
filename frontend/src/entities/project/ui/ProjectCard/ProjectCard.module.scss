@@ -10,7 +10,7 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     user-select: none;
-    min-width: min-content; 
+    min-width: min-content;
 
     &:hover {
         transform: translateY(-2px);

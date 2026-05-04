@@ -79,6 +79,7 @@ export interface TaskPreview {
     type: string;
     priority: TaskPriority;
     status: TaskStatus;
+    assignee_id?: number;
     assignee?: string;
     created_at: string;
     deadline: string;

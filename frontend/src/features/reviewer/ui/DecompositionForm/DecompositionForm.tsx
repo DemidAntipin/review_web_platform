@@ -88,7 +88,7 @@ export const DecompositionForm = ({ reviewerComment, onSubmit, onCancel }: Decom
 
     return (
         <div className={s.container}>
-            <SideOverlay isOpen={showContext} onToggle={() => setShowContext(!showContext)} title="Текст замечания">
+            <SideOverlay isOpen={showContext} onToggle={() => setShowContext(!showContext)} title="Текст замечания" className={s.overlay}>
                 <MarkdownPreview value={reviewerComment.content_md} />
             </SideOverlay>
 

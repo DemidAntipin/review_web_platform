@@ -7,6 +7,11 @@ export interface UserSuggestion {
     username: string;
 }
 
+export interface ProjectSuggestion {
+    id: number;
+    title: string;
+}
+
 export const searchUsers = async (query: string): Promise<UserSuggestion[]> => {
     const { data } = await $api.get<UserSuggestion[]>(ENDPOINTS.AUTH.SEARCH(query));
     return data;

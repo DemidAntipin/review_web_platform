@@ -4,6 +4,7 @@ import { taskApi } from '@/entities/task/api/task.api';
 import { SortDirection } from '@/entities/project/model/types';
 import { reviewerApi } from '@/entities/reviewer/api/reviewer.api';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { useProjectMembers } from '@/features/project/lib/hooks/useProjectMembers';
 
 
 const applyFilters = (state: KanbanState): TaskPreview[] => {
@@ -11,7 +12,7 @@ const applyFilters = (state: KanbanState): TaskPreview[] => {
         tasks, searchQuery, selectedTypes, 
         selectedPriorities, selectedReviewers, 
         selectedComments, sortField, sortDirection,
-        showHidden, hiddenTasksIds 
+        showHidden, hiddenTasksIds, selectedAssignees
     } = state;
 
     const query = searchQuery.toLowerCase();
@@ -25,8 +26,8 @@ const applyFilters = (state: KanbanState): TaskPreview[] => {
         const matchesPriority = selectedPriorities.length === 0 || selectedPriorities.includes(task.priority);
         const matchesReviewer = selectedReviewers.length === 0 || selectedReviewers.includes(task.reviewer_id);
         const matchesComment = selectedComments.length === 0 || (task.comment_id && selectedComments.includes(task.comment_id));
-
-        return matchesSearch && matchesType && matchesPriority && matchesReviewer && matchesComment;
+        const matchesAssignee = selectedAssignees.length === 0 || (task.assignee_id === undefined || task.assignee_id === null ? selectedAssignees.includes(null) : selectedAssignees.includes(task.assignee_id));
+        return matchesSearch && matchesType && matchesPriority && matchesReviewer && matchesComment && matchesAssignee;
     });
 
     return filteredTasks.sort((a, b) => {
@@ -73,6 +74,8 @@ interface KanbanState {
     selectedPriorities: string[];
     selectedReviewers: number[];
     selectedComments: number[];
+    selectedAssignees: (number | null)[];
+    toggleAssignee: (assigneeId: number | null) => void;
 
     toggleType: (type: string) => void;
     togglePriority: (priority: string) => void;
@@ -110,6 +113,7 @@ export const useKanbanStore = create<KanbanState>()(
             selectedPriorities: [],
             selectedReviewers: [],
             selectedComments: [],
+            selectedAssignees: [],
 
             sortField: 'created_at',
             sortDirection: 'desc',
@@ -268,6 +272,18 @@ export const useKanbanStore = create<KanbanState>()(
                 return { ...nextState, filteredTasks: applyFilters(nextState) };
             }),
 
+            toggleAssignee: (assigneeId) => set((state) => {
+                const isSelected = state.selectedAssignees.includes(assigneeId);
+
+                let newState = { ...state };
+                if (isSelected) {
+                    newState.selectedAssignees = state.selectedAssignees.filter(id => id !== assigneeId);
+                } else {
+                    newState.selectedAssignees = [...state.selectedAssignees, assigneeId];
+                }
+                return { ...newState, filteredTasks: applyFilters(newState) };
+            }),
+
             resetFilters: () => set((state) => {
                 const updated: KanbanState = {
                     ...state,
@@ -279,6 +295,7 @@ export const useKanbanStore = create<KanbanState>()(
                     sortField: 'created_at',
                     sortDirection: 'desc',
                     showHidden: false,
+                    selectedAssignees: [],
                     hiddenTasksIds: new Set<number>()
                 };
                 return { ...updated, filteredTasks: applyFilters(updated) };
@@ -330,6 +347,7 @@ export const useKanbanStore = create<KanbanState>()(
                 selectedReviewers: state.selectedReviewers,
                 sortField: state.sortField,
                 sortDirection: state.sortDirection,
+                selectedAssignees: state.selectedAssignees,
             }),
         }
     )

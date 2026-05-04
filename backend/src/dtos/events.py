@@ -89,3 +89,15 @@ class TaskCommentAddedEvent(BaseEvent):
     action_type: ActionTypeStr = EventType.TASK_COMMENT_ADDED.value
     task_id: ID
     chat_message_id: ID
+
+class ResponseSavedEvent(BaseModel):
+    action_type: ActionTypeStr = EventType.RESPONSE_SAVED.value
+    comment_id: ID
+    reviewer_id: ID
+    response_id: ID
+
+class ResponseApprovedEvent(BaseEvent):
+    action_type: ActionTypeStr = EventType.RESPONSE_APPROVED.value
+    comment_id: ID
+    reviewer_id: ID
+    response_id: ID

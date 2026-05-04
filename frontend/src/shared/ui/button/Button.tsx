@@ -11,13 +11,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     children, 
     variant = 'primary', 
     fullWidth, 
-    className, 
+    className,
     ...props 
 }, ref) => {
     return (
         <button
             ref={ref}
-            className={clsx(s.button, s[variant], fullWidth && s.fullWidth, className)} 
+            className={clsx(s.button, s[variant], fullWidth && s.fullWidth, className)}
             {...props}
         >
             {children}

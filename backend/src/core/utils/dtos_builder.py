@@ -3,10 +3,12 @@ from sqlalchemy.orm import selectinload
 from src.core.types import ID
 from src.dtos.project.project import ProjectDTO, ProjectPreviewDTO
 from src.dtos.project.project_member import ProjectMemberPreviewDTO
+from src.dtos.response.response import ResponseDTO
 from src.dtos.reviewer.reviewer import ReviewerDTO
 from src.dtos.reviewer.reviewer_comment import CommentDTO, CommentShortDTO
 from src.models.attachment import Attachment
 from src.models.project_member import ProjectMember
+from src.models.response import Response
 from src.models.task_comment import TaskComment
 from src.models.comment.comment import Comment
 from src.models.task.task import Task
@@ -223,3 +225,15 @@ async def get_member_preview(project_id: ID, user_id: ID) -> ProjectMemberPrevie
         if not member:
             return None
         return ProjectMemberPreviewDTO.model_validate(member)
+    
+async def get_response_preview(comment_id: ID) -> ResponseDTO:
+    query = (
+        select(Response)
+        .where(Response.comment_id == comment_id).limit(1)
+    )
+    async with DBSession() as db:
+        result = await db.execute(query)
+        response = result.scalar_one_or_none()
+        if not response:
+            return None
+        return ResponseDTO.model_validate(response)

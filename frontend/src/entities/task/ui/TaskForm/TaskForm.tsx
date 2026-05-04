@@ -3,10 +3,9 @@ import { Field } from "@/shared/ui/field/Field";
 import { SideOverlay } from "@/shared/ui/sideoverlay/SideOverlay";
 import { MarkdownEditor } from "@/shared/widgets/MarkdownEditor/ui/MarkdownEditor";
 import { MarkdownPreview } from "@/shared/widgets/MarkdownEditor/ui/MarkdownPreview";
-import { ChangeEvent, SubmitEvent, useEffect, useState } from "react";
-import { PRIORITY_MAP, Task, TYPE_MAP } from "../../model/types";
+import { useEffect, useState } from "react";
+import { Task, TYPE_MAP } from "../../model/types";
 import s from './TaskForm.module.scss';
-import clsx from 'clsx';
 import { ReviewerComment } from "@/entities/reviewer/model/types";
 import { useUserSearch } from "@/features/project/lib/hooks/useUserSearch";
 import { UserSearchSelect } from "@/features/project/ui/TeamMenu/MemberForm/UserSearchSelect";
@@ -67,13 +66,16 @@ export const TaskForm = ({ reviewerComment, initialData, onSubmit, onCancel }: T
                 isOpen={showContext} 
                 onToggle={() => setShowContext(!showContext)}
                 title="Текст замечания"
+                className={s.overlay}
             >
                 <MarkdownPreview value={reviewerComment.content_md} />
             </SideOverlay>
-            <form className={s.form} onSubmit={(e) => { e.preventDefault(); onSubmit(formState); }}>
+            <form className={s.form} 
+                    onSubmit={(e) => { e.preventDefault(); onSubmit(formState); }} 
+                    onMouseDown={(e) => e.stopPropagation()} 
+                    onPointerDown={(e) => e.stopPropagation()}>
                 <div className={s.body}>
                     <Field label="Название" required
-                        className={s.input} 
                         value={formState.title} 
                         onChange={e => updateField('title', e.target.value)} 
                         placeholder="Введите название задачи" />
@@ -99,6 +101,7 @@ export const TaskForm = ({ reviewerComment, initialData, onSubmit, onCancel }: T
                         onChange={e => updateField('description_md', e.target.value)}
                         placeholder="Опишите задачу в формате Markdown + вставки LaTeX"
                         required
+                        className={s.editor}
                     />
                 </div>
 

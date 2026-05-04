@@ -10,6 +10,7 @@ import { ProjectMenu } from '@/features/project/ui/ProjectMenu/ProjectMenu';
 import { ProjectFilters } from '@/features/project/ui/ProjectFilters/ProjectFilters';
 import { ProjectStatus, STATUS_MAP } from '@/entities/project/model/types';
 import { useShallow } from 'zustand/react/shallow';
+import { MobileFab } from '@/shared/ui/mobile_actions/MobileFab';
 
 export const HomePage = () => {
     const { setPageTitle, setHeaderActions, setHeaderSearch } = useOutletContext<any>();

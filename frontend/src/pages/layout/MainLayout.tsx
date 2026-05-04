@@ -8,6 +8,8 @@ import { Loader } from '@/shared/ui/loader/Loader';
 import { MobileNav } from './MobileNav';
 import clsx from 'clsx';
 import { useProjectStore } from '@/entities/project/model/project.store';
+import { MobileFab } from '@/shared/ui/mobile_actions/MobileFab';
+import { useMediaQuery } from '@/shared/lib/hooks/useMediaQuery';
 
 export const MainLayout = () => {
     const [pageTitle, setPageTitle] = useState('');
@@ -17,11 +19,7 @@ export const MainLayout = () => {
     const { projects, setProjects } = useProjectStore();
     const navigate = useNavigate();
 
-    const contextValue = useMemo(() => ({
-        setPageTitle,
-        setHeaderActions,
-        setHeaderSearch
-    }), []);
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     useEffect(() => {
         const init = async () => {
@@ -52,14 +50,14 @@ export const MainLayout = () => {
 
             <header className={s.header}>
                 <div className={s.headerContent}>
-                    <h1 className={clsx(s.pageTitle, s.desktopOnly)} onClick={() => navigate("/projects")}>{pageTitle}</h1>                   
+                    <h1 className={clsx(s.pageTitle, s.desktopOnly)} onClick={() => navigate("/my_projects")}>{pageTitle}</h1>                   
                     {user && <UserInfo user={user} className={s.mobileOnly} dropdownPosition="bottom-start" />}
                 </div>
             </header>
 
             <section className={clsx(s.actionsBar, !(headerSearch || headerActions) && s.mobileOnly)}>
                 <div className={s.gridContainer}>
-                    <h1 className={clsx(s.pageTitle, s.mobileOnly)} onClick={() => navigate("/projects")}>
+                    <h1 className={clsx(s.pageTitle, s.mobileOnly)} onClick={() => navigate("/my_projects")}>
                         {pageTitle}
                     </h1>
                     {headerSearch && (
@@ -67,8 +65,8 @@ export const MainLayout = () => {
                             {headerSearch}
                         </div>
                     )}
-                    {headerActions && (
-                        <div className={clsx(s.pageActionsSlot, s.desktopOnly)}>
+                    {headerActions && !isMobile && (
+                        <div className={clsx(s.pageActionsSlot)}>
                             {headerActions}
                         </div>
                     )}
@@ -80,10 +78,10 @@ export const MainLayout = () => {
                     <Outlet context={{ setPageTitle, setHeaderActions, setHeaderSearch }} />
                 </div>
             </main>
-            {headerActions && (
-                <div className={clsx(s.mobileActionsFooter, s.mobileOnly)}>
+            {headerActions && isMobile && (
+                <MobileFab>
                     {headerActions}
-                </div>
+                </MobileFab>
             )}
             <MobileNav />
         </div>

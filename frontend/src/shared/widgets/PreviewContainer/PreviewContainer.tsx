@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2, FileWarning } from 'lucide-react';
 import s from './PreviewContainer.module.scss';
+import clsx from 'clsx';
 
 interface Props {
     url: string;
     isText?: boolean;
     isHtml?: boolean;
+    className?: string;
 }
 
-export const PreviewContainer = ({ url, isText, isHtml }: Props) => {
+export const PreviewContainer = ({ url, isText, isHtml, className }: Props) => {
     const [content, setContent] = useState<string | null>(null);
     const [loading, setLoading] = useState(isText || isHtml);
     const [error, setError] = useState(false);
@@ -33,20 +35,28 @@ export const PreviewContainer = ({ url, isText, isHtml }: Props) => {
         }
     }, [url, isText, isHtml]);
 
-    if (loading) return <div className={s.loader}><Loader2 className={s.spin} /> <span>Загрузка...</span></div>;
+    if (loading) return <div className={clsx(s.loader)}><Loader2 className={s.spin} /> <span>Загрузка...</span></div>;
     if (error) return <div className={s.error}><FileWarning /> <span>Ошибка загрузки</span></div>;
 
     if (isHtml && content) {
-        return <div className={s.htmlPreview} dangerouslySetInnerHTML={{ __html: content }} />;
+        return <div className={clsx(s.htmlPreview, className)} dangerouslySetInnerHTML={{ __html: content }} />;
     }
 
     if (isText && content) {
         return (
-            <pre className={s.textPreview}>
+            <pre className={clsx(s.textPreview, className)}>
                 <code>{content}</code>
             </pre>
         );
     }
 
-    return <iframe src={url} className={s.iframePreview} title="Preview" />;
+    return (
+        <div className={clsx(s.iframeWrapper, className)}>
+            <iframe 
+                src={`${url}#toolbar=1&view=FitH`}
+                className={s.iframePreview} 
+                title="Preview" 
+            />
+        </div>
+    );
 };
