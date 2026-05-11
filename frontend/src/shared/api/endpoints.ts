@@ -43,5 +43,11 @@ export const ENDPOINTS = {
 
        return base
     })(),
-    LOGS: '/logs/'
+    LOGS: '/logs/',
+    AI: (() => {
+        const base = () => `/ai`;
+        base.RESPONSE_TEMPLATE = (project_id:number, reviewer_id:number, comment_id:number) => `/projects/${project_id}/reviewers/${reviewer_id}/comments/${comment_id}/responses/ai/generate_response`;
+
+        return base
+    })()
 };

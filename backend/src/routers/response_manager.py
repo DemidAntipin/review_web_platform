@@ -10,8 +10,10 @@ from src.models.response import Response
 from src.models.comment.comment import Comment
 from src.dtos.response.response import ExportDTO, ResponseApproveDTO, ResponseDTO, ResponseSaveDTO
 from src.core.events.event_dispatcher import EventDispatcher
+from src.routers import ai_router
 
 router = APIRouter(prefix="/responses", tags=["responses"])
+router.include_router(ai_router.router)
 
 @router.get("/", response_model=ResponseDTO)
 async def get_comment_response(project_id: ID, reviewer_id: ID, comment_id: ID, db: DBSession, current_user: ProjectMemberAny):

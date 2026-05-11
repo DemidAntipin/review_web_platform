@@ -20,4 +20,8 @@ export interface ExportDTO {
     format: ExportFormat
 }
 
+export interface AIResponse {
+    response: string;
+}
+
 export type ExportFormat = 'pdf' | 'docx' | 'latex';

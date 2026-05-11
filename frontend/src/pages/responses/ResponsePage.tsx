@@ -53,7 +53,7 @@ export const ResponsePage = () => {
     
     const { reviewers } = useReviewerStore();
 
-    const { selectedCommentId, selectedReviewerId, currentContent, setCurrentContent, isLoading, currentResponse } = useResponseStore();
+    const { selectedCommentId, selectedReviewerId, currentContent, setCurrentContent, isLoading, isGenerating } = useResponseStore();
 
     const selectedComment = useMemo(() => {
         const reviewer = reviewers.find(r => r.id === selectedReviewerId);
@@ -143,18 +143,23 @@ export const ResponsePage = () => {
                         {!selectedCommentId ? (
                             <EmptySelection message="Выберите замечание в меню сверху, чтобы начать работу над ответом" />
                         ) : (
-                            isPrivileged ? 
-                                <MarkdownEditor
-                                    value={currentContent}
-                                    onChange={(e) => setCurrentContent(e.target.value)}
-                                    className={s.editor}
-                                />
-                                : <>
-                                    <div className={s.header}>
-                                        <span>Ответ рецензенту</span>
+                            <>
+                                {isGenerating && <Loader />}
+                                {isPrivileged ? (
+                                    <MarkdownEditor
+                                        value={currentContent}
+                                        onChange={(e) => setCurrentContent(e.target.value)}
+                                        className={s.editor}
+                                    />
+                                ) : (
+                                    <div>
+                                        <div className={s.header}>
+                                            <span>Ответ рецензенту</span>
+                                        </div>
+                                        <MarkdownPreview value={currentContent} />
                                     </div>
-                                    <MarkdownPreview value={currentContent} />
-                                  </>
+                                )}
+                            </>
                         )}
                     </div>
 

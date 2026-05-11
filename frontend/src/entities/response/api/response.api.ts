@@ -1,6 +1,6 @@
 import { $api } from '@/shared/api/client';
 import { ENDPOINTS } from '@/shared/api/endpoints';
-import { ReviewerResponse, ResponseSaveDto, ResponseApproveDto, ExportFormat } from '../model/types';
+import { ReviewerResponse, ResponseSaveDto, ResponseApproveDto, ExportFormat, AIResponse } from '../model/types';
 
 export const responseApi = {
     get: (projectId: number, reviewerId: number, commentId: number) =>
@@ -19,5 +19,10 @@ export const responseApi = {
             { responseType: 'blob' }
         );
         return response.data;
+    },
+
+    generate_template: async (projectId: number, reviewerId: number, commentId: number) => {
+        const response = await $api.post(ENDPOINTS.AI.RESPONSE_TEMPLATE(projectId, reviewerId, commentId));
+        return response;
     }
 };

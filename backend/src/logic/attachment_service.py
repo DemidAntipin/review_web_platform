@@ -7,6 +7,7 @@ from src.logic.document_converter import DocumentConverter
 from src.models.attachment import Attachment
 from src.core.storage.LocalStorage import LocalStorage
 from sqlalchemy.ext.asyncio import AsyncSession
+from slugify import slugify
 
 class AttachmentService:
     storage = LocalStorage 
@@ -14,12 +15,9 @@ class AttachmentService:
     @staticmethod
     def __prepare_safe_name(filename: str, task_id: int, attachment_id: int) -> str:
         name, ext = os.path.splitext(filename)
-        name = name.replace(" ", "_")
-        name = re.sub(r'[^\w\d\-_]', '', name)
-        name = name[:100]
-        clean_ext = re.sub(r'[^\w\d.]', '', ext).lower()
+        name = slugify(name)
         
-        return f"t{task_id}_a{attachment_id}_{name}{clean_ext}"
+        return f"t{task_id}_a{attachment_id}_{name}{ext}"
 
     @staticmethod
     async def upload_file(db: AsyncSession, task_id: int, file: UploadFile) -> Attachment:

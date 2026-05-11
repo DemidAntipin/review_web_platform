@@ -1,10 +1,9 @@
 import { create } from 'zustand';
-import { TaskPreview, TaskStatus, STATUS_MAP, PRIORITY_MAP, STATUS_TO_ID, transformTask, TaskSortField, Task, TYPE_TO_ID, TaskType, TaskPriority, PRIORITY_TO_ID } from '@/entities/task/model/types';
+import { TaskPreview, TaskStatus, STATUS_TO_ID, transformTask, TaskSortField, Task } from '@/entities/task/model/types';
 import { taskApi } from '@/entities/task/api/task.api';
 import { SortDirection } from '@/entities/project/model/types';
 import { reviewerApi } from '@/entities/reviewer/api/reviewer.api';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { useProjectMembers } from '@/features/project/lib/hooks/useProjectMembers';
 
 
 const applyFilters = (state: KanbanState): TaskPreview[] => {

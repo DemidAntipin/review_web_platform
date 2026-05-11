@@ -11,12 +11,13 @@ import { useParams } from 'react-router-dom';
 import { Dialog } from '@/shared/ui/dialog/Dialog';
 import { ExportForm } from '../ExportForm/ExportForm';
 import { ExportDTO } from '../../model/types';
+import { Loader } from '@/shared/ui/loader/Loader';
 
 export const ResponseActionButtons: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>(); 
     const project_id = Number(projectId);
 
-    const { currentResponse, saveResponse, approveResponse, exportResponse} = useResponseStore();
+    const { currentResponse, saveResponse, approveResponse, exportResponse, generateResponse, selectedReviewerId, selectedCommentId, isGenerating} = useResponseStore();
     const isDirty = useResponseStore(state => state.currentContent !== state.initialContent);
 
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -49,10 +50,10 @@ export const ResponseActionButtons: React.FC = () => {
         },
         { 
             show: permissions.canGenerate, 
-            label: 'Шаблон', 
-            icon: <FileText size={16} />, 
-            handler: () => {/* Логика генерации */},
-            disabled: !currentResponse
+            label: isGenerating ? 'Генерация...' : 'Шаблон',
+            icon: isGenerating ? <Loader noWrapper size={16} /> : <FileText size={16} />,
+            handler: () => generateResponse(project_id, selectedReviewerId!, selectedCommentId!),
+            disabled: !selectedCommentId || isGenerating
         },
         { 
             show: permissions.canApprove, 
@@ -68,7 +69,7 @@ export const ResponseActionButtons: React.FC = () => {
             handler: () => setIsExportModalOpen(true),
             disabled: false
         }
-    ], [permissions, currentResponse, isDirty, project_id, exportResponse]);
+    ], [permissions, currentResponse, isDirty, project_id, exportResponse, isGenerating]);
 
     const handleExportSubmit = async (data: ExportDTO) => {
         await exportResponse(project_id, data.format, data.reviewerId, data.commentId);

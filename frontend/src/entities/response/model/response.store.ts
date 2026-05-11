@@ -9,6 +9,7 @@ interface ResponseState {
     initialContent: string;
     currentContent: string;
     isLoading: boolean;
+    isGenerating: boolean;
 
     setReviewer: (id: number | null) => void;
     setComment: (id: number | null, text?: string) => void;
@@ -20,11 +21,15 @@ interface ResponseState {
     exportResponse: (projectId: number, format: ExportFormat, targetReviewerId:number, targetCommentId:number) => Promise<void>;
 
     applyExternalUpdate: (data: ReviewerResponse) => void;
+
+    generateResponse: (projectId: number, reviewerId: number, commentId: number) => void;
+
     getIsDirty: () => boolean;
 }
 
 export const useResponseStore = create<ResponseState>((set, get) => ({
     isLoading: false,
+    isGenerating: false,
     selectedReviewerId: null,
     selectedCommentId: null,
     currentResponse: null,
@@ -126,6 +131,20 @@ export const useResponseStore = create<ResponseState>((set, get) => ({
             initialContent: data.response_md,
             currentContent: isDirty ? state.currentContent : data.response_md
         });
+    },
+
+    generateResponse: async (projectId, reviewerId, commentId) => {
+        set ({isGenerating: true});
+        try {
+            const { data } = await responseApi.generate_template(projectId, reviewerId, commentId);
+            set({currentContent: data.response });
+        }
+        catch (error) {
+            console.error("Ошибка при генерации черновика:", error);
+        }
+        finally {
+            set({isGenerating: false})
+        }
     },
 
     getIsDirty: () => get().currentContent !== get().initialContent,
