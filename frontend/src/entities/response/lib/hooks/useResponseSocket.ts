@@ -6,11 +6,9 @@ export const useResponseSocket = (commentId: number | null) => {
     const applyExternalUpdate = useResponseStore((state) => state.applyExternalUpdate);
 
     useEffect(() => {
-        console.log(commentId);
         if (!commentId) return;
 
         const handleUpdate = (payload: any) => {
-            console.log(payload);
             applyExternalUpdate(payload);
         };
 
