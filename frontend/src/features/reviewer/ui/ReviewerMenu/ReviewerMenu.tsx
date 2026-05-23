@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MoreVertical, Edit2, Trash2, EyeOff, Eye } from 'lucide-react';
 import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
@@ -22,7 +22,12 @@ export const ReviewerMenu: React.FC<ReviewerMenuProps> = ({ reviewer, projectId 
     const [activeModal, setActiveModal] = useState<'edit' | 'delete' | null>(null);
     const { toggleReviewerHide, hiddenReviewerIds, updateReviewer, removeReviewer } = useReviewerStore();
     const { user: currentUser } = useAuthStore();
-    const { members } = useProjectMembers(projectId);
+    const { members, fetchMembers } = useProjectMembers(projectId);
+   
+    useEffect(() => {
+        if (!projectId) return;
+        fetchMembers();
+    }, [projectId, fetchMembers]);
     
     const isHidden = hiddenReviewerIds.has(reviewer.id);
 

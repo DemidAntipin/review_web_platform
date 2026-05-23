@@ -44,7 +44,7 @@ services:
     expose:
       - "5173"
     environment:
-      VITE_API_URL: https://localhost/api
+      VITE_API_URL: /api
     volumes:
       - ./frontend:/app
       - /app/node_modules

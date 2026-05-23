@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MoreVertical, Edit2, Trash2, EyeOff, Eye } from 'lucide-react';
 import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
@@ -24,7 +24,12 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({ project, isHidden, onT
     const { updateProject, deleteProject } = useProjectStore();
 
     const { user: currentUser } = useAuthStore();
-    const { members } = useProjectMembers(project.id);
+    const { members, fetchMembers } = useProjectMembers(project.id);
+       
+    useEffect(() => {
+        if (!project.id) return;
+        fetchMembers();
+    }, [project, fetchMembers]);
     
     const isPrivileged = useMemo(() => {
         const currentMember = members.find(m => m.user_id === currentUser?.id);

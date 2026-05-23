@@ -24,8 +24,7 @@
   border-radius: var(--border-radius);
   padding: var(--padding-inner);
   
-  width: fit-content;
-  min-width: 350px; 
+  width: fit-content; 
   max-width: 100%;
   
   height: auto;
@@ -70,7 +69,7 @@
 .iframePreview {
   width: 100%;
   height: 100%;
-  min-width: 60vw;
+  min-width: 40vw;
   border: none;
 }
 

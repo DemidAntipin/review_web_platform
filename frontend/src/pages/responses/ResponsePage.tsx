@@ -77,11 +77,6 @@ export const ResponsePage = () => {
 
     useResponseSocket(selectedCommentId);
 
-    useEffect(() => {
-        if (!project_id) return;
-        setTasks(project_id);
-    }, [project_id, setTasks]);
-
     const readyTasks = tasks.filter(task => 
         selectedCommentId && 
         task.comment_id === selectedCommentId && 
@@ -89,12 +84,18 @@ export const ResponsePage = () => {
     );
 
     const { user: currentUser } = useAuthStore();
-        const { members } = useProjectMembers(project_id);
+    const { members, fetchMembers } = useProjectMembers(project_id);
+
+    useEffect(() => {
+        if (!project_id) return;
+        setTasks(project_id);
+        fetchMembers();
+    }, [project_id, setTasks, fetchMembers]);
 
     const isPrivileged = useMemo(() => {
-            const currentMember = members.find(m => m.user_id === currentUser?.id);
-            return currentUser?.role === 'Админ' || ROLE_MAP[currentMember?.role as keyof typeof ROLE_MAP] === "Автор";
-        }, [members, currentUser]);
+        const currentMember = members.find(m => m.user_id === currentUser?.id);
+        return currentUser?.role === 'Админ' || ROLE_MAP[currentMember?.role as keyof typeof ROLE_MAP] === 'Автор';
+    }, [members, currentUser]);
 
     const handleSelectItem = async (taskId: number) => {
         setShowPreview(true);

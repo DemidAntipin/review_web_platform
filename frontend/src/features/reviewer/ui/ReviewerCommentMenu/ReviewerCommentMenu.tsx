@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MoreVertical, Edit2, Trash2, EyeOff, Eye } from 'lucide-react';
 import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { IconButton } from '@/shared/ui/icon_button/IconButton';
@@ -23,7 +23,12 @@ export const ReviewerCommentMenu: React.FC<ReviewerCommentMenuProps> = ({ commen
     const { toggleCommentHide, hiddenCommentIds, removeComment, reviewers, updateComment } = useReviewerStore();
 
     const { user: currentUser } = useAuthStore();
-    const { members } = useProjectMembers(projectId);
+    const { members, fetchMembers } = useProjectMembers(projectId);
+       
+    useEffect(() => {
+        if (!projectId) return;
+        fetchMembers();
+    }, [projectId, fetchMembers]);
     
     const isHidden = hiddenCommentIds.has(comment.id);
 
@@ -54,7 +59,7 @@ export const ReviewerCommentMenu: React.FC<ReviewerCommentMenuProps> = ({ commen
 
                     {isPrivileged && (
                         <>
-                            <button className={s.menuItem} onClick={() => setActiveModal('edit')}>
+                            <button className={s.menuItem} onClick={() => { setActiveModal('edit');}}>
                                 <Edit2 size={14} /> Редактировать
                             </button>
                             <button className={clsx(s.menuItem, s.danger)} onClick={() => setActiveModal('delete')}>

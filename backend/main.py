@@ -18,7 +18,3 @@ app.include_router(websocket_router.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(project_manager.router, prefix="/api")
 app.include_router(logger.router, prefix="/api")
-
-@app.get("/")
-def foo():
-    return {"message": "Hello World!"}

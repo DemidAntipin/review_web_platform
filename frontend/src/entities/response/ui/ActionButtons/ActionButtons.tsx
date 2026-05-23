@@ -69,7 +69,7 @@ export const ResponseActionButtons: React.FC = () => {
             handler: () => setIsExportModalOpen(true),
             disabled: false
         }
-    ], [permissions, currentResponse, isDirty, project_id, exportResponse, isGenerating]);
+    ], [permissions, currentResponse, isDirty, project_id, exportResponse, isGenerating, selectedCommentId]);
 
     const handleExportSubmit = async (data: ExportDTO) => {
         await exportResponse(project_id, data.format, data.reviewerId, data.commentId);

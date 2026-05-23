@@ -4,8 +4,8 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx", // Сообщает TS, что транспиляцию JSX делает React
-    "types": ["react", "react-dom"], // Явно указываем, какие типы загружать
+    "jsx": "react-jsx",
+    "types": ["react", "react-dom"],
     "strict": true,
     "baseUrl": ".",
     "paths": {

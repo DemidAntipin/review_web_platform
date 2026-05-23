@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { COMMENT_PRIORITY_MAP, COMMENT_TYPE_MAP, CreateCommentDto, Reviewer, ReviewerComment, transformComment, UpdateCommentDto } from '../model/types';
 import { reviewerApi } from '../api/reviewer.api';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { Section } from 'lucide-react';
 
 const applyFilters = (state: ReviewerState): Reviewer[] => {
     const { 
@@ -64,6 +65,7 @@ interface ReviewerState {
     addComment: (projectId: number, reviewerId: number, comment: CreateCommentDto) => Promise<void>;
     updateComment: (projectId: number, reviewerId: number, commentId: number, updates: UpdateCommentDto) => Promise<void>;
     removeComment: (projectId: number, reviewerId: number, commentId: number) => Promise<void>;
+    setDetailedComment: (projectId: number, reviewerId: number, commentId: number) => Promise<void>;
     setComment: (reviewerId: number, comment: ReviewerComment) => void;
     deleteComment: (reviewerId: number, commentId: number) => void;
     
@@ -234,7 +236,15 @@ export const useReviewerStore = create<ReviewerState>()(
                     return { ...nextState, filteredReviewers: applyFilters(nextState) };
                 });
             },
-
+            setDetailedComment: async (projectId, reviewerId, commentId) => {
+                try {
+                    const { data } = await reviewerApi.getComment(projectId, reviewerId, commentId);
+                    get().setComment(reviewerId, data)
+                } catch (e) {
+                    console.error("Failed to delete comment:", e);
+                    throw e;
+                }
+            },
             deleteComment: (reviewerId, commentId) => {
                 set((state) => {
                     const nextReviewers = state.reviewers.map(r => 

@@ -25,4 +25,7 @@ export const reviewerApi = {
 
     decompose: (projectId: number, reviewerId: number, comment_id: number, tasks: Partial<Task>[]) =>
         $api.post<Task[]>(ENDPOINTS.REVIEWERS.COMMENTS.DECOMPOSE(projectId, reviewerId, comment_id), tasks),
+
+    getComment: (projectId: number, reviewerId: number, comment_id: number) =>
+        $api.get<ReviewerComment>(ENDPOINTS.REVIEWERS.COMMENTS.BY_ID(projectId, reviewerId, comment_id)),
 };

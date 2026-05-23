@@ -77,16 +77,16 @@ export const ReviewerCommentForm = ({ reviewer, initialData, onSubmit, onClose }
                         className={s.editor}
                         required
                     />
-                </div>
 
-                <footer className={s.footer}>
-                    <Button variant="ghost" type="button" onClick={onClose}>
-                        Отмена
-                    </Button>
-                    <Button variant="primary" type="submit" disabled={!content.trim()}>
-                        Добавить
-                    </Button>
-                </footer>
+                    <footer className={s.footer}>
+                        <Button variant="ghost" type="button" onClick={onClose}>
+                            Отмена
+                        </Button>
+                        <Button variant="primary" type="submit" disabled={!content.trim()}>
+                            { initialData ? "Сохранить" : 'Добавить' }
+                        </Button>
+                    </footer>
+                </div>
             </form>
         </div>
     );

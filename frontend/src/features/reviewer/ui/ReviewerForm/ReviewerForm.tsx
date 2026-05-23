@@ -57,16 +57,16 @@ export const ReviewerForm = ({
                         disabled={isLoading}
                         className={s.editor}
                     />
-                </div>
                 
-                <footer className={s.footer}>
-                    <Button variant="secondary" type="button" onClick={onCancel} disabled={isLoading}>
-                        Отмена
-                    </Button>
-                    <Button variant="primary" type="submit" disabled={!name.trim() || isLoading}>
-                        {isLoading ? 'Загрузка...' : submitText}
-                    </Button>
-                </footer>
+                    <footer className={s.footer}>
+                        <Button variant="secondary" type="button" onClick={onCancel} disabled={isLoading}>
+                            Отмена
+                        </Button>
+                        <Button variant="primary" type="submit" disabled={!name.trim() || isLoading}>
+                            {isLoading ? 'Загрузка...' : submitText}
+                        </Button>
+                    </footer>
+                </div>
             </form>
         </div>
     );
