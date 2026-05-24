@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from src.core.types import ID, UsernameStr, MarkdownStr
-from src.dtos.reviewer.reviewer_comment import CommentShortDTO
+from src.dtos.reviewer.reviewer_comment import CommentDetailDTO
 
 class ReviewerBaseDTO(BaseModel):
     name: UsernameStr
@@ -20,7 +20,7 @@ class ReviewerDTO(ReviewerBaseDTO):
     model_config = ConfigDict(from_attributes=True)
 
 class ReviewerCommentsDTO(ReviewerDTO):
-    comments: List[CommentShortDTO] = []
+    comments: List[CommentDetailDTO] = []
 
 class ProjectReviewersPageDTO(BaseModel):
     reviewers: List[ReviewerCommentsDTO]

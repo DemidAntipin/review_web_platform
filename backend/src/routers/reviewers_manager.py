@@ -7,7 +7,7 @@ from src.core.events.event_dispatcher import EventDispatcher
 from src.core.types import ID
 from src.dtos.events import ReviewerAddedEvent, ReviewerRemovedEvent, ReviewerUpdatedEvent
 from src.dtos.reviewer.reviewer import ProjectReviewersPageDTO, ReviewerCommentsDTO, ReviewerCreateDTO, ReviewerDTO
-from src.dtos.reviewer.reviewer_comment import CommentShortDTO
+from src.dtos.reviewer.reviewer_comment import CommentDetailDTO
 from src.models.comment.comment import Comment
 from src.models.project.project import Project
 from src.models.reviewer import Reviewer
@@ -101,7 +101,7 @@ async def get_reviewers_board(project_id: ID, db: DBSession, current_user: Proje
             reviewers[rev_id] = ReviewerCommentsDTO.model_validate({**ReviewerDTO.model_validate(r.Reviewer).model_dump()})
             reviewers[rev_id].comments = []
         if r.Comment:
-            comment_dto = CommentShortDTO.model_validate(r.Comment)
+            comment_dto = CommentDetailDTO.model_validate(r.Comment)
             comment_dto.tasks_count = r.tasks_count
             comment_dto.completed_tasks_count = r.completed_tasks_count
             reviewers[rev_id].comments.append(comment_dto)

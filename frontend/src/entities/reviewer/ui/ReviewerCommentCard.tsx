@@ -9,6 +9,7 @@ import { Task } from '@/entities/task/model/types';
 import { DecompositionForm } from '@/features/reviewer/ui/DecompositionForm/DecompositionForm';
 import { useKanbanStore } from '@/features/kanban-dnd/model/kanban.store';
 import { useParams } from 'react-router-dom';
+import { getCommentPreview } from '@/shared/lib/utils/text';
 
 interface CommentProps {
     comment: ReviewerComment;
@@ -54,7 +55,7 @@ export const ReviewerCommentCard = ({ comment, actionMenu }: CommentProps) => {
                 </div>
             </div>
             <div className={s.commentContent}>
-                {comment.content_md}
+                {getCommentPreview(comment.content_md, 120)}
             </div>
             
             <div className={s.tagWrapper}>

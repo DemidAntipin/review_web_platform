@@ -1,10 +1,10 @@
 import { $api } from '@/shared/api/client';
 import { ENDPOINTS } from '@/shared/api/endpoints';
-import { ReviewerResponse, ResponseSaveDto, ResponseApproveDto, ExportFormat, AIResponse } from '../model/types';
+import { ReviewerResponse, ResponseSaveDto, ResponseApproveDto, ExportFormat } from '../model/types';
 
 export const responseApi = {
     get: (projectId: number, reviewerId: number, commentId: number) =>
-        $api.get<ReviewerResponse>(ENDPOINTS.RESPONSES(projectId, reviewerId, commentId)),
+        $api.get<ReviewerResponse>(ENDPOINTS.RESPONSES(projectId, reviewerId, commentId), { allowedErrors: [404] }),
 
     save: (projectId: number, reviewerId: number, commentId: number, data: ResponseSaveDto) =>
         $api.post<ReviewerResponse>(ENDPOINTS.RESPONSES(projectId, reviewerId, commentId), data),

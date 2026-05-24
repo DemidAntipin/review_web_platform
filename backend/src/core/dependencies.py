@@ -19,7 +19,7 @@ DBSession = Annotated[AsyncSession, Depends(get_db_session)]
 async def get_current_user(db: DBSession, token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Не удалось валидировать пользователя",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -66,7 +66,7 @@ def check_user_permission(required_roles: List[UserRole]) -> User:
         if results.role not in required_roles:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN, 
-                    detail=f"Недостаточно прав для выполнения запроса. Требуются: {', '.join(required_roles)}. Ваша роль: {results.role}"
+                    detail=f"Недостаточно прав для выполнения запроса. Требуются: {', '.join(r.name for r in required_roles)}. Ваша роль: {results.role.name}"
                 )
         return UserMember(user=user, role=results.role)
     return check_permission

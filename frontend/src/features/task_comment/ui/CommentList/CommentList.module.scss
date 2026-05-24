@@ -25,6 +25,7 @@
 
   &.left {
     align-self: flex-start;
+    align-items: flex-start;
     .bubble {
       background: var(--border-color);
       border-bottom-left-radius: 4px;
@@ -37,7 +38,7 @@
     align-items: flex-end;
     .bubble {
       background: var(--accent-color);
-      color: #fff;
+      color: var(--text-on-accent);
       border-bottom-right-radius: 4px;
     }
   }
@@ -48,7 +49,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 2px;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
 
   .name {
     font-weight: 600;
@@ -57,11 +58,12 @@
 
   .role {
     padding: 1px 6px;
-    background: var(--border-color);
+    background: var(--secondary-bg);
     border-radius: 10px;
-    color: var(--text-tertiary);
-    font-size: 0.65rem;
+    color: var(--text-primary);
+    font-size: 0.75rem;
     text-transform: lowercase;
+    letter-spacing: 0.02em;
   }
 }
 

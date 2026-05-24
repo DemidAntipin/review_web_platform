@@ -5,7 +5,7 @@ from fastapi import Response, UploadFile
 from fastapi.responses import FileResponse
 from src.logic.document_converter import DocumentConverter
 from src.models.attachment import Attachment
-from src.core.storage.LocalStorage import LocalStorage
+from src.core.storage.local_storage import LocalStorage
 from sqlalchemy.ext.asyncio import AsyncSession
 from slugify import slugify
 

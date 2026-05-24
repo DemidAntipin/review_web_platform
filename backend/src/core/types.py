@@ -19,6 +19,4 @@ ActionTypeStr = Annotated[str, Field(pattern=r"^[A-Z_]+$")]
 
 MarkdownStr = Annotated[str, Field(max_length=20000), AfterValidator(validate_string)]
 
-MarkdownShortStr = Annotated[str, Field(max_length=20000), AfterValidator(validate_string)]
-
 UTCDatetime = Annotated[datetime, BeforeValidator(validate_datetime)]

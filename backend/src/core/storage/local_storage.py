@@ -1,7 +1,7 @@
 import os
 import shutil
 from fastapi import UploadFile
-from src.core.storage.BaseStorage import BaseStorage
+from src.core.storage.base_storage import BaseStorage
 
 class LocalStorage(BaseStorage):
     UPLOAD_DIR = "uploads"

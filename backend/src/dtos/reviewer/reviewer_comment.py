@@ -3,7 +3,7 @@ from typing import Optional
 from src.models.comment.comment_priority import CommentPriority
 from src.models.comment.comment_status import CommentStatus
 from src.models.comment.comment_type import CommentType
-from src.core.types import ID, MarkdownStr, MarkdownShortStr, UTCDatetime
+from src.core.types import ID, MarkdownStr, UTCDatetime
 
 class CommentBaseDTO(BaseModel):
     priority: CommentPriority
@@ -26,11 +26,6 @@ class CommentDTO(CommentBaseDTO):
     created_at: UTCDatetime
 
     model_config = ConfigDict(from_attributes=True)
-
-class CommentShortDTO(CommentDTO):
-    content_md: MarkdownShortStr
-    tasks_count: int = 0
-    completed_tasks_count: int = 0
 
 class CommentDetailDTO(CommentDTO):
     content_md: MarkdownStr

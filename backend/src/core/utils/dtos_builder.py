@@ -5,7 +5,7 @@ from src.dtos.project.project import ProjectDTO, ProjectPreviewDTO
 from src.dtos.project.project_member import ProjectMemberPreviewDTO
 from src.dtos.response.response import ResponseDTO
 from src.dtos.reviewer.reviewer import ReviewerDTO
-from src.dtos.reviewer.reviewer_comment import CommentDTO, CommentShortDTO
+from src.dtos.reviewer.reviewer_comment import CommentDTO, CommentDetailDTO
 from src.models.attachment import Attachment
 from src.models.project_member import ProjectMember
 from src.models.response import Response
@@ -113,7 +113,7 @@ async def get_attachment_dto(attachment_id: ID) -> AttachmentDTO:
         res = await db.get(Attachment, attachment_id)
         return AttachmentDTO.model_validate(res) if res else None
 
-async def get_comment_preview_dto(comment_id: ID) -> CommentShortDTO:
+async def get_comment_preview_dto(comment_id: ID) -> CommentDetailDTO:
     task_count_sub = (
         select(func.count(Task.id))
         .where(Task.comment_id == comment_id, Task.deleted_at == None)
@@ -139,7 +139,7 @@ async def get_comment_preview_dto(comment_id: ID) -> CommentShortDTO:
     if not row:
         return None
 
-    return CommentShortDTO.model_validate({
+    return CommentDetailDTO.model_validate({
                 **CommentDTO.model_validate(row.Comment).model_dump(),
                 "tasks_count": row.tasks_count,
                 "completed_tasks_count": row.completed_tasks_count
