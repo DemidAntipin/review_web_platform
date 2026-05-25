@@ -5,7 +5,7 @@ from typing import List
 from datetime import datetime
 from src.dtos.events import TaskUpdatedEvent, TaskDeletedEvent
 from src.core.events.event_dispatcher import EventDispatcher
-from src.core.dependencies import DBSession, ProjectAuthor, ProjectMemberAny
+from src.core.dependencies import DBSession, ProjectAuthor, ProjectCoauthor, ProjectMemberAny
 from src.core.types import ID
 from src.models.comment.comment import Comment
 from src.models.task.task import Task
@@ -89,7 +89,7 @@ async def get_task_details(project_id: ID, task_id: ID, db: DBSession, current_u
     return TaskDetailDTO.model_validate(task)
 
 @router.patch("/{task_id}", response_model=TaskDTO)
-async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSession, current_user: ProjectMemberAny, background_tasks: BackgroundTasks):
+async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSession, current_user: ProjectCoauthor | ProjectAuthor, background_tasks: BackgroundTasks):
     query = (
         select(Task)
         .join(Comment, Comment.id == Task.comment_id).join(Reviewer, Reviewer.id == Comment.reviewer_id)
@@ -103,15 +103,6 @@ async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSe
             raise HTTPException(403, detail="Недостаточно прав. Вы не являетесь исполнителем задачи.")
         if set(data.model_dump(exclude_unset=True).keys()) > {"status"}:
             raise HTTPException(403, detail="Исполнитель может менять только статус")
-        allowed = {TaskStatus.todo, TaskStatus.in_progress, TaskStatus.completed}
-        if data.status and data.status not in allowed:
-            raise HTTPException(403, f"Недопустимый статус для исполнителя")
-    elif current_user.role == UserRole.editor:
-        if set(data.model_dump(exclude_unset=True).keys()) > {"status"}:
-            raise HTTPException(403, detail="Редактор может менять только статус")
-        allowed = {TaskStatus.completed, TaskStatus.ready_for_review, TaskStatus.in_progress}
-        if data.status and data.status not in allowed:
-            raise HTTPException(403, "Недопустимый статус для редактора")
     task.update(data)
 
     await db.commit()
