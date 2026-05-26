@@ -1,0 +1,61 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: var(--background-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.filterGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    gap: 12px;
+    align-items: flex-start;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+.filterGroup {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.dateSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.groupLabel {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    height: 16px;
+}
+
+.dateInputs {
+    display: flex;
+    gap: 8px;
+    
+    :global(.field-container) {
+        margin-bottom: 0;
+    }
+}
+
+[data-theme='dark'] .dateInputs {
+    color-scheme: dark;
+}
+
+.submitBtnWrapper {
+    padding-top: 28px; 
+    
+    @media (max-width: 768px) {
+        padding-top: 0;
+    }
+}
