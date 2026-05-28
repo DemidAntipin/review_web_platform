@@ -78,9 +78,18 @@
 
 3. Запустите скрипт инициализации от имени суперпользователя (этот скрипт автоматизирует все шаги, включая сборку Docker-образов и запуск контейнеров):
     
+    Linux
+
     ```bash
-    chmod +x setup.sh
-    sudo ./setup.sh
+    chmod +x setup-linux.sh
+    sudo ./setup-linux.sh
+    ```
+
+    MacOS
+
+    ```
+    chmod +x setup-macos.sh
+    ./setup-macos.sh
     ```
 
 4. Приложение будет доступно по протоколу HTTPS на порту конфигурации Nginx.
