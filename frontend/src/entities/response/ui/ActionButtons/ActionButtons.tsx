@@ -17,8 +17,13 @@ export const ResponseActionButtons: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>(); 
     const project_id = Number(projectId);
 
-    const { currentResponse, saveResponse, approveResponse, exportResponse, generateResponse, selectedReviewerId, selectedCommentId, isGenerating} = useResponseStore();
+    const currentResponse = useResponseStore(state => state.currentResponse);
+    const selectedReviewerId = useResponseStore(state => state.selectedReviewerId);
+    const selectedCommentId = useResponseStore(state => state.selectedCommentId);
+    const isGenerating = useResponseStore(state => state.isGenerating);
     const isDirty = useResponseStore(state => state.currentContent !== state.initialContent);
+
+    const { saveResponse, approveResponse, exportResponse, generateResponse } = useResponseStore();
 
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 

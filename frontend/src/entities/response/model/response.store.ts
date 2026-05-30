@@ -70,8 +70,13 @@ export const useResponseStore = create<ResponseState>((set, get) => ({
     saveResponse: async (projectId) => {
         const { selectedReviewerId, selectedCommentId, currentContent, getIsDirty } = get();
         if (!getIsDirty() || !selectedReviewerId || !selectedCommentId) return;
-        await responseApi.save(projectId, selectedReviewerId, selectedCommentId, { 
+        const { data } = await responseApi.save(projectId, selectedReviewerId, selectedCommentId, { 
             response_md: currentContent 
+        });
+        set({
+            currentResponse: data,
+            initialContent: data.response_md,
+            currentContent: data.response_md
         });
     },
 
