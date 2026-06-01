@@ -14,17 +14,20 @@ class WebSocketService {
         
         const url = `${protocol}//${host}/api/ws/${userId}?token=${token}`;
 
-        if (this.socket?.url === url && this.socket.readyState === WebSocket.OPEN) {
+        if (this.socket?.url === url && 
+            (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
             return;
         }
 
         if (this.socket) {
+            this.socket.onclose = null;
             this.socket.close();
         }
 
-        this.socket = new WebSocket(url);
+        const ws = new WebSocket(url);
+        this.socket = ws;
 
-        this.socket.onmessage = (event) => {
+        ws.onmessage = (event) => {
             try {
                 const { event_type, project_id, payload } = JSON.parse(event.data);
                 console.log(event_type, project_id, payload);
@@ -40,9 +43,11 @@ class WebSocketService {
             }
         };
 
-        this.socket.onclose = () => {
-            this.socket = null;
-            this.reconnectTimer = setTimeout(() => this.connect(userId, token), this.RECONNECT_INTERVAL);
+        ws.onclose = () => {
+            if (this.socket === ws) {
+                this.socket = null;
+                this.reconnectTimer = setTimeout(() => this.connect(userId, token), this.RECONNECT_INTERVAL);
+            }
         };
     }
 
