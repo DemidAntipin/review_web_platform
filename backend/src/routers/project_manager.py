@@ -27,16 +27,18 @@ async def list_projects(db: DBSession, current_user: CurrentUser):
     query = (
         select(
             Project,
-            coalesce(func.count(distinct(Task.id)), 1).label("total_tasks_count"),
+            coalesce(func.count(distinct(Task.id)), 0).label("total_tasks_count"),
             coalesce(func.count(distinct(Task.id)).filter(Task.completed_at.is_not(None)), 0).label("completed_tasks_count")
         )
         .outerjoin(Reviewer, Reviewer.project_id == Project.id)
         .outerjoin(Comment, Comment.reviewer_id == Reviewer.id)
-        .outerjoin(Task, Task.comment_id == Comment.id)
-        .join(ProjectMember, ProjectMember.project_id == Project.id)
-        .where(ProjectMember.user_id == current_user.id, Project.deleted_at == None, Task.deleted_at==None)
-        .group_by(Project.id)
+        .outerjoin(Task, (Task.comment_id == Comment.id) & (Task.deleted_at == None))
     )
+    filters = [Project.deleted_at == None]
+    if current_user.role != UserRole.admin:
+        query = query.join(ProjectMember, ProjectMember.project_id == Project.id)
+        filters.append(ProjectMember.user_id == current_user.id)
+    query = query.where(*filters).group_by(Project.id)
     response = await db.execute(query)
     results = response.all()
     projects=[]

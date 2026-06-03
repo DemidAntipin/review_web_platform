@@ -89,7 +89,7 @@ async def get_task_details(project_id: ID, task_id: ID, db: DBSession, current_u
     return TaskDetailDTO.model_validate(task)
 
 @router.patch("/{task_id}", response_model=TaskDTO)
-async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSession, current_user: ProjectCoauthor, background_tasks: BackgroundTasks):
+async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSession, current_user: ProjectMemberAny, background_tasks: BackgroundTasks):
     query = (
         select(Task)
         .join(Comment, Comment.id == Task.comment_id).join(Reviewer, Reviewer.id == Comment.reviewer_id)
@@ -98,11 +98,9 @@ async def update_task(project_id: ID, task_id: ID, data: TaskUpdateDTO, db: DBSe
     task = result.scalar_one_or_none()
     if not task:
         raise HTTPException(404, detail="Задача не найдена")
-    if current_user.role == UserRole.coauthor:
-        if task.assignee_id != current_user.user.id:
-            raise HTTPException(403, detail="Недостаточно прав. Вы не являетесь исполнителем задачи.")
+    if current_user.role == (UserRole.coauthor | UserRole.editor):
         if set(data.model_dump(exclude_unset=True).keys()) > {"status"}:
-            raise HTTPException(403, detail="Исполнитель может менять только статус")
+            raise HTTPException(403, detail="Ваша роль позволяет менять только статус")
     task.update(data)
 
     await db.commit()

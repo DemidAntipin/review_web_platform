@@ -8,7 +8,8 @@ import { Dropdown } from '@/shared/ui/dropdown/Dropdown';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/shared/ui/button/Button';
 import { AttachmentList } from '@/features/attachments/ui/AttachmentList';
-import { useRef } from 'react';
+import { useRef, isValidElement, cloneElement } from 'react';
+import { TaskMenuHandle } from './TaskMenu/TaskMenu';
 
 interface TaskCardProps { 
     task: TaskPreview;
@@ -26,12 +27,13 @@ const TYPE_CONFIG: Record<TaskType, { icon: any, label: string }> = {
 
 export const TaskCard = ({ task, actionMenu, onClick }: TaskCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<TaskMenuHandle>(null);
     const { projectId } = useParams<{ projectId: string }>(); 
     const project_id = Number(projectId);
     const typeInfo = TYPE_CONFIG[task.type as TaskType] || { icon: FileText, label: task.type };
     const { icon: TypeIcon, label: typeLabel } = typeInfo;
     return (
-        <div className={s.card} ref={cardRef} onClick={onClick}>
+        <div className={s.card} ref={cardRef} onClick={onClick} onDoubleClick={() => menuRef.current?.openEdit()}>
             <div className={s.cardHeader}>
                 <div className={s.badges}>
                     <span className={s.labelBadge}>R{task.reviewer_id}-C{task.comment_id}</span>
@@ -39,8 +41,11 @@ export const TaskCard = ({ task, actionMenu, onClick }: TaskCardProps) => {
                         {task.priority}
                     </span>
                 </div>
-                <div onClick={e => e.stopPropagation()}>
-                    {actionMenu}
+                <div onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
+                    {isValidElement(actionMenu) 
+                        ? cloneElement(actionMenu, { ref: menuRef } as any)
+                        : actionMenu
+                    }
                 </div>
             </div>
             
@@ -52,7 +57,7 @@ export const TaskCard = ({ task, actionMenu, onClick }: TaskCardProps) => {
 
             <div className={s.cardFooter}>
                 <span className={s.username}>{task.assignee || "Нет исполнителя"}</span>
-                <div className={s.stats} onClick={(e) => e.stopPropagation()}>
+                <div className={s.stats} onClick={(e) => e.stopPropagation()} onDoubleClick={(e) => e.stopPropagation()}>
                     <Dropdown 
                         position="bottom"
                         containerRef={cardRef}

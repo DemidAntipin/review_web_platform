@@ -43,7 +43,7 @@ export const AppRouter = createBrowserRouter([
                     {
                         path: ':projectId',
                         children: [
-                            { index: true, element: <Navigate to="kanban" replace /> },
+                            { index: true, element: <Navigate to="reviewers" replace /> },
                             { path: 'kanban', element: <KanbanPage /> },
                             { path: 'reviewers', element: <ReviewersPage />},
                             { path: 'responses', element: <ResponsePage />},

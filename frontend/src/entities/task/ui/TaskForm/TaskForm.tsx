@@ -12,15 +12,17 @@ import { UserSearchSelect } from "@/features/project/ui/TeamMenu/MemberForm/User
 import { useParams } from "react-router-dom";
 import { useKanbanStore } from "@/features/kanban-dnd/model/kanban.store";
 import { Loader } from "@/shared/ui/loader/Loader";
+import clsx from "clsx";
 
 interface TaskFormProps {
     reviewerComment: ReviewerComment;
     initialData?: Partial<Task> & { assignee?: string };
     onSubmit: (data: Partial<Task>) => void;
     onCancel: () => void;
+    readOnly?: boolean;
 }
 
-export const TaskForm = ({ reviewerComment, initialData, onSubmit, onCancel }: TaskFormProps) => {
+export const TaskForm = ({ reviewerComment, initialData, onSubmit, onCancel, readOnly }: TaskFormProps) => {
     const { projectId } = useParams<{ projectId: string }>();
     const fetchTaskDetails = useKanbanStore(state => state.fetchTaskDetails);
     const [formState, setFormState] = useState({
@@ -55,6 +57,7 @@ export const TaskForm = ({ reviewerComment, initialData, onSubmit, onCancel }: T
     const { searchTerm, setSearchTerm, suggestions } = useUserSearch(false);
 
     const updateField = (name: string, value: any) => {
+        if (readOnly) return;
         setFormState(prev => ({ ...prev, [name]: value }));
     };
 
@@ -75,42 +78,55 @@ export const TaskForm = ({ reviewerComment, initialData, onSubmit, onCancel }: T
                     onMouseDown={(e) => e.stopPropagation()} 
                     onPointerDown={(e) => e.stopPropagation()}>
                 <div className={s.body}>
-                    <Field label="Название" required
+                    <Field label="Название" required disabled={readOnly}
                         value={formState.title} 
                         onChange={e => updateField('title', e.target.value)} 
                         placeholder="Введите название задачи" />
 
                     <Field label="Тип" required>
-                        <select className={s.select} value={formState.type} onChange={e => updateField('type', Number(e.target.value))}>
+                        <select className={s.select} value={formState.type} onChange={e => updateField('type', Number(e.target.value))} disabled={readOnly}>
                             {Object.entries(TYPE_MAP).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                         </select>
                     </Field>
 
-                    <UserSearchSelect
-                        label="Исполнитель"
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                        suggestions={suggestions}
-                        onSelect={u => { updateField('assignee_id', Number(u.id)); setSearchTerm(u.username); }}
-                        placeholder="Введите username исполнителя"
-                    />
+                    {readOnly ? (
+                        <Field label="Исполнитель" value={initialData?.assignee || "Нет исполнителя"} disabled={readOnly} />
+                    ) : (
+                        <UserSearchSelect
+                            label="Исполнитель"
+                            value={searchTerm}
+                            onChange={setSearchTerm}
+                            suggestions={suggestions}
+                            onSelect={u => { updateField('assignee_id', Number(u.id)); setSearchTerm(u.username); }}
+                            placeholder="Введите username исполнителя"
+                        />
+                    )}
 
-                    <MarkdownEditor
-                        label="Описание задачи"
-                        value={formState.description_md}
-                        onChange={e => updateField('description_md', e.target.value)}
-                        placeholder="Опишите задачу в формате Markdown + вставки LaTeX"
-                        required
-                        className={s.editor}
-                    />
+
+                    {readOnly ? (
+                        <MarkdownPreview value={formState.description_md} />
+                    ) : (
+                        <MarkdownEditor
+                            label="Описание задачи"
+                            value={formState.description_md}
+                            onChange={e => updateField('description_md', e.target.value)}
+                            placeholder="Опишите задачу в формате Markdown + вставки LaTeX"
+                            required
+                            className={s.editor}
+                        />
+                    )}
                 </div>
 
-                <div className={s.formFooter}>
-                    <Button variant="secondary" type="button" onClick={onCancel}>Отмена</Button>
-                    <Button variant="primary" type="submit" disabled={!formState.title.trim()}>
-                        {initialData ? 'Обновить' : 'Добавить'}
-                    </Button>
-                </div>
+                <div className={clsx(s.formFooter)}>
+                    { !readOnly &&
+                        <>
+                            <Button variant="secondary" type="button" onClick={onCancel}>Отмена</Button>
+                            <Button variant="primary" type="submit" disabled={!formState.title.trim()}>
+                                {initialData ? 'Обновить' : 'Добавить'}
+                            </Button>
+                        </>
+                    }
+                    </div>
             </form>
         </div>
     );

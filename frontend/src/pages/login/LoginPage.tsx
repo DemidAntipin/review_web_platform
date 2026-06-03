@@ -11,7 +11,7 @@ export const LoginPage = () => {
     const token = useAuthStore((state) => state.token);
 
     if (token) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/projects" replace />;
     }
 
     return (

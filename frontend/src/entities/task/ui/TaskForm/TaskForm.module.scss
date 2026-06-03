@@ -8,7 +8,7 @@
     overflow: visible;
     max-height: 90vh;
     height: 100%;
-    min-width: 0;
+    min-width: 320px;
 }
 
 .form {
@@ -70,4 +70,8 @@
     gap: 12px;
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
+}
+
+.readOnly {
+    display: none;
 }

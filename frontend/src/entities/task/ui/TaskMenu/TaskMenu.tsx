@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, forwardRef, useImperativeHandle } from "react";
 import { useKanbanStore } from "@/features/kanban-dnd/model/kanban.store";
 import { PRIORITY_TO_ID, STATUS_TO_ID, TaskPreview, TaskPriority, TaskStatus, TaskType, TYPE_TO_ID } from "@/entities/task/model/types";
 import { Dropdown } from "@/shared/ui/dropdown/Dropdown";
@@ -7,7 +7,6 @@ import { Edit2, Eye, EyeOff, MoreVertical, Trash2 } from "lucide-react";
 import { Dialog } from "@/shared/ui/dialog/Dialog";
 import { TaskForm } from "../TaskForm/TaskForm";
 import { Button } from "@/shared/ui/button/Button";
-import { ReviewerComment } from "@/entities/reviewer/model/types";
 import clsx from "clsx";
 import s from './TaskMenu.module.scss';
 import { useReviewerStore } from "@/entities/reviewer/model/reviewer.store";
@@ -16,13 +15,16 @@ import { useProjectMembers } from "@/features/project/lib/hooks/useProjectMember
 import { ROLE_MAP } from "@/shared/config/roles";
 import { useParams } from "react-router-dom";
 import { taskApi } from "../../api/task.api";
-import { ENDPOINTS } from "@/shared/api/endpoints";
 
 interface TaskMenuProps {
     task: TaskPreview;
 }
 
-export const TaskMenu: React.FC<TaskMenuProps> = ({ task }) => {
+export interface TaskMenuHandle {
+    openEdit: () => void;
+}
+
+export const TaskMenu = forwardRef<TaskMenuHandle, TaskMenuProps>(({ task }, ref) => {
     const { projectId } = useParams<{ projectId: string }>();
     const project_id = Number(projectId);
     const [activeModal, setActiveModal] = useState<'edit' | 'delete' | null>(null);
@@ -72,6 +74,12 @@ export const TaskMenu: React.FC<TaskMenuProps> = ({ task }) => {
         setActiveModal(null);
     };
 
+    useImperativeHandle(ref, () => ({
+        openEdit: () => {
+            setActiveModal('edit');
+        }
+    }));
+
     return (
         <div onClick={e => e.stopPropagation()}>
             <Dropdown trigger={
@@ -101,13 +109,14 @@ export const TaskMenu: React.FC<TaskMenuProps> = ({ task }) => {
             <Dialog 
                 isOpen={activeModal === 'edit'} 
                 onClose={() => setActiveModal(null)} 
-                title="Редактировать задачу"
+                title={isPrivileged ? "Редактировать задачу" : "Детали задачи"}
             >
                 <TaskForm 
                     initialData={taskInitialData}
                     reviewerComment={reviewerComment!} 
                     onSubmit={handleUpdate}
                     onCancel={() => setActiveModal(null)}
+                    readOnly={!isPrivileged}
                 />
             </Dialog>
 
@@ -130,4 +139,6 @@ export const TaskMenu: React.FC<TaskMenuProps> = ({ task }) => {
             </Dialog>
         </div>
     );
-};
+});
+
+TaskMenu.displayName = 'TaskMenu';
